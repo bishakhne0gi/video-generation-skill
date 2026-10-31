@@ -1,0 +1,220 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --paper:#F4F1EA; --paper2:#E7E1D4; --sheet:#FBF9F4;
+  --ink:#14110E; --ink2:#5A5245; --navy:#16233B;
+  --yellow:#FFEB00; --pen:#DC3220; --pentype:#B32414; --rule:#B8B0A0;
+  background:var(--paper); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* the coloured field travels WITH the stage, so a navy or yellow frame reads as a
+   card sliding over the page rather than as the ground changing colour. */
+.field{position:absolute;inset:0}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:88%;letter-spacing:-.045em;line-height:.90;color:var(--ink)}
+.deck{font-weight:500;line-height:1.26;color:var(--ink2)}
+.quote{font-family:"Serif",Georgia,serif;line-height:1.16;color:var(--ink)}
+.ital{font-family:"Serif",Georgia,serif;font-style:italic}
+.mono{font-family:"JBMono",monospace;color:var(--ink)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink2);font-size:21px}
+.redtype{color:var(--pentype)}
+.onnavy{color:var(--sheet)}
+.onnavy .tag,.onnavy .deck{color:#A9B6C9}
+
+/* ---- PAPER: a sheet is defined by its shadow and its edge, never by a stripe ---- */
+.sheet{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.16), 0 10px 24px rgba(20,17,14,.12)}
+.card{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.14), 0 7px 18px rgba(20,17,14,.10)}
+.hair{position:absolute;background:var(--rule);height:1px}
+.rule2{position:absolute;background:var(--ink);height:3px}
+
+/* ---- THE MARKER: sits BEHIND its phrase, skewed, origin left ---- */
+.mark{position:absolute;background:var(--yellow);z-index:0;transform-origin:0% 50%}
+.marknavy{background:var(--yellow)}
+.phrase{position:relative;z-index:1}
+
+/* ---- THE PEN: strokes only. Never a glyph, never on navy. ---- */
+.pen{position:absolute;pointer-events:none;overflow:visible}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--pen);stroke-linecap:round;
+  stroke-linejoin:round}
+.penY path,.penY line,.penY polyline{stroke:var(--yellow)}
+.penD path,.penD line,.penD polyline{stroke:var(--pentype)}
+.penI path,.penI line,.penI polyline{stroke:var(--ink)}
+
+  </style>
+
+  <div id="root" data-composition-id="03-shelf" data-start="0" data-width="1920" data-height="1080">
+<div class="field" style="background:var(--paper)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:108px">03 · the shelf</div>
+      <div id="s-rule" class="rule2" style="left:118px;top:146px;width:104px;transform-origin:0% 50%;"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:114px;top:172px;width:1240px;font-size:88px">NINE VERBS.<br>SIXTEEN YEARS.</div>
+      <div id="s-deck" class="deck" style="position:absolute;left:118px;top:380px;width:860px;font-size:32px">Every method a server is expected to understand, at the year its RFC landed.</div>
+
+      <div class="tag" style="position:absolute;left:130px;top:456px;font-size:18px">1996 – 1997 · RFC 1945, RFC 2068</div>
+      
+      <div id="f3-c0" class="card" style="left:128px;top:512px;width:160px;height:84px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:30px;font-weight:700;letter-spacing:.02em;color:var(--ink)">GET</span>
+      </div>
+      <div id="f3-c1" class="card" style="left:301px;top:512px;width:160px;height:84px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:30px;font-weight:700;letter-spacing:.02em;color:var(--ink)">HEAD</span>
+      </div>
+      <div id="f3-c2" class="card" style="left:474px;top:512px;width:160px;height:84px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:30px;font-weight:700;letter-spacing:.02em;color:var(--ink)">POST</span>
+      </div>
+      <div id="f3-c3" class="card" style="left:647px;top:512px;width:160px;height:84px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:30px;font-weight:700;letter-spacing:.02em;color:var(--ink)">OPTIONS</span>
+      </div>
+      <div id="f3-c4" class="card" style="left:128px;top:610px;width:160px;height:84px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:30px;font-weight:700;letter-spacing:.02em;color:var(--ink)">PUT</span>
+      </div>
+      <div id="f3-c5" class="card" style="left:301px;top:610px;width:160px;height:84px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:30px;font-weight:700;letter-spacing:.02em;color:var(--ink)">DELETE</span>
+      </div>
+      <div id="f3-c6" class="card" style="left:474px;top:610px;width:160px;height:84px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:30px;font-weight:700;letter-spacing:.02em;color:var(--ink)">TRACE</span>
+      </div>
+      <div id="f3-c7" class="card" style="left:647px;top:610px;width:160px;height:84px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:30px;font-weight:700;letter-spacing:.02em;color:var(--ink)">CONNECT</span>
+      </div>
+
+      <div class="tag" style="position:absolute;left:796px;top:456px;font-size:18px">2010 · RFC 5789</div>
+      
+      <div id="f3-patch" class="card" style="left:796px;top:512px;width:260px;height:108px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:44px;font-weight:700;letter-spacing:.02em;color:var(--ink)">PATCH</span>
+      </div>
+
+      <!-- the gap is not a caption, it is a duration. Count it. -->
+      <div id="f3-yeartag" class="tag" style="position:absolute;left:1116px;top:516px;font-size:17px;opacity:0">COUNTING</div>
+      <div style="position:absolute;left:1116px;top:540px;width:300px;height:96px">
+        <div id="f3-y" style="position:relative;font-size:82px"><span id="f3-y-0" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2010</span></span><span id="f3-y-1" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2011</span></span><span id="f3-y-2" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2012</span></span><span id="f3-y-3" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2013</span></span><span id="f3-y-4" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2014</span></span><span id="f3-y-5" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2015</span></span><span id="f3-y-6" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2016</span></span><span id="f3-y-7" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2017</span></span><span id="f3-y-8" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2018</span></span><span id="f3-y-9" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2019</span></span><span id="f3-y-10" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2020</span></span><span id="f3-y-11" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2021</span></span><span id="f3-y-12" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2022</span></span><span id="f3-y-13" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2023</span></span><span id="f3-y-14" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2024</span></span><span id="f3-y-15" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;">2025</span></span><span id="f3-y-16" style="position:absolute;left:0;top:0;white-space:nowrap"><span class="hdr" style="font-size:82px;color:var(--pentype)">2026</span></span></div>
+      </div>
+
+      <div id="f3-qtag" class="tag" style="position:absolute;left:1492px;top:456px;font-size:18px;opacity:0">2026 · RFC 10008</div>
+      
+      <div id="f3-query" class="card" style="left:1492px;top:512px;width:264px;height:108px;display:flex;align-items:center;justify-content:center;transform:rotate(0deg)">
+        <span class="mono" style="font-size:44px;font-weight:700;letter-spacing:.02em;color:var(--ink)">QUERY</span>
+      </div>
+
+      <div style="position:absolute;left:1096px;top:774px;width:640px">
+        <div id="f3-mk" class="mark" style="left:-6px;top:8px;width:610px;height:54px"></div>
+        <div class="phrase quote" style="position:relative;font-size:52px">sixteen years of silence</div>
+      </div>
+
+      <svg id="f3-brk-svg" class="pen " style="left:0;top:0;width:1920px;height:1080px" viewBox="0 0 1920 1080">
+      <path id="f3-brk" d="M1064,688 L1064,722 M1064,722 L1482,722 M1482,722 L1482,688" stroke-width="5" style="stroke-dasharray:780;stroke-dashoffset:780"/>
+    </svg>
+      <svg id="f3-cir-svg" class="pen " style="left:0;top:0;width:1920px;height:1080px" viewBox="0 0 1920 1080">
+      <path id="f3-cir" d="M1743.4,513.8 L1752.6,518.0 L1761.4,522.3 L1769.8,527.0 L1777.6,531.9 L1784.5,537.2 L1790.3,542.9 L1794.8,548.8 L1797.9,554.9 L1799.6,561.2 L1799.9,567.5 L1798.9,573.8 L1796.8,580.0 L1793.7,586.2 L1789.6,592.2 L1784.8,598.0 L1779.0,603.7 L1772.4,609.2 L1764.9,614.4 L1756.4,619.3 L1747.0,623.8 L1736.6,627.8 L1725.5,631.3 L1713.6,634.2 L1701.3,636.6 L1688.7,638.4 L1676.0,639.7 L1663.2,640.7 L1650.5,641.4 L1637.9,641.9 L1625.3,642.3 L1612.6,642.5 L1599.7,642.6 L1586.6,642.5 L1573.3,642.0 L1559.9,641.1 L1546.5,639.5 L1533.5,637.4 L1521.1,634.5 L1509.5,630.9 L1499.1,626.6 L1489.8,621.7 L1482.0,616.4 L1475.4,610.7 L1470.1,604.9 L1465.9,598.9 L1462.5,592.8 L1460.0,586.8 L1458.0,580.7 L1456.7,574.7 L1456.0,568.7 L1456.0,562.6 L1456.8,556.6 L1458.6,550.6 L1461.4,544.7 L1465.3,538.9 L1470.2,533.3 L1476.2,527.9 L1483.1,522.7 L1490.7,517.8 L1499.1,513.1 L1507.9,508.7 L1517.3,504.4 L1527.2,500.3 L1537.7,496.5 L1548.8,492.9 L1560.5,489.6 L1572.9,486.8 L1585.8,484.6 L1599.3,483.1 L1613.2,482.3 L1627.1,482.4 L1640.8,483.3 L1654.2,484.9 L1667.0,487.3 L1679.1,490.2 L1690.5,493.5 L1701.3,497.0 L1711.5,500.8 L1721.3,504.6 L1730.8,508.5 L1740.1,512.4 L1749.3,516.5 L1758.3,520.7 L1766.9,525.3 L1774.9,530.1 L1782.2,535.3 L1788.4,540.8 L1793.3,546.7 L1797.0,552.7 L1799.1,558.9 L1799.9,565.3 L1799.4,571.6 L1797.7,577.8 L1794.9,584.0 L1791.2,590.0 L1786.6,595.9" stroke-width="6" style="stroke-dasharray:1030;stroke-dashoffset:1030"/>
+    </svg>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — ACT BREAK lift. Rises from below through a softer scale curve
+      // than the travel, so the pull-back reads as the page being turned up and over.
+      tl.fromTo("#stage", { y: 372 }, { y: 0, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#stage", { scale: 0.86 }, { scale: 1, duration: 0.78, ease: "power2.out" }, 0);
+      // SEAM CARRIER — the tag and the headline are at FULL opacity from frame zero and
+      // ride the cut in on the stage. They are never faded up: the gate measures MOTION,
+      // so a frame whose content fades in at 0.1s passes while visibly entering blank.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.46, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 16 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-deck", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30);
+      gsap.set("#f3-c0", { autoAlpha: 0 });
+      tl.fromTo("#f3-c0", { autoAlpha: 0, scale: 0.82, rotation: 0.64 }, { autoAlpha: 1, scale: 1, rotation: -1.17, duration: 0.24, ease: "steps(4)" }, 0.80);
+      gsap.set("#f3-c1", { autoAlpha: 0 });
+      tl.fromTo("#f3-c1", { autoAlpha: 0, scale: 0.82, rotation: 0.55 }, { autoAlpha: 1, scale: 1, rotation: 1.36, duration: 0.24, ease: "steps(4)" }, 0.93);
+      gsap.set("#f3-c2", { autoAlpha: 0 });
+      tl.fromTo("#f3-c2", { autoAlpha: 0, scale: 0.82, rotation: 0.84 }, { autoAlpha: 1, scale: 1, rotation: -0.71, duration: 0.24, ease: "steps(4)" }, 1.06);
+      gsap.set("#f3-c3", { autoAlpha: 0 });
+      tl.fromTo("#f3-c3", { autoAlpha: 0, scale: 0.82, rotation: 1.36 }, { autoAlpha: 1, scale: 1, rotation: -0.06, duration: 0.24, ease: "steps(4)" }, 1.19);
+      gsap.set("#f3-c4", { autoAlpha: 0 });
+      tl.fromTo("#f3-c4", { autoAlpha: 0, scale: 0.82, rotation: 0.70 }, { autoAlpha: 1, scale: 1, rotation: 1.00, duration: 0.24, ease: "steps(4)" }, 1.32);
+      gsap.set("#f3-c5", { autoAlpha: 0 });
+      tl.fromTo("#f3-c5", { autoAlpha: 0, scale: 0.82, rotation: -0.46 }, { autoAlpha: 1, scale: 1, rotation: 1.36, duration: 0.24, ease: "steps(4)" }, 1.45);
+      gsap.set("#f3-c6", { autoAlpha: 0 });
+      tl.fromTo("#f3-c6", { autoAlpha: 0, scale: 0.82, rotation: -0.68 }, { autoAlpha: 1, scale: 1, rotation: -0.53, duration: 0.24, ease: "steps(4)" }, 1.58);
+      gsap.set("#f3-c7", { autoAlpha: 0 });
+      tl.fromTo("#f3-c7", { autoAlpha: 0, scale: 0.82, rotation: 0.32 }, { autoAlpha: 1, scale: 1, rotation: 1.08, duration: 0.24, ease: "steps(4)" }, 1.71);
+      gsap.set("#f3-patch", { autoAlpha: 0 });
+      tl.fromTo("#f3-patch", { autoAlpha: 0, scale: 0.82, rotation: -6 }, { autoAlpha: 1, scale: 1, rotation: -0.15, duration: 0.26, ease: "steps(4)" }, 2.30);
+      // the gap gets counted. Sixteen years is the whole argument of this frame, so it is
+      // spent on screen as sixteen years rather than as a caption saying so.
+      // the rail is hidden until it starts counting: a bare "2010" floating in the gap
+      // before the tag arrives reads as a stray label, not as a clock.
+      gsap.set("#f3-y-0", { autoAlpha: 0 });
+      tl.fromTo("#f3-yeartag", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.20, ease: "steps(3)" }, 2.60);
+      tl.to("#f3-y-0", { autoAlpha: 1, duration: 0.14, ease: "steps(2)" }, 2.66);
+
+      for (var _r_f3y = 1; _r_f3y < 17; _r_f3y++) gsap.set("#f3-y-" + _r_f3y, { autoAlpha: 0 });
+      tl.set("#f3-y-1", { autoAlpha: 1 }, 2.70);
+      tl.set("#f3-y-0", { autoAlpha: 0 }, 2.70);
+      tl.set("#f3-y-2", { autoAlpha: 1 }, 2.87);
+      tl.set("#f3-y-1", { autoAlpha: 0 }, 2.87);
+      tl.set("#f3-y-3", { autoAlpha: 1 }, 3.03);
+      tl.set("#f3-y-2", { autoAlpha: 0 }, 3.03);
+      tl.set("#f3-y-4", { autoAlpha: 1 }, 3.20);
+      tl.set("#f3-y-3", { autoAlpha: 0 }, 3.20);
+      tl.set("#f3-y-5", { autoAlpha: 1 }, 3.36);
+      tl.set("#f3-y-4", { autoAlpha: 0 }, 3.36);
+      tl.set("#f3-y-6", { autoAlpha: 1 }, 3.53);
+      tl.set("#f3-y-5", { autoAlpha: 0 }, 3.53);
+      tl.set("#f3-y-7", { autoAlpha: 1 }, 3.69);
+      tl.set("#f3-y-6", { autoAlpha: 0 }, 3.69);
+      tl.set("#f3-y-8", { autoAlpha: 1 }, 3.86);
+      tl.set("#f3-y-7", { autoAlpha: 0 }, 3.86);
+      tl.set("#f3-y-9", { autoAlpha: 1 }, 4.02);
+      tl.set("#f3-y-8", { autoAlpha: 0 }, 4.02);
+      tl.set("#f3-y-10", { autoAlpha: 1 }, 4.19);
+      tl.set("#f3-y-9", { autoAlpha: 0 }, 4.19);
+      tl.set("#f3-y-11", { autoAlpha: 1 }, 4.35);
+      tl.set("#f3-y-10", { autoAlpha: 0 }, 4.35);
+      tl.set("#f3-y-12", { autoAlpha: 1 }, 4.52);
+      tl.set("#f3-y-11", { autoAlpha: 0 }, 4.52);
+      tl.set("#f3-y-13", { autoAlpha: 1 }, 4.68);
+      tl.set("#f3-y-12", { autoAlpha: 0 }, 4.68);
+      tl.set("#f3-y-14", { autoAlpha: 1 }, 4.85);
+      tl.set("#f3-y-13", { autoAlpha: 0 }, 4.85);
+      tl.set("#f3-y-15", { autoAlpha: 1 }, 5.01);
+      tl.set("#f3-y-14", { autoAlpha: 0 }, 5.01);
+      tl.set("#f3-y-16", { autoAlpha: 1 }, 5.18);
+      tl.set("#f3-y-15", { autoAlpha: 0 }, 5.18);
+
+      gsap.set("#f3-brk", { strokeDashoffset: 780 });
+      tl.to("#f3-brk", { strokeDashoffset: 0, duration: 0.74, ease: "steps(11)" }, 4.20);
+
+      gsap.set("#f3-mk", { scaleX: 0, skewX: -1.2 });
+      tl.fromTo("#f3-mk", { scaleX: 0, skewX: -1.2 }, { scaleX: 1, skewX: -1.2, duration: 0.44, ease: "steps(7)" }, 5.60);
+      gsap.set("#f3-query", { autoAlpha: 0 });
+      tl.fromTo("#f3-query", { autoAlpha: 0, y: -180, rotation: -9 }, { autoAlpha: 1, y: 0, rotation: -0.52, duration: 0.42, ease: "steps(6)" }, 7.10);
+      tl.fromTo("#f3-qtag", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.20, ease: "steps(3)" }, 7.42);
+
+      gsap.set("#f3-cir", { strokeDashoffset: 1030 });
+      tl.to("#f3-cir", { strokeDashoffset: 0, duration: 0.78, ease: "steps(12)" }, 7.62);
+      // the eight recede: the argument is now about the tenth one
+      tl.to(["#f3-c0","#f3-c1","#f3-c2","#f3-c3","#f3-c4","#f3-c5","#f3-c6","#f3-c7"], { autoAlpha: 0.45, duration: 0.60, ease: "power2.out", stagger: 0.03 }, 7.80);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 10.09);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["03-shelf"] = tl;
+    })();
+  </script>
+</template>

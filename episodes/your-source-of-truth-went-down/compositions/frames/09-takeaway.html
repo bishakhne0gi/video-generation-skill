@@ -1,0 +1,150 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Bricolage"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Jakarta"; src: url("assets/fonts/Jakarta-var.woff2") format("woff2"); font-weight: 200 800; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --void: #16102B; --void-2: #241748;
+      --ink: #FFFFFF; --ink-soft: #C9BEE8; --ink-mute: #9E8FC4;
+      --coral: #FF7A6B; --amber: #FFC24B; --mint: #5FE0B0; --lilac: #B48BFF; --sky: #6FC7FF;
+      --clay-ink: #16102B; --coral-lit: #FFB2A6; --lilac-lit: #D2B8FF;
+      background: var(--void);
+      font-family: "Jakarta", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .clay { position: absolute; }
+    .glass {
+      position: absolute;
+      background: rgba(22,16,43,0.76);
+      -webkit-backdrop-filter: blur(30px) saturate(150%);
+      backdrop-filter: blur(30px) saturate(150%);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 30px;
+      box-shadow: 0 22px 58px rgba(0,0,0,0.40);
+    }
+    .wplate { background: #FFFFFF; border-radius: 14px; display: flex; align-items: center;
+      justify-content: center; box-shadow: 0 10px 26px rgba(0,0,0,0.34); }
+
+
+    #f9-stage { position: absolute; inset: 0; }
+    /* all five clays, closest to camera — the fullest field in the film */
+    #f9-c1 { left: -300px; top: -260px; width: 720px; height: 720px; border-radius: 300px; background: var(--lilac); transform: rotate(-14deg);
+      box-shadow: inset 16px 18px 34px rgba(255,255,255,0.54), inset -18px -20px 40px rgba(0,0,0,0.22), 0 34px 78px rgba(0,0,0,0.44); }
+    #f9-c2 { left: 1560px; top: -240px; width: 700px; height: 700px; border-radius: 290px; background: var(--amber); transform: rotate(12deg);
+      box-shadow: inset 16px 18px 34px rgba(255,255,255,0.54), inset -18px -20px 40px rgba(0,0,0,0.22), 0 34px 78px rgba(0,0,0,0.44); }
+    #f9-c3 { left: -260px; top: 700px; width: 660px; height: 660px; border-radius: 280px; background: var(--sky); transform: rotate(9deg);
+      box-shadow: inset 15px 17px 32px rgba(255,255,255,0.52), inset -17px -19px 38px rgba(0,0,0,0.21), 0 32px 74px rgba(0,0,0,0.43); }
+    #f9-c4 { left: 1540px; top: 720px; width: 700px; height: 700px; border-radius: 290px; background: var(--mint); transform: rotate(-9deg);
+      box-shadow: inset 16px 18px 34px rgba(255,255,255,0.53), inset -18px -20px 40px rgba(0,0,0,0.21), 0 34px 78px rgba(0,0,0,0.43); }
+    #f9-c5 { left: 810px; top: 900px; width: 420px; height: 420px; border-radius: 180px; background: var(--coral);
+      box-shadow: inset 12px 14px 26px rgba(255,255,255,0.50), inset -14px -16px 32px rgba(0,0,0,0.20), 0 26px 60px rgba(0,0,0,0.40); }
+
+    #f9-col { left: 292px; top: 148px; width: 1336px; padding: 46px 56px; border-radius: 40px; }
+    .f9-line { display: flex; align-items: baseline; gap: 28px; margin-bottom: 30px; }
+    .f9-line:last-child { margin-bottom: 0; }
+    .f9-n { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 26px;
+      color: var(--coral-lit); flex: none; width: 46px; }
+    .f9-t { position: relative; font-family: "Bricolage", sans-serif; font-weight: 800;
+      font-size: 62px; letter-spacing: -0.032em; color: var(--ink); line-height: 1.06; }
+    .f9-u { position: absolute; left: 0; right: 0; bottom: -14px; height: 5px; border-radius: 3px;
+      background: var(--coral); }
+    /* this line is the longest in the film; at 62px it wrapped and the rule landed across
+       the wrap. Sized to fit the column on one line. */
+    #f9-l3 .f9-t { font-size: 50px; white-space: nowrap; }
+
+    #f9-pill { left: 292px; top: 612px; height: 88px; padding: 0 40px; border-radius: 44px;
+      display: flex; align-items: center; gap: 24px; }
+    #f9-pill .pill-id { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 29px; color: var(--ink); }
+    #f9-pill .pill-sep { width: 7px; height: 7px; border-radius: 4px; background: var(--ink-mute); }
+    .f9-st { position: absolute; left: 322px; font-family: "JetBrains Mono", monospace;
+      font-weight: 700; font-size: 29px; letter-spacing: 0.10em; }
+    #f9-st-old { color: var(--coral-lit); }
+    #f9-st-new { color: var(--mint); }
+
+    #f9-end { left: 292px; top: 756px; width: 1336px; padding: 34px 56px; border-radius: 34px;
+      display: flex; align-items: center; }
+    #f9-end-l { font-family: "Bricolage", sans-serif; font-weight: 800; font-size: 50px;
+      letter-spacing: -0.03em; color: var(--ink); }
+    #f9-end-r { margin-left: auto; font-family: "JetBrains Mono", monospace; font-weight: 700;
+      font-size: 24px; letter-spacing: 0.14em; color: var(--ink-soft); }
+  </style>
+
+  <div id="root" data-composition-id="09-takeaway" data-width="1920" data-height="1080">
+    <div id="f9-clip" class="clip" data-start="0" data-duration="10.0" data-track-index="0" data-layout-allow-overflow>
+      <div id="f9-stage">
+        <div id="f9-c1" class="clay"></div>
+        <div id="f9-c2" class="clay"></div>
+        <div id="f9-c3" class="clay"></div>
+        <div id="f9-c4" class="clay"></div>
+        <div id="f9-c5" class="clay"></div>
+
+        <div id="f9-col" class="glass">
+          <div class="f9-line" id="f9-l1"><div class="f9-n">01</div><div class="f9-t">Mirror the content.<div class="f9-u"></div></div></div>
+          <div class="f9-line" id="f9-l2"><div class="f9-n">02</div><div class="f9-t">Name the authority.<div class="f9-u"></div></div></div>
+          <div class="f9-line" id="f9-l3"><div class="f9-n">03</div><div class="f9-t">Decide what happens when it goes dark.<div class="f9-u"></div></div></div>
+        </div>
+
+        <div id="f9-pill" class="glass" data-layout-allow-overlap>
+          <div class="pill-id">origin/pr-118</div>
+          <div class="pill-sep"></div>
+          <div class="f9-st" id="f9-st-old">held</div>
+          <div class="f9-st" id="f9-st-new">reconciled</div>
+        </div>
+
+        <div id="f9-end" class="glass">
+          <div id="f9-end-l">EP 26 &middot; Subagents</div>
+          <div id="f9-end-r">NEXT</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // ---- SEAM 8 -> 9 ENTRY: ELEVATION (y -1). Frame 08 lifted to -250; this enters from
+      // BELOW at +250 and rises to 0. Same sign of velocity, one continuous move up.
+      tl.fromTo("#f9-stage", { y: 250 }, { y: 0, duration: 0.50, ease: "power4.out" }, 0);
+      // The primary surface and its headline are NOT faded up: they are at full opacity
+      // from frame zero and ride the cut in on the stage. The seam gate measures MOTION, so
+      // a frame whose content fades up at 0.4s still passes while entering visibly blank.
+
+      tl.fromTo("#f9-c1", { scale: 0.84, x: -60, y: -50 }, { scale: 1, x: 0, y: 0, duration: 1.05, ease: "back.out(1.4)" }, 0.30);
+      tl.fromTo("#f9-c2", { scale: 0.84, x: 60, y: -50 },  { scale: 1, x: 0, y: 0, duration: 1.05, ease: "back.out(1.4)" }, 0.42);
+      tl.fromTo("#f9-c3", { scale: 0.84, x: -60, y: 50 },  { scale: 1, x: 0, y: 0, duration: 1.05, ease: "back.out(1.4)" }, 0.54);
+      tl.fromTo("#f9-c4", { scale: 0.84, x: 60, y: 50 },   { scale: 1, x: 0, y: 0, duration: 1.05, ease: "back.out(1.4)" }, 0.66);
+      tl.fromTo("#f9-c5", { scale: 0.82, y: 70 },          { scale: 1, y: 0, duration: 1.0, ease: "back.out(1.5)" }, 0.78);
+
+      // Scene 2 (0.5-5.4s): the three instructions, evenly spaced against the read.
+      tl.fromTo("#f9-col", { y: 34 }, { y: 0, duration: 0.60, ease: "power3.out" }, 0.20);
+      tl.fromTo("#f9-l1", { x: -30 }, { x: 0, duration: 0.52, ease: "power3.out" }, 0.24);
+      gsap.set(".f9-u", { transformOrigin: "0% 50%" });
+      var uls = document.querySelectorAll(".f9-u");
+      [0.60, 2.46, 4.36].forEach(function (t, i) {
+        tl.fromTo(uls[i], { scaleX: 0 }, { scaleX: 1, duration: 1.32, ease: "power2.inOut" }, t);
+      });
+      [2.10, 4.00].forEach(function (t, i) {
+        tl.fromTo("#f9-l" + (i + 2), { autoAlpha: 0, x: -30 },
+                  { autoAlpha: 1, x: 0, duration: 0.52, ease: "power3.out" }, t);
+      });
+
+      // Scene 3 (4.4-7.4s): the continuity object reconciles. The only time in the film it
+      // leaves coral, and the only success cue.
+      gsap.set("#f9-st-new", { autoAlpha: 0 });
+      tl.fromTo("#f9-pill", { autoAlpha: 0, x: -34 }, { autoAlpha: 1, x: 0, duration: 0.52, ease: "power3.out" }, 5.55);
+      tl.to("#f9-st-old", { autoAlpha: 0, y: -16, duration: 0.32, ease: "power2.in" }, 6.35);
+      tl.fromTo("#f9-st-new", { y: 18 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "back.out(1.6)" }, 6.62);
+
+      // Scene 4 (7.4-10.0s): the end card, and the tail runs silent so the bed lifts.
+      tl.fromTo("#f9-end", { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: 0.58, ease: "power3.out" }, 6.30);
+      tl.fromTo("#f9-end-l", { x: -26 }, { x: 0, duration: 0.52, ease: "power3.out" }, 6.50);
+      tl.fromTo("#f9-end-r", { autoAlpha: 0, x: 26 }, { autoAlpha: 1, x: 0, duration: 0.48, ease: "power2.out" }, 6.90);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["09-takeaway"] = tl;
+    })();
+  </script>
+</template>

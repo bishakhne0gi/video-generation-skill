@@ -1,0 +1,15 @@
+[
+ "This is a twenty kilobyte JPEG. Four hundred pixels square. Watch what happens when you need it bigger.",
+ "It falls apart. Every raster does. There is nothing inside the file to zoom into.",
+ "VectorDrop rebuilds it as a vector. Drop the image in \u2014 that is the entire interface.",
+ "Four stages run. Normalize, quantize, trace, assemble. Nine seconds for this one.",
+ "Thirty-one paths come back. Real bezier curves, stacked dark to light, every one of them editable.",
+ "Now zoom again. Forty times in, and every edge is still exact. That is the whole point.",
+ "Click any path. Change its fill, its opacity, or its shape, down to the anchor point.",
+ "Take one trace three ways. Full colour, grayscale, or a hard stencil for vinyl and screen print.",
+ "Save a version. Switching between them costs nothing. Export SVG, or PNG at one or two times.",
+ "It opens in Figma, in Illustrator, or straight into your build. No plugin, no round trip.",
+ "Five hundred people are already using it.",
+ "Sign up and three credits are on us. No card, no trial timer.",
+ "VectorDrop. Turn any image into editable vectors."
+]

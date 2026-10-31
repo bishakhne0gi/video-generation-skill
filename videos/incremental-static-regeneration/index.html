@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Ship It EP 22 — Incremental Static Regeneration</title>
+    <script src="public/vendor/gsap.min.js"></script>
+    <style>
+      /* ── code-editorial, staged locally so the render resolves offline ───── */
+      @font-face { font-family: "EB Garamond"; src: url("public/fonts/EBGaramond-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+      @font-face { font-family: "EB Garamond"; src: url("public/fonts/EBGaramond-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+      @font-face { font-family: "Inter"; src: url("public/fonts/Inter-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+      @font-face { font-family: "Inter"; src: url("public/fonts/Inter-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+      @font-face { font-family: "JetBrains Mono"; src: url("public/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+      @font-face { font-family: "JetBrains Mono"; src: url("public/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+      :root {
+        --ink: #141413;
+        --cream: #faf9f5;
+        --tile: #efe9de;
+        --tile-strong: #ece3d4;
+        --coral: #cc785c;
+        --navy: #181715;
+        --navy-soft: #1f1e1b;
+        --navy-elev: #252320;
+        --teal: #5db8a6;   /* fixed syntax decoration — never remixed */
+        --amber: #e8a55a;
+        --hair: 1px solid rgba(20, 20, 19, 0.12);
+        --hair-strong: 1px solid rgba(20, 20, 19, 0.2);
+        --hair-dark: 1px solid rgba(250, 249, 245, 0.14);
+        --card-shadow: 0 1px 3px rgba(20, 20, 19, 0.08), 0 4px 16px rgba(20, 20, 19, 0.04);
+      }
+
+      body { margin: 0; background: var(--ink); }
+
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+
+      /* Scene fill lives on a full-bleed CHILD, never on the root — the
+         producer's frame compositing can drop the root's own background and
+         render the frame black. */
+      .paper { position: absolute; inset: 0; background: var(--cream); }
+      .paper--navy { background: var(--navy); }
+
+      .clip { position: absolute; inset: 0; }
+
+      /* Every scene's content sits in ONE transformed wrapper. The seam tweens
+         drive this wrapper only, so a seam is one object moving, not a pile of
+         independently-animated children (motion-doctrine: carriers). */
+      .stage { position: absolute; inset: 0; display: flex; flex-direction: column;
+               justify-content: center; padding: 0 80px; box-sizing: border-box; }
+
+      /* — type ramp — */
+      .kicker { font-family: "JetBrains Mono", monospace; font-size: 28px; font-weight: 500;
+                letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); }
+      .kicker .spike { color: var(--coral); margin-right: 12px; }
+      .display { font-family: "EB Garamond", serif; font-weight: 400; font-size: 140px;
+                 line-height: 1.02; letter-spacing: -0.022em; color: var(--ink); margin: 0; }
+      .headline { font-family: "EB Garamond", serif; font-weight: 400; font-size: 88px;
+                  line-height: 1.06; letter-spacing: -0.018em; color: var(--ink); margin: 0; }
+      .lead { font-family: Inter, system-ui, sans-serif; font-weight: 400; font-size: 40px;
+              line-height: 1.5; color: var(--ink); margin: 0; }
+      .body { font-family: Inter, system-ui, sans-serif; font-weight: 400; font-size: 29px;
+              line-height: 1.5; color: var(--ink); margin: 0; }
+      .tag { font-family: Inter, system-ui, sans-serif; font-weight: 500; font-size: 26px;
+             letter-spacing: 0.18em; text-transform: uppercase; color: rgba(20,20,19,0.55); }
+      .mono { font-family: "JetBrains Mono", monospace; font-weight: 500; font-size: 26px;
+              letter-spacing: 0.02em; color: var(--ink); }
+      .num { font-family: "EB Garamond", serif; font-weight: 400; font-size: 180px;
+             line-height: 0.95; letter-spacing: -0.025em; color: var(--ink); }
+      .unit { font-family: "JetBrains Mono", monospace; font-weight: 500; font-size: 40px; color: var(--ink); }
+      .src { font-family: "JetBrains Mono", monospace; font-size: 20px; letter-spacing: 0.1em;
+             text-transform: uppercase; color: rgba(20,20,19,0.62); }
+      .on-navy { color: var(--cream); }
+      .on-navy .src { color: rgba(250,249,245,0.42); }
+
+      /* — the warm-navy code surface — */
+      .code-surface { background: var(--navy-soft); border: var(--hair-dark); border-radius: 8px;
+                      overflow: hidden; box-shadow: var(--card-shadow); }
+      .code-bar { background: var(--navy-elev); border-bottom: var(--hair-dark);
+                  padding: 14px 22px; display: flex; align-items: center; gap: 14px; }
+      .code-bar .dot { width: 11px; height: 11px; border-radius: 50%; background: rgba(250,249,245,0.18); }
+      .code-bar .name { font-family: "JetBrains Mono", monospace; font-size: 22px;
+                        color: rgba(250,249,245,0.74); letter-spacing: 0.02em; }
+      .code-body { padding: 30px 34px; font-family: "JetBrains Mono", monospace; font-size: 32px;
+                   line-height: 1.6; color: var(--cream); white-space: pre; }
+      .kw { color: #d98a6e; }
+      .str { color: var(--teal); }
+      .n { color: var(--amber); }
+      .cmt { color: rgba(250,249,245,0.38); }
+
+      .card { background: var(--cream); border: var(--hair); border-radius: 12px;
+              box-shadow: var(--card-shadow); }
+      .card--tile { background: var(--tile); }
+
+      /* the ONE voltage moment per frame */
+      .coral-band { background: var(--coral); color: var(--cream); border-radius: 8px;
+                    font-family: Inter, system-ui, sans-serif; font-weight: 500; font-size: 30px; }
+
+      .rule { height: 1px; background: rgba(20,20,19,0.12); transform-origin: left center; }
+      .rule--coral { background: var(--coral); }
+      .rule--dark { background: rgba(250,249,245,0.14); }
+
+      /* ── the continuity object: the x-nextjs-cache header chip ───────────── */
+      #hdr { pointer-events: none; background: none; }
+      #hdr-in { position: absolute; left: 80px; bottom: 56px; display: flex; align-items: center;
+                gap: 16px; padding: 14px 24px; border-radius: 9999px; background: var(--navy);
+                border: var(--hair-dark); box-shadow: var(--card-shadow); }
+      #hdr .k { font-family: "JetBrains Mono", monospace; font-size: 24px; color: rgba(250,249,245,0.55); }
+      #hdr .stwrap { position: relative; display: inline-block; width: 250px; height: 30px; }
+      #hdr .st { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 12px; opacity: 0; }
+      #hdr .v { font-family: "JetBrains Mono", monospace; font-size: 26px; font-weight: 700;
+                letter-spacing: 0.06em; line-height: 30px; }
+      #hdr .led { width: 11px; height: 11px; border-radius: 50%; }
+
+      #epmark { pointer-events: none; background: none; }
+      #epmark-in { position: absolute; right: 80px; bottom: 56px; font-family: "JetBrains Mono", monospace;
+                   font-size: 22px; letter-spacing: 0.16em; text-transform: uppercase;
+                   color: rgba(20,20,19,0.62); }
+
+      /* — frame 1 — */
+      #f1-q { display: flex; align-items: baseline; gap: 22px; }
+
+      /* — frame 3 — */
+      .col { flex: 1; padding: 40px 44px; box-sizing: border-box; }
+      .meter { height: 18px; border-radius: 3px; background: rgba(20,20,19,0.1); overflow: hidden; }
+      .meter > i { display: block; height: 100%; width: 100%; background: var(--ink); transform-origin: left center; }
+
+      /* — frame 4 / 5: the timeline instrument — */
+      .track { position: relative; height: 26px; border-radius: 3px; background: rgba(20,20,19,0.09); }
+      .track > .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 62.5%; background: var(--ink); border-radius: 3px 0 0 3px; transform-origin: left center; }
+      .track > .expired { position: absolute; top: 0; bottom: 0; background: rgba(20,20,19,0.05); }
+      .reqwrap { position: absolute; top: -46px; width: 0; display: flex; justify-content: center; }
+      .req { font-family: "JetBrains Mono", monospace; font-size: 21px; font-weight: 700;
+             letter-spacing: 0.06em; white-space: nowrap; padding: 6px 12px; border-radius: 4px;
+             background: var(--ink); color: var(--cream); }
+      .req--stale { background: var(--coral); }
+      .tick { position: absolute; top: -12px; width: 2px; height: 50px; background: rgba(20,20,19,0.25); }
+
+      /* — frame 7: the instances — */
+      .inst { position: relative; flex: 1; border: var(--hair); border-radius: 12px; background: var(--cream);
+              padding: 28px 26px; box-shadow: var(--card-shadow); }
+      .ring { position: absolute; inset: -3px; border-radius: 15px; border: 3px solid var(--coral); opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-3n7c" id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="70.1">
+      <!-- ══ FRAME 1 — the question ══ 0 → 8.59 -->
+      <section data-hf-id="hf-k0w2" id="f1" class="clip" data-start="0" data-duration="8.59" data-track-index="1">
+        <div data-hf-id="hf-2ava" class="paper"></div>
+        <div data-hf-id="hf-8m7q" class="stage" id="f1-stage">
+          <div data-hf-id="hf-fsyy" class="kicker" id="f1-kick"><span data-hf-id="hf-3274" class="spike">✱</span>one line of config</div>
+          <div data-hf-id="hf-swbb" class="code-surface" id="f1-code" style="margin-top: 34px; width: 1180px;">
+            <div data-hf-id="hf-qc5b" class="code-bar">
+              <span data-hf-id="hf-9gry" class="dot"></span><span data-hf-id="hf-1x0d" class="name">app/blog/[id]/page.tsx</span>
+            </div>
+            <div data-hf-id="hf-s3po" class="code-body"><span data-hf-id="hf-6zby" class="kw">export const</span> revalidate = <span data-hf-id="hf-b895" class="n" id="f1-60">60</span></div>
+          </div>
+          <div data-hf-id="hf-hccs" id="f1-q" style="margin-top: 64px">
+            <h2 data-hf-id="hf-wgud" class="display" id="f1-qa">second</h2>
+            <h2 data-hf-id="hf-tgk7" class="display" id="f1-qb" style="color: var(--coral)">61</h2>
+            <h2 data-hf-id="hf-10s4" class="display" id="f1-qc">— who waits?</h2>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ FRAME 2 — title (silent) ══ 8.59 → 13.59 -->
+      <section data-hf-id="hf-e25q" id="f2" class="clip" data-start="8.59" data-duration="5" data-track-index="1">
+        <div data-hf-id="hf-btl6" class="paper"></div>
+        <div data-hf-id="hf-glq1" class="stage" id="f2-stage" style="align-items: center; text-align: center">
+          <div data-hf-id="hf-1225" class="kicker" id="f2-kick"><span data-hf-id="hf-ixnc" class="spike">✱</span>ship it · ep 22</div>
+          <h1 data-hf-id="hf-8uus" class="display" id="f2-t1" style="margin-top: 30px">Serve the stale.</h1>
+          <h1 data-hf-id="hf-78ip" class="display" id="f2-t2">Rebuild behind it.</h1>
+          <div data-hf-id="hf-7oi5" class="rule" id="f2-rule" style="width: 520px; margin-top: 42px"></div>
+          <div data-hf-id="hf-nfr3" class="tag" id="f2-sub" style="margin-top: 30px">Incremental Static Regeneration</div>
+        </div>
+      </section>
+
+      <!-- ══ FRAME 3 — the two you already have ══ 13.59 → 25.08 -->
+      <section data-hf-id="hf-1gjx" id="f3" class="clip" data-start="13.59" data-duration="11.49" data-track-index="1">
+        <div data-hf-id="hf-c7w7" class="paper"></div>
+        <div data-hf-id="hf-ahl8" class="stage" id="f3-stage">
+          <div data-hf-id="hf-2gkz" class="kicker" id="f3-kick"><span data-hf-id="hf-hqq9" class="spike">✱</span>the two you already have</div>
+          <div data-hf-id="hf-3gcu" style="display: flex; gap: 40px; margin-top: 46px">
+            <div data-hf-id="hf-zcy9" class="card col" id="f3-a">
+              <div data-hf-id="hf-z5ge" class="tag">Static</div>
+              <div data-hf-id="hf-e8ta" style="display: flex; align-items: baseline; gap: 16px; margin-top: 18px">
+                <span data-hf-id="hf-7zv8" class="num" style="font-size: 128px" id="f3-ms">12</span><span data-hf-id="hf-fh87" class="unit">ms</span>
+              </div>
+              <div data-hf-id="hf-59b9" class="body" style="margin-top: 10px">Instant on every request.</div>
+              <div data-hf-id="hf-1xw9" class="rule" style="margin: 30px 0 26px"></div>
+              <div data-hf-id="hf-13ei" class="mono" style="font-size: 24px">next build · <span data-hf-id="hf-ndm0" id="f3-pages">0</span> pages</div>
+              <div data-hf-id="hf-u0bc" class="meter" style="margin-top: 14px"><i data-hf-id="hf-3357" id="f3-build"></i></div>
+              <div data-hf-id="hf-8q72" class="body" style="margin-top: 18px; color: rgba(20,20,19,0.6)">
+                And wrong until you rebuild all of them.
+              </div>
+            </div>
+            <div data-hf-id="hf-5io2" class="card col" id="f3-b">
+              <div data-hf-id="hf-2hax" class="tag">Dynamic</div>
+              <div data-hf-id="hf-9zwi" style="display: flex; align-items: baseline; gap: 16px; margin-top: 18px">
+                <span data-hf-id="hf-qbrg" class="num" style="font-size: 128px" id="f3-fresh">100</span><span data-hf-id="hf-ebd2" class="unit">% fresh</span>
+              </div>
+              <div data-hf-id="hf-uoci" class="body" style="margin-top: 10px">Correct on every request.</div>
+              <div data-hf-id="hf-tui5" class="rule" style="margin: 30px 0 26px"></div>
+              <div data-hf-id="hf-ne3g" class="mono" style="font-size: 24px">rendered · <span data-hf-id="hf-seu1" id="f3-reqs">0</span> requests</div>
+              <div data-hf-id="hf-p180" class="meter" style="margin-top: 14px"><i data-hf-id="hf-yxg7" id="f3-cost" style="background: var(--coral)"></i></div>
+              <div data-hf-id="hf-1rw0" class="body" style="margin-top: 18px; color: rgba(20,20,19,0.6)">
+                And you pay to render every one.
+              </div>
+            </div>
+          </div>
+          <div data-hf-id="hf-ocgu" class="src" id="f3-src" style="margin-top: 34px">Next.js 16.3.1 · guides/incremental-static-regeneration</div>
+        </div>
+      </section>
+
+      <!-- ══ FRAME 4 — second sixty-one (THE ARRIVAL) ══ 25.08 → 32.99 -->
+      <section data-hf-id="hf-9u1r" id="f4" class="clip" data-start="25.08" data-duration="7.91" data-track-index="1">
+        <div data-hf-id="hf-cm78" class="paper"></div>
+        <div data-hf-id="hf-oazb" class="stage" id="f4-stage">
+          <div data-hf-id="hf-e5nk" class="kicker" id="f4-kick"><span data-hf-id="hf-i51a" class="spike">✱</span>second sixty-one</div>
+          <div data-hf-id="hf-4g7z" style="margin-top: 92px; position: relative; width: 1600px" id="f4-tlwrap">
+            <div data-hf-id="hf-gnnj" class="track" id="f4-track">
+              <div data-hf-id="hf-l22r" class="fill" id="f4-fill"></div>
+              <div data-hf-id="hf-60jn" class="expired" id="f4-exp" style="left: 62.5%; right: 0"></div>
+              <div data-hf-id="hf-lh8c" class="tick" id="f4-tick" style="left: 62.5%"></div>
+            </div>
+            <div data-hf-id="hf-06tg" class="mono" id="f4-tickl" style="position: absolute; left: 62.5%; top: 44px; font-size: 22px; transform: translateX(-50%); color: rgba(20,20,19,0.55)">60s</div>
+            <div data-hf-id="hf-bcpv" class="reqwrap" style="left: 14%"><div data-hf-id="hf-9jkv" class="req" id="f4-r1">HIT</div></div>
+            <div data-hf-id="hf-zs2j" class="reqwrap" style="left: 32%"><div data-hf-id="hf-dfsy" class="req" id="f4-r2">HIT</div></div>
+            <div data-hf-id="hf-qwj7" class="reqwrap" style="left: 50%"><div data-hf-id="hf-x7i1" class="req" id="f4-r3">HIT</div></div>
+            <div data-hf-id="hf-oha5" class="reqwrap" style="left: 74%"><div data-hf-id="hf-5x69" class="req req--stale" id="f4-r4">STALE</div></div>
+          </div>
+          <div data-hf-id="hf-y34b" style="display: flex; align-items: center; gap: 26px; margin-top: 96px" id="f4-regen">
+            <div data-hf-id="hf-p0cd" class="mono" style="font-size: 25px; color: rgba(20,20,19,0.6); width: 330px">
+              regenerating in background
+            </div>
+            <div data-hf-id="hf-tp6y" class="meter" style="flex: 1; height: 14px"><i data-hf-id="hf-3hxb" id="f4-regenbar" style="background: rgba(20,20,19,0.35)"></i></div>
+          </div>
+          <div data-hf-id="hf-0u9v" class="lead" id="f4-said" style="margin-top: 46px; max-width: 1400px">
+            The response is already gone. The rebuild has not finished starting.
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ FRAME 5 — the next visitor ══ 32.99 → 41.56 -->
+      <section data-hf-id="hf-u28v" id="f5" class="clip" data-start="32.99" data-duration="8.57" data-track-index="1">
+        <div data-hf-id="hf-d0i9" class="paper"></div>
+        <div data-hf-id="hf-ah8a" class="stage" id="f5-stage">
+          <div data-hf-id="hf-0uvr" class="kicker" id="f5-kick"><span data-hf-id="hf-gy47" class="spike">✱</span>the next visitor</div>
+          <div data-hf-id="hf-nj2k" style="display: flex; gap: 34px; margin-top: 52px; align-items: stretch">
+            <div data-hf-id="hf-iexk" class="card col" id="f5-old" style="max-width: 640px">
+              <div data-hf-id="hf-2w32" class="tag">Cached entry</div>
+              <div data-hf-id="hf-gy9o" class="headline" style="font-size: 62px; margin-top: 20px" id="f5-oldv">v1</div>
+              <div data-hf-id="hf-txry" class="body" style="margin-top: 14px; color: rgba(20,20,19,0.6)" id="f5-oldl">served while rebuilding</div>
+            </div>
+            <div data-hf-id="hf-tfca" style="display: flex; align-items: center; justify-content: center; width: 120px">
+              <div data-hf-id="hf-3l2o" class="mono" id="f5-arrow" style="font-size: 46px; color: var(--coral)">→</div>
+            </div>
+            <div data-hf-id="hf-4kr7" class="card col" id="f5-new" style="max-width: 640px">
+              <div data-hf-id="hf-xkh8" class="tag">Replaced</div>
+              <div data-hf-id="hf-gpwa" class="headline" style="font-size: 62px; margin-top: 20px" id="f5-newv">v2</div>
+              <div data-hf-id="hf-l102" class="body" style="margin-top: 14px; color: rgba(20,20,19,0.6)" id="f5-newl">cached for everyone after</div>
+            </div>
+          </div>
+          <div data-hf-id="hf-b955" class="coral-band" id="f5-band" style="margin-top: 56px; padding: 26px 34px; max-width: 1180px">
+            The visitor who paid for the rebuild is not the visitor who benefits from it.
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ FRAME 6 — don't wait for the clock ══ 41.56 → 51.71 -->
+      <section data-hf-id="hf-9sq8" id="f6" class="clip" data-start="41.56" data-duration="10.15" data-track-index="1">
+        <div data-hf-id="hf-deta" class="paper"></div>
+        <div data-hf-id="hf-qa91" class="stage" id="f6-stage">
+          <div data-hf-id="hf-o94g" class="kicker" id="f6-kick"><span data-hf-id="hf-hcf8" class="spike">✱</span>on demand</div>
+          <div data-hf-id="hf-fo4d" style="display: flex; gap: 44px; margin-top: 42px; align-items: flex-start">
+            <div data-hf-id="hf-cfey" class="code-surface" id="f6-code" style="width: 980px">
+              <div data-hf-id="hf-5kvz" class="code-bar"><span data-hf-id="hf-zcc2" class="dot"></span><span data-hf-id="hf-3lvy" class="name">app/actions.ts</span></div>
+              <div data-hf-id="hf-rp1c" class="code-body" style="font-size: 28px"><span data-hf-id="hf-h9oe" class="str">'use server'</span>
+<span data-hf-id="hf-iusy" class="kw">import</span> { revalidatePath } <span data-hf-id="hf-n65j" class="kw">from</span> <span data-hf-id="hf-x394" class="str">'next/cache'</span>
+
+<span data-hf-id="hf-4yrz" class="kw">export async function</span> createPost() {
+  <span data-hf-id="hf-o3ys" id="f6-call">revalidatePath(<span data-hf-id="hf-5j70" class="str">'/posts'</span>)</span>
+}</div>
+            </div>
+            <div data-hf-id="hf-2a0v" style="flex: 1" id="f6-side">
+              <div data-hf-id="hf-h04p" class="mono" id="f6-alt" style="font-size: 25px; color: rgba(20,20,19,0.72)">revalidateTag(<span data-hf-id="hf-vx89" style="color: var(--coral)">'posts'</span>, <span data-hf-id="hf-ipk2" style="color: var(--coral)">'max'</span>)</div>
+              <div data-hf-id="hf-o7k8" class="body" id="f6-altl" style="margin-top: 14px; color: rgba(20,20,19,0.6)">
+                The granular one. The docs still prefer whole paths.
+              </div>
+              <div data-hf-id="hf-diub" class="rule" style="margin: 34px 0"></div>
+              <div data-hf-id="hf-8blx" class="tag" id="f6-nl">What it does not do</div>
+              <div data-hf-id="hf-w097" class="headline" id="f6-not" style="font-size: 54px; margin-top: 18px">
+                It invalidates. It does not rebuild.
+              </div>
+              <div data-hf-id="hf-llwz" class="body" id="f6-notl" style="margin-top: 18px; color: rgba(20,20,19,0.6)">
+                Regeneration waits for the next request.
+              </div>
+            </div>
+          </div>
+          <div data-hf-id="hf-r3iu" class="src" id="f6-src" style="margin-top: 30px">Next.js 16.3.1 · revalidatePath · revalidateTag</div>
+        </div>
+      </section>
+
+      <!-- ══ FRAME 7 — the honest cost ══ 51.71 → 63.10 -->
+      <section data-hf-id="hf-le08" id="f7" class="clip" data-start="51.71" data-duration="11.39" data-track-index="1">
+        <div data-hf-id="hf-dt4b" class="paper"></div>
+        <div data-hf-id="hf-dlwg" class="stage" id="f7-stage">
+          <div data-hf-id="hf-zxn6" class="kicker" id="f7-kick"><span data-hf-id="hf-g5i5" class="spike">✱</span>the honest cost</div>
+          <div data-hf-id="hf-dfvq" style="display: flex; gap: 26px; margin-top: 46px" id="f7-row">
+            <div data-hf-id="hf-m8cm" class="inst" id="f7-i1">
+              <div data-hf-id="hf-csls" class="ring" id="f7-ring"></div>
+              <div data-hf-id="hf-ksqg" class="mono" style="font-size: 23px; color: rgba(20,20,19,0.55)">instance 1</div>
+              <div data-hf-id="hf-wh73" class="headline" id="f7-v1" style="font-size: 56px; margin-top: 14px">v2</div>
+              <div data-hf-id="hf-n6qp" class="body" id="f7-s1" style="margin-top: 12px; color: rgba(20,20,19,0.6)">revalidated</div>
+            </div>
+            <div data-hf-id="hf-ia8l" class="inst" id="f7-i2">
+              <div data-hf-id="hf-jltd" class="mono" style="font-size: 23px; color: rgba(20,20,19,0.55)">instance 2</div>
+              <div data-hf-id="hf-3q69" class="headline" id="f7-v2" style="font-size: 56px; margin-top: 14px">v1</div>
+              <div data-hf-id="hf-styo" class="body" id="f7-s2" style="margin-top: 12px; color: rgba(20,20,19,0.6)">own timer · <span data-hf-id="hf-p90k" id="f7-t2">60</span>s</div>
+            </div>
+            <div data-hf-id="hf-faz0" class="inst" id="f7-i3">
+              <div data-hf-id="hf-k04e" class="mono" style="font-size: 23px; color: rgba(20,20,19,0.55)">instance 3</div>
+              <div data-hf-id="hf-0xr0" class="headline" id="f7-v3" style="font-size: 56px; margin-top: 14px">v1</div>
+              <div data-hf-id="hf-2ehf" class="body" id="f7-s3" style="margin-top: 12px; color: rgba(20,20,19,0.6)">own timer · <span data-hf-id="hf-djz1" id="f7-t3">60</span>s</div>
+            </div>
+            <div data-hf-id="hf-2sgj" class="inst" id="f7-i4">
+              <div data-hf-id="hf-it7b" class="mono" style="font-size: 23px; color: rgba(20,20,19,0.55)">instance 4</div>
+              <div data-hf-id="hf-4dgz" class="headline" id="f7-v4" style="font-size: 56px; margin-top: 14px">v1</div>
+              <div data-hf-id="hf-k17a" class="body" id="f7-s4" style="margin-top: 12px; color: rgba(20,20,19,0.6)">own timer · <span data-hf-id="hf-3ye2" id="f7-t4">60</span>s</div>
+            </div>
+          </div>
+          <div data-hf-id="hf-sgju" class="lead" id="f7-say" style="margin-top: 46px; max-width: 1500px">
+            The default cache is per instance. Revalidating reaches the one that took the call.
+          </div>
+          <div data-hf-id="hf-wjbj" style="display: flex; align-items: center; gap: 22px; margin-top: 40px" id="f7-fix">
+            <div data-hf-id="hf-hrvc" class="rule rule--coral" id="f7-fixrule" style="width: 260px; height: 2px"></div>
+            <div data-hf-id="hf-58gb" class="mono" id="f7-fixl" style="font-size: 26px; color: var(--coral); white-space: nowrap">
+              shared cacheHandler
+            </div>
+          </div>
+          <div data-hf-id="hf-gin4" class="src" id="f7-src" style="margin-top: 26px">Next.js 16.3.1 · caveats · multiple instances</div>
+        </div>
+      </section>
+
+      <!-- ══ FRAME 8 — sign-off (silent) ══ 63.10 → 70.10 -->
+      <section data-hf-id="hf-xw9k" id="f8" class="clip" data-start="63.1" data-duration="7" data-track-index="1">
+        <div data-hf-id="hf-ijc6" class="paper paper--navy"></div>
+        <div data-hf-id="hf-5u33" class="stage on-navy" id="f8-stage" style="align-items: center; text-align: center">
+          <h2 data-hf-id="hf-lgvc" class="headline" id="f8-rule1" style="color: var(--cream); font-size: 76px">Serve the stale.</h2>
+          <h2 data-hf-id="hf-17no" class="headline" id="f8-rule2" style="color: var(--cream); font-size: 76px">Rebuild behind it.</h2>
+          <h2 data-hf-id="hf-vh2x" class="headline" id="f8-rule3" style="color: var(--coral); font-size: 76px">Never promise the first visitor it's fresh.</h2>
+          <div data-hf-id="hf-gsu0" class="rule rule--dark" id="f8-line" style="width: 460px; margin-top: 44px"></div>
+          <div data-hf-id="hf-i95s" class="tag" id="f8-by" style="margin-top: 34px; color: rgba(250,249,245,0.72)">Bishakh</div>
+          <div data-hf-id="hf-ywn4" class="src" id="f8-next" style="margin-top: 20px; color: rgba(250,249,245,0.6)">
+            Next: subagents, and the context you throw away on purpose
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ the continuity object — outside every scene, so no cut interrupts it ══ -->
+      <div data-hf-id="hf-36d5" id="hdr" class="clip" data-start="13.59" data-duration="49.51" data-track-index="2">
+        <div data-hf-id="hf-q06f" id="hdr-in">
+          <span data-hf-id="hf-ihto" class="k">x-nextjs-cache:</span>
+          <span data-hf-id="hf-jaxg" class="stwrap">
+            <span data-hf-id="hf-lld5" class="st" id="hdr-s1"><span data-hf-id="hf-rp0a" class="led" style="background: rgba(250,249,245,0.75)"></span><span data-hf-id="hf-o5gu" class="v" style="color: rgba(250,249,245,0.75)">MISS</span></span>
+            <span data-hf-id="hf-rr2y" class="st" id="hdr-s2"><span data-hf-id="hf-vmcl" class="led" style="background: #5db8a6"></span><span data-hf-id="hf-9oja" class="v" style="color: #5db8a6">HIT</span></span>
+            <span data-hf-id="hf-vp6z" class="st" id="hdr-s3"><span data-hf-id="hf-fulu" class="led" style="background: #cc785c"></span><span data-hf-id="hf-8a2b" class="v" style="color: #cc785c">STALE</span></span>
+            <span data-hf-id="hf-87pg" class="st" id="hdr-s4"><span data-hf-id="hf-lx6h" class="led" style="background: #5db8a6"></span><span data-hf-id="hf-hf4q" class="v" style="color: #5db8a6">HIT</span></span>
+            <span data-hf-id="hf-8zd9" class="st" id="hdr-s5"><span data-hf-id="hf-oq6m" class="led" style="background: #e8a55a"></span><span data-hf-id="hf-wd13" class="v" style="color: #e8a55a">REVALIDATED</span></span>
+            <span data-hf-id="hf-cxha" class="st" id="hdr-s6"><span data-hf-id="hf-i0s6" class="led" style="background: #cc785c"></span><span data-hf-id="hf-8fv7" class="v" style="color: #cc785c">STALE</span></span>
+          </span>
+        </div>
+      </div>
+      <div data-hf-id="hf-12ht" id="epmark" class="clip" data-start="0" data-duration="63.1" data-track-index="3"><span data-hf-id="hf-518n" id="epmark-in">Ship It · EP 22</span></div>
+
+      <!-- ══ the score ══ CC0 bed, ducked OFFLINE against the real narration
+           with a sidechain carve, so the mix is baked and deterministic and the
+           bed lifts on the two beats that carry no line. ══ -->
+      <audio data-hf-id="hf-n2o8" id="bed" data-start="0" data-duration="70.1" data-track-index="8" src="public/audio/music/bed.mp3"></audio>
+
+      <!-- ══ narration ══ -->
+      <audio data-hf-id="hf-wifu" id="vo1" data-start="0" data-duration="8.19" data-track-index="9" data-volume="0.88" src="public/audio/vo/line1.wav"></audio>
+      <audio data-hf-id="hf-odgf" id="vo2" data-start="13.59" data-duration="11.09" data-track-index="9" data-volume="0.88" src="public/audio/vo/line2.wav"></audio>
+      <audio data-hf-id="hf-4hpq" id="vo3" data-start="25.08" data-duration="7.51" data-track-index="9" data-volume="0.88" src="public/audio/vo/line3.wav"></audio>
+      <audio data-hf-id="hf-x8dz" id="vo4" data-start="32.99" data-duration="8.17" data-track-index="9" data-volume="0.88" src="public/audio/vo/line4.wav"></audio>
+      <audio data-hf-id="hf-fioj" id="vo5" data-start="41.56" data-duration="9.75" data-track-index="9" data-volume="0.88" src="public/audio/vo/line5.wav"></audio>
+      <audio data-hf-id="hf-h6bb" id="vo6" data-start="51.71" data-duration="10.99" data-track-index="9" data-volume="0.88" src="public/audio/vo/line6.wav"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /* ══════════════════════════════════════════════════════════════════════
+         THE SEAM PLAN  (per /motion-doctrine)
+
+         The current is LEFT. Every ordinary seam is a cut-the-curve travelling
+         left: the outgoing stage accelerates out on power4.in, the incoming
+         stage is already mid-flight on power4.out at matched velocity, and the
+         cut lands mid-motion on BOTH sides. Entry ≈ 127% of exit.
+
+         Three vectors are spent, and only three:
+           2→3  z-forward  (zoom-through)  — deeper into the same thought
+           3→4  z-back     (inverse zoom)  — ARRIVAL. The thesis lands.
+           7→8  y-up       (elevation)     — into the conclusion
+
+         Z-sign rule: on a push BOTH sides grow; on an inverse zoom BOTH shrink.
+         A receding exit answered by a grow-from-small entry is the mirrored-
+         vector violation the doctrine calls the most common one.
+
+         Clips never overlap in time, so exactly one scene is visible per frame
+         and the cut is a cut rather than a dissolve.
+
+         ONLY allowlisted properties are animated — opacity/autoAlpha, x, y,
+         scale, rotation, color, backgroundColor, borderRadius, transforms.
+         Nothing tweens `width` (bars are full-width and scale on X from the
+         left) and nothing tweens `boxShadow` (the coral ring is its own
+         element, faded in). No `.clip` element is ever a tween target; every
+         tween lands on a wrapper INSIDE a clip.
+         ══════════════════════════════════════════════════════════════════════ */
+
+      const EXIT = 0.34;          // outgoing accelerates for this long
+      const ENTER = 0.43;         // ≈127% of EXIT
+      const TRAVEL = 232;         // ~12% of frame width — partial travel
+
+      const W = {
+        f1: [0, 8.59], f2: [8.59, 13.59], f3: [13.59, 25.08], f4: [25.08, 32.99],
+        f5: [32.99, 41.56], f6: [41.56, 51.71], f7: [51.71, 63.1], f8: [63.1, 70.1],
+      };
+
+      /** Ordinary seam: leave LEFT, arrive LEFT, matched speed, cut mid-motion. */
+      function cutLeft(outSel, inSel, cutAt) {
+        // hard kill AT the cut — non-linear seeking must not leave the outgoing
+        // scene visible behind the incoming one
+        tl.set(outSel, { autoAlpha: 0 }, cutAt);
+        tl.to(outSel, { x: -TRAVEL, autoAlpha: 0, duration: EXIT, ease: "power4.in" }, cutAt - EXIT);
+        tl.fromTo(inSel, { x: TRAVEL * 1.27, autoAlpha: 0 },
+                  { x: 0, autoAlpha: 1, duration: ENTER, ease: "power4.out" }, cutAt);
+      }
+      /** Push deeper: both sides growing. */
+      function zoomThrough(outSel, inSel, cutAt) {
+        // hard kill AT the cut — non-linear seeking must not leave the outgoing
+        // scene visible behind the incoming one
+        tl.set(outSel, { autoAlpha: 0 }, cutAt);
+        tl.to(outSel, { scale: 1.34, autoAlpha: 0, duration: EXIT, ease: "power4.in" }, cutAt - EXIT);
+        tl.fromTo(inSel, { scale: 0.72, autoAlpha: 0 },
+                  { scale: 1, autoAlpha: 1, duration: ENTER, ease: "power4.out" }, cutAt);
+      }
+      /** ARRIVAL: both sides shrinking — something bigger lands. */
+      function inverseZoom(outSel, inSel, cutAt) {
+        // hard kill AT the cut — non-linear seeking must not leave the outgoing
+        // scene visible behind the incoming one
+        tl.set(outSel, { autoAlpha: 0 }, cutAt);
+        tl.to(outSel, { scale: 0.74, autoAlpha: 0, duration: EXIT, ease: "power4.in" }, cutAt - EXIT);
+        tl.fromTo(inSel, { scale: 1.42, autoAlpha: 0 },
+                  { scale: 1, autoAlpha: 1, duration: ENTER, ease: "power4.out" }, cutAt);
+      }
+      /** Elevation into the conclusion: both sides travelling up. */
+      function cutUp(outSel, inSel, cutAt) {
+        // hard kill AT the cut — non-linear seeking must not leave the outgoing
+        // scene visible behind the incoming one
+        tl.set(outSel, { autoAlpha: 0 }, cutAt);
+        tl.to(outSel, { y: -TRAVEL, autoAlpha: 0, duration: EXIT, ease: "power4.in" }, cutAt - EXIT);
+        tl.fromTo(inSel, { y: TRAVEL * 1.27, autoAlpha: 0 },
+                  { y: 0, autoAlpha: 1, duration: ENTER, ease: "power4.out" }, cutAt);
+      }
+      /** A bar that fills: full width in CSS, scaled on X from its left edge. */
+      function fill(sel, to, at, dur, ease) {
+        tl.fromTo(sel, { scaleX: 0, transformOrigin: "left center" },
+                  { scaleX: to, duration: dur, ease: ease || "none" }, at);
+      }
+      /** A counter that keeps counting — the element is looked up at run time. */
+      function count(id, from, to, at, dur, fmt) {
+        const o = { v: from };
+        tl.to(o, { v: to, duration: dur, ease: "none", onUpdate: () => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = fmt ? fmt(o.v) : Math.round(o.v);
+        } }, at);
+      }
+      const comma = (v) => Math.round(v).toLocaleString("en-US");
+
+      // The film opens from rest — there is no seam before the first frame.
+      tl.fromTo("#f1-stage", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3, ease: "power2.out" }, 0);
+
+      /* ── FRAME 1 — the question ── route: staged reveals ───────────────── */
+      tl.fromTo("#f1-kick", { y: 26, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, 0.15);
+      tl.fromTo("#f1-code", { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, ease: "power3.out" }, 0.5);
+      tl.fromTo("#f1-60", { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: "back.out(1.5)" }, 1.35);
+      // stillness, then the question the whole film answers
+      tl.fromTo("#f1-qa", { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, 3.1);
+      tl.fromTo("#f1-qb", { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, 3.28);
+      tl.fromTo("#f1-qc", { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, 3.46);
+      // NOT `autoAlpha` on the surface. A dark panel dimmed with opacity over a
+      // cream ground blends toward the page and renders as a mid-grey slab —
+      // the exact failure logged in references/station-strip.md. Dim the
+      // CONTENT and leave the surface at full strength.
+      tl.to("#f1-code .code-body", { autoAlpha: 0.45, duration: 0.6, ease: "power2.inOut" }, 3.6);
+      tl.to("#f1-code .code-bar", { autoAlpha: 0.5, duration: 0.6, ease: "power2.inOut" }, 3.6);
+
+      cutLeft("#f1-stage", "#f2-stage", W.f2[0]);
+
+      /* ── FRAME 2 — title (silent) ── the breather; the bed's first lift ── */
+      tl.fromTo("#f2-kick", { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.45, ease: "power3.out" }, W.f2[0] + 0.35);
+      tl.fromTo("#f2-t1", { y: 44, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, ease: "power3.out" }, W.f2[0] + 0.6);
+      tl.fromTo("#f2-t2", { y: 44, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, ease: "power3.out" }, W.f2[0] + 0.82);
+      fill("#f2-rule", 1, W.f2[0] + 1.5, 0.8, "power2.inOut");
+      tl.fromTo("#f2-sub", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5, ease: "power2.out" }, W.f2[0] + 1.9);
+
+      zoomThrough("#f2-stage", "#f3-stage", W.f3[0]);
+
+      /* ── FRAME 3 — the two you already have ── route: sequenced UI life ──
+         Both costs run for the whole beat. Neither column is the answer. */
+      tl.fromTo("#f3-kick", { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.45, ease: "power3.out" }, W.f3[0] + 0.3);
+      tl.fromTo("#f3-a", { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, ease: "power3.out" }, W.f3[0] + 0.55);
+      tl.fromTo("#f3-b", { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, ease: "power3.out" }, W.f3[0] + 0.72);
+      count("f3-pages", 0, 10000, W.f3[0] + 1.6, 6.2, comma);
+      fill("#f3-build", 1, W.f3[0] + 1.6, 6.2);
+      count("f3-reqs", 0, 41850, W.f3[0] + 1.6, 8.6, comma);
+      fill("#f3-cost", 1, W.f3[0] + 1.6, 8.6);
+      tl.fromTo("#f3-src", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, W.f3[0] + 2.4);
+
+      inverseZoom("#f3-stage", "#f4-stage", W.f4[0]);
+
+      /* ── FRAME 4 — second sixty-one (THE ARRIVAL) ── animated sequences ──
+         The split IS the teaching: the response leaves while the rebuild has
+         barely started. Cause and effect share a timeline position. */
+      tl.fromTo("#f4-kick", { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.4, ease: "power3.out" }, W.f4[0] + 0.25);
+      tl.fromTo("#f4-track", { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, W.f4[0] + 0.35);
+      fill("#f4-fill", 1, W.f4[0] + 0.6, 2.4);
+      tl.fromTo("#f4-tick", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, W.f4[0] + 2.9);
+      tl.fromTo("#f4-tickl", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, W.f4[0] + 2.9);
+      [["#f4-r1", 0.95], ["#f4-r2", 1.55], ["#f4-r3", 2.15]].forEach(function (p) {
+        tl.fromTo(p[0], { y: -14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.28, ease: "back.out(1.6)" }, W.f4[0] + p[1]);
+      });
+      tl.fromTo("#f4-exp", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: "power2.out" }, W.f4[0] + 3.15);
+      // ── stillness before climax: 0.65s ──
+      tl.fromTo("#f4-r4", { y: -18, autoAlpha: 0, scale: 0.8 },
+        { y: 0, autoAlpha: 1, scale: 1, duration: 0.34, ease: "back.out(1.7)" }, W.f4[0] + 3.95);
+      tl.fromTo("#f4-regen", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out" }, W.f4[0] + 3.95);
+      fill("#f4-regenbar", 0.88, W.f4[0] + 3.95, 3.0, "power1.out");
+      tl.fromTo("#f4-said", { y: 26, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, W.f4[0] + 5.0);
+
+      cutLeft("#f4-stage", "#f5-stage", W.f5[0]);
+
+      /* ── FRAME 5 — the next visitor ── animated sequences ──────────────── */
+      tl.fromTo("#f5-kick", { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.4, ease: "power3.out" }, W.f5[0] + 0.25);
+      tl.fromTo("#f5-old", { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, W.f5[0] + 0.45);
+      tl.fromTo("#f5-arrow", { x: -22, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.4, ease: "power3.out" }, W.f5[0] + 1.05);
+      tl.fromTo("#f5-new", { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, W.f5[0] + 1.2);
+      // the entry is REPLACED — interpolated, not swapped
+      tl.to("#f5-old", { autoAlpha: 0.42, duration: 0.7, ease: "power2.inOut" }, W.f5[0] + 2.2);
+      tl.fromTo("#f5-band", { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, ease: "power3.out" }, W.f5[0] + 3.4);
+
+      cutLeft("#f5-stage", "#f6-stage", W.f6[0]);
+
+      /* ── FRAME 6 — don't wait for the clock ── staged reveals ───────────
+         The correction is held back and paid off late, because the correction
+         is the reason the frame exists. */
+      tl.fromTo("#f6-kick", { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.4, ease: "power3.out" }, W.f6[0] + 0.25);
+      tl.fromTo("#f6-code", { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, ease: "power3.out" }, W.f6[0] + 0.45);
+      tl.fromTo("#f6-call", { backgroundColor: "rgba(204,120,92,0)" },
+        { backgroundColor: "rgba(204,120,92,0.28)", duration: 0.5, ease: "power2.out" }, W.f6[0] + 1.5);
+      tl.fromTo("#f6-alt", { x: 26, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.45, ease: "power3.out" }, W.f6[0] + 2.2);
+      tl.fromTo("#f6-altl", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, W.f6[0] + 2.45);
+      tl.fromTo("#f6-nl", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35 }, W.f6[0] + 4.4);
+      tl.fromTo("#f6-not", { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, ease: "power3.out" }, W.f6[0] + 4.6);
+      tl.fromTo("#f6-notl", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, W.f6[0] + 5.3);
+      tl.fromTo("#f6-src", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, W.f6[0] + 5.8);
+
+      cutLeft("#f6-stage", "#f7-stage", W.f7[0]);
+
+      /* ── FRAME 7 — the honest cost ── animated sequences ────────────────
+         One instance flips; the other three keep counting on their own clocks,
+         and their independence is the loud part of the frame. */
+      tl.fromTo("#f7-kick", { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.4, ease: "power3.out" }, W.f7[0] + 0.25);
+      ["#f7-i1", "#f7-i2", "#f7-i3", "#f7-i4"].forEach(function (sel, i) {
+        tl.fromTo(sel, { y: 36, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, W.f7[0] + 0.45 + i * 0.1);
+      });
+      // the call lands on instance 1 only — a ring element, not a boxShadow tween
+      tl.fromTo("#f7-ring", { autoAlpha: 0, scale: 1.04 }, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "power3.out" }, W.f7[0] + 1.9);
+      tl.to("#f7-v1", { color: "#CC785C", duration: 0.35 }, W.f7[0] + 1.9);
+      // three clocks that never agree
+      count("f7-t2", 60, 22, W.f7[0] + 2.1, 6.4);
+      count("f7-t3", 60, 37, W.f7[0] + 2.1, 6.4);
+      count("f7-t4", 60, 9, W.f7[0] + 2.1, 6.4);
+      tl.fromTo("#f7-say", { y: 26, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, W.f7[0] + 3.2);
+      fill("#f7-fixrule", 1, W.f7[0] + 6.6, 0.6, "power2.inOut");
+      tl.fromTo("#f7-fixl", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, W.f7[0] + 6.9);
+      tl.fromTo("#f7-src", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, W.f7[0] + 7.4);
+
+      cutUp("#f7-stage", "#f8-stage", W.f8[0]);
+
+      /* ── FRAME 8 — sign-off (silent) ────────────────────────────────────── */
+      tl.fromTo("#f8-rule1", { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, W.f8[0] + 0.5);
+      tl.fromTo("#f8-rule2", { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, W.f8[0] + 0.72);
+      tl.fromTo("#f8-rule3", { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out" }, W.f8[0] + 1.15);
+      fill("#f8-line", 1, W.f8[0] + 1.9, 0.9, "power2.inOut");
+      tl.fromTo("#f8-by", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45 }, W.f8[0] + 2.6);
+      tl.fromTo("#f8-next", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45 }, W.f8[0] + 3.1);
+
+      /* ══ the continuity object ═══════════════════════════════════════════
+         `x-nextjs-cache` is a real Next.js response header, not an invention.
+         Each state is its OWN span, shown and hidden with zero-duration sets at
+         explicit beat boundaries — fully seekable, and no scripted textContent
+         that a backward seek could leave stale. States are HELD, never
+         interpolated: the value changes only when the argument changes, and the
+         header name never moves, because it is the same header being read. */
+      const HDR = [
+        ["#hdr-s1", W.f3[0] + 0.4,  W.f3[0] + 3.2],   // MISS        — first build
+        ["#hdr-s2", W.f3[0] + 3.2,  W.f4[0] + 3.95],  // HIT         — inside the window
+        ["#hdr-s3", W.f4[0] + 3.95, W.f5[0] + 2.2],   // STALE       — second sixty-one
+        ["#hdr-s4", W.f5[0] + 2.2,  W.f6[0] + 1.5],   // HIT         — the next visitor
+        ["#hdr-s5", W.f6[0] + 1.5,  W.f7[0] + 3.2],   // REVALIDATED — on demand
+        ["#hdr-s6", W.f7[0] + 3.2,  W.f7[1] - 0.5],   // STALE       — the instances that missed it
+      ];
+      tl.fromTo("#hdr-in", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "power3.out" }, W.f3[0] + 0.3);
+      HDR.forEach(function (h) {
+        tl.set(h[0], { autoAlpha: 1 }, h[1]);
+        tl.fromTo(h[0], { y: 7 }, { y: 0, duration: 0.3, ease: "power2.out" }, h[1]);
+        tl.set(h[0], { autoAlpha: 0 }, h[2]);
+      });
+      tl.to("#hdr-in", { autoAlpha: 0, duration: 0.4, ease: "power2.in" }, W.f7[1] - 0.5);
+      tl.fromTo("#epmark-in", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 }, 0.6);
+      tl.to("#epmark-in", { autoAlpha: 0, duration: 0.4 }, W.f7[1] - 0.5);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

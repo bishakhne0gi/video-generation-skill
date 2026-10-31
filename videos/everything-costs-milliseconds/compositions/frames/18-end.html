@@ -1,0 +1,136 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="18-end" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/cabinet.jpg');opacity:0.62"></div>
+  <div class="scrim" style="background:radial-gradient(90% 100% at 46% 42%, rgba(9,20,19,.24) 0%, rgba(9,20,19,.78) 64%, rgba(9,20,19,.94) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      <div id="e-plate" class="panel" style="left:250px;top:264px;width:1420px;height:412px;
+        background:rgba(11,16,15,.55);border-color:rgba(232,161,60,.22)"></div>
+      <div id="e-seam" class="rule" style="left:250px;top:264px;width:1420px;height:2px;
+        background:linear-gradient(90deg,rgba(232,161,60,0),rgba(232,161,60,.85),rgba(232,161,60,0));transform-origin:50% 50%"></div>
+
+      <div id="e-h1" class="hdr" style="position:absolute;left:0;top:330px;width:1920px;text-align:center;font-size:104px">EVERYTHING COSTS</div>
+      <div id="e-h2" style="position:absolute;left:0;top:450px;width:1920px;text-align:center;
+        font-family:'Instrument',Georgia,serif;font-style:italic;font-weight:400;
+        font-size:118px;line-height:1;color:var(--brass);letter-spacing:-.01em">milliseconds</div>
+      <div id="e-sub" class="lead" style="position:absolute;left:0;top:596px;width:1920px;text-align:center;font-size:30px;opacity:.82">
+        Spend them where the user is looking.</div>
+
+      <div id="e-next" style="position:absolute;left:0;top:772px;width:1920px;text-align:center">
+        <div class="mono" style="font-size:16px;letter-spacing:.22em;color:var(--emerald-lit);opacity:.6">NEXT EPISODE</div>
+        <div class="hdr" style="font-size:54px;margin-top:12px">EP 27 &middot; SUBAGENTS</div></div>
+
+      <div id="e-mark" class="mono" style="position:absolute;left:0;top:936px;width:1920px;text-align:center;
+        font-size:15px;letter-spacing:.24em;opacity:.34">EP 26 &middot; FRONTEND PERFORMANCE</div>
+      <div id="e-route" style="position:absolute;left:610px;top:700px;width:700px;height:34px"></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — Z-BACK continued: enters ABOVE 1.0 and settles down to it, so both
+      // halves share the sign of the scale velocity. Mirroring reads as a bounce, not a move.
+      tl.fromTo("#stage", { scale: 1.46 }, { scale: 1, duration: 0.62, ease: "power4.out" }, 0);
+      // everything is already on screen and settling out of the Z-back together — the card
+      // does not assemble itself after the seam, it arrives having been assembled.
+      // SEAM CARRIER — the plate and the display line are at full opacity from frame zero
+      // and ride the Z-back in. Faded up, the reserved vector lands on an empty frame.
+      tl.fromTo("#e-seam", { scaleX: 0 }, { scaleX: 1, duration: 0.78, ease: "power3.out" }, 0.10);
+      tl.fromTo("#e-h1", { y: 16 }, { y: 0, duration: 0.60, ease: "power3.out" }, 0);
+      tl.fromTo("#e-h2", { autoAlpha: 0, y: 28, scale: 0.95 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.74, ease: "back.out(1.2)" }, 0.40);
+      tl.fromTo("#e-sub", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.52 }, 0.92);
+      // the promise, given its own beat so it is read rather than skipped.
+      // the route, drawn once, in the order we travelled it — fifteen marks lighting
+      // across the tail, then dimming as the promise takes the frame.
+      var rt = document.querySelector("#e-route");
+      for (var i = 0; i < 15; i++) {
+        var m = document.createElement("div");
+        m.style.cssText = "position:absolute;left:" + (i*47) + "px;top:12px;width:30px;height:5px;border-radius:3px;" +
+          "background:" + (i === 14 ? "var(--brass)" : "var(--mint)");
+        rt.appendChild(m);
+        tl.fromTo(m, { autoAlpha: 0, scaleX: 0 }, { autoAlpha: 0.75, scaleX: 1, duration: 0.30, ease: "power3.out" }, 2.10 + i*0.16);
+      }
+      tl.fromTo("#e-next", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.62, ease: "power3.out" }, 4.80);
+      tl.to("#e-route", { autoAlpha: 0.30, duration: 0.90, ease: "power2.out" }, 5.10);
+      tl.fromTo("#e-mark", { autoAlpha: 0 }, { autoAlpha: 0.34, duration: 0.60 }, 5.70);
+      // the last motion in the film: the brass seam fading out under the sign-off.
+      tl.to("#e-seam", { autoAlpha: 0.25, duration: 2.20, ease: "power2.inOut" }, 7.20);
+      // no exit: the film ends here. The bed carries the last four seconds alone.
+      void true;
+      window.__timelines = window.__timelines || {};
+      window.__timelines["18-end"] = tl;
+    })();
+  </script>
+</template>

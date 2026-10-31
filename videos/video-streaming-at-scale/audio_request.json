@@ -1,0 +1,44 @@
+{
+  "provider": "auto",
+  "speed": 1,
+  "lines": [
+    {
+      "id": "01",
+      "text": "One film. A million people. All pressing play inside the same second."
+    },
+    {
+      "id": "03",
+      "text": "Do the arithmetic. One ultra-high-definition stream is about fifteen megabits per second. A million of them is fifteen terabits."
+    },
+    {
+      "id": "04",
+      "text": "So the film is never sent. It is cut into segments, six seconds each, and those are what travel."
+    },
+    {
+      "id": "05",
+      "text": "Encode every segment more than once, at different bitrates. Same six seconds of story. Three different weights."
+    },
+    {
+      "id": "06",
+      "text": "Then publish one text file that lists them. That playlist is everything the player is given. It works out the rest itself."
+    },
+    {
+      "id": "07",
+      "text": "Watch the buffer. When throughput drops, the player asks for a smaller rendition next. The picture softens. It never stops."
+    },
+    {
+      "id": "08",
+      "text": "Now put copies near people. A million viewers reach a nearby cache. The origin serves that segment once."
+    },
+    {
+      "id": "09",
+      "text": "Small pieces. Several sizes. One list. Cached close. That is streaming at scale."
+    }
+  ],
+  "bgm": {
+    "mode": "retrieve",
+    "query": "warm-pastoral-orchestral-wonder",
+    "blob": "You are never sent the film. It is cut into six-second segments, encoded at several bitrates, listed in one text file, and served from a cache near you.",
+    "arc": "The valley (one film, a million people) → Title → The arithmetic (15 Tbps) → Segmentation, the thesis → The bitrate ladder → The manifest (the one dark frame) → Adaptive bitrate on the road → The edge caches at dusk → Takeaway on the hilltop"
+  }
+}

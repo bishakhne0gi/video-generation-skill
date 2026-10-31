@@ -1,0 +1,103 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --deep: #000000; --div: rgba(252,252,252,0.16);
+      --hot: #ff6a3d;
+      --on-dark: #fcfcfc; --on-mute: rgba(252,252,252,0.78); --on-faint: rgba(252,252,252,0.5);
+    }
+    /* the deep register: the film ends on black, radius none, full bleed */
+    #f8-ground { position: absolute; inset: 0; background: var(--deep); }
+    #f8-stage { position: absolute; inset: 0; }
+
+    .f8-line {
+      position: absolute; left: 96px; width: 1730px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+      font-size: 116px; line-height: 1.0; letter-spacing: -0.03em; color: var(--on-dark);
+    }
+    #f8-l1 { top: 268px; }
+    #f8-l2 { top: 396px; }
+    #f8-l2 em { font-style: normal; color: var(--hot); }
+
+    #f8-rule { position: absolute; left: 96px; top: 596px; width: 1730px; height: 1px; background: var(--div); transform-origin: left center; }
+    #f8-note {
+      position: absolute; left: 96px; top: 636px; width: 1180px;
+      font-family: "JetBrains Mono", monospace; font-size: 24px; line-height: 1.6; color: var(--on-mute);
+    }
+
+    #f8-mark {
+      position: absolute; left: 96px; top: 828px;
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--on-faint);
+    }
+    #f8-next {
+      position: absolute; right: 96px; top: 820px; display: flex; align-items: center; gap: 14px;
+      padding: 11px 26px; border-radius: 9999px; border: 1px solid var(--div);
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--on-mute);
+    }
+    #f8-next s { text-decoration: none; color: var(--on-faint); font-weight: 400; }
+
+    #f8-grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.09; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    }
+  </style>
+
+  <div id="root" data-composition-id="08-takeaway" data-width="1920" data-height="1080">
+    <div id="f8-ground" class="clip" data-start="0" data-duration="7.2" data-track-index="0"></div>
+
+    <div id="f8-stage">
+      <div class="f8-line" id="f8-l1">Authenticate once.</div>
+      <div class="f8-line" id="f8-l2">Authorise <em>every time.</em></div>
+
+      <div id="f8-rule"></div>
+      <div id="f8-note">A token proves the front desk let you in.<br />It never proves the door should open.</div>
+
+      <div id="f8-mark">Tech Episode 23 &middot; Authentication vs Authorisation</div>
+      <div id="f8-next">Next <s>&rarr;</s> EP 24 &middot; Subagents</div>
+
+      <div id="f8-grain"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      gsap.set("#f8-l2, #f8-note, #f8-mark, #f8-next", { autoAlpha: 0 });
+      gsap.set("#f8-rule", { scaleX: 0 });
+
+      // ---- SEAM 7 -> 8 ENTRY: cut UP (y -1) — elevation into the conclusion. Frame 07
+      // exited travelling UP (y -> -196); this side arrives from BELOW, still moving up, so
+      // the vector runs straight through the cut. Spent once in the film.
+      tl.fromTo("#f8-stage", { y: 250 }, { y: 0, duration: 0.46, ease: "power4.out" }, 0);
+      tl.fromTo("#f8-l1", { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 0);
+
+      // ---- Scene 2 (1.6–3.0s): the second clause. These two lines are the whole episode,
+      // and they are the only large type on the frame.
+      tl.fromTo("#f8-l2", { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 1.44);
+
+      // ---- Scene 3 (3.0–5.4s): the hairline draws, the note lands, and the next episode is
+      // NAMED — a promise EP 20, 21 and 22 all made and none kept.
+      tl.to("#f8-rule", { scaleX: 1, duration: 0.62, ease: "power3.out" }, 2.86);
+      tl.fromTo("#f8-note", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 3.16);
+      tl.fromTo("#f8-mark", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 3.9);
+      tl.fromTo("#f8-next", { autoAlpha: 0, x: 26 }, { autoAlpha: 1, x: 0, duration: 0.42, ease: "power3.out" }, 4.14);
+
+      // ---- Scene 4 (5.4–7.2s): HELD. Grain only. The film ends still, and this is the
+      // second place the bed lifts. As the FINAL frame this one may settle out — and it
+      // does not: a hold is the right ending, and an exit here would just be a fade.
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["08-takeaway"] = tl;
+    })();
+  </script>
+</template>

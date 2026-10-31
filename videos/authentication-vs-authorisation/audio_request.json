@@ -1,0 +1,37 @@
+{
+  "provider": "auto",
+  "speed": 1,
+  "lines": [
+    {
+      "id": "01",
+      "text": "Walk up to a hotel room door. Your keycard proves who you are. It does not decide which doors open."
+    },
+    {
+      "id": "03",
+      "text": "Start at the front desk. Hand over a passport. They check it, then they issue a card. Authentication is that whole exchange — a claim, a check, a credential."
+    },
+    {
+      "id": "04",
+      "text": "Now carry that card to a door. Four twelve opens. Four thirteen does not. The lock never asks who you are — only what you may open."
+    },
+    {
+      "id": "05",
+      "text": "Read the two status codes carefully. Four oh one says Unauthorized, but it means we do not know you. Four oh three means we know you, and the answer is no."
+    },
+    {
+      "id": "06",
+      "text": "Look at this route. The token is valid, so it returns two hundred, and it returns someone else's invoice. Check ownership, not identity."
+    },
+    {
+      "id": "07",
+      "text": "Now count what that costs. Broken access control ranks number one on the OWASP Top Ten, with one point eight million recorded occurrences."
+    }
+  ],
+  "bgm": {
+    "mode": "retrieve",
+    "query": "tense-minimal-editorial",
+    "blob": "Authentication proves who you are. Authorisation decides what you may touch. Skipping the second is the #1 security risk on the web.",
+    "arc": "Hook (the door) → Title → AuthN (the desk) → AuthZ (the lock, the thesis) → The naming trap (401/403) → The route (the bug and the one-line fix) → What it costs (OWASP A01) → Takeaway"
+  },
+  "voice": "am_michael"
+}

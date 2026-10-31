@@ -1,0 +1,215 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Bricolage"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Jakarta"; src: url("assets/fonts/Jakarta-var.woff2") format("woff2"); font-weight: 200 800; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --void: #16102B; --void-2: #241748;
+      --ink: #FFFFFF; --ink-soft: #C9BEE8; --ink-mute: #9E8FC4;
+      --coral: #FF7A6B; --amber: #FFC24B; --mint: #5FE0B0; --lilac: #B48BFF; --sky: #6FC7FF;
+      --clay-ink: #16102B; --coral-lit: #FFB2A6; --lilac-lit: #D2B8FF;
+      background: var(--void);
+      font-family: "Jakarta", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .clay { position: absolute; }
+    .glass {
+      position: absolute;
+      background: rgba(22,16,43,0.76);
+      -webkit-backdrop-filter: blur(30px) saturate(150%);
+      backdrop-filter: blur(30px) saturate(150%);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 30px;
+      box-shadow: 0 22px 58px rgba(0,0,0,0.40);
+    }
+    .wplate { background: #FFFFFF; border-radius: 14px; display: flex; align-items: center;
+      justify-content: center; box-shadow: 0 10px 26px rgba(0,0,0,0.34); }
+
+
+    #f3-stage { position: absolute; inset: 0; }
+    #f3-c1 { left: -260px; top: -220px; width: 640px; height: 640px; border-radius: 270px; background: var(--lilac); transform: rotate(-10deg);
+      box-shadow: inset 15px 17px 32px rgba(255,255,255,0.52), inset -17px -19px 38px rgba(0,0,0,0.22), 0 32px 74px rgba(0,0,0,0.43); }
+    #f3-c2 { left: 1640px; top: 620px; width: 560px; height: 560px; border-radius: 240px; background: var(--sky); transform: rotate(14deg);
+      box-shadow: inset 14px 16px 30px rgba(255,255,255,0.50), inset -16px -18px 36px rgba(0,0,0,0.21), 0 30px 70px rgba(0,0,0,0.42); }
+    #f3-c3 { left: -200px; top: 760px; width: 480px; height: 480px; border-radius: 200px; background: var(--mint); transform: rotate(6deg);
+      box-shadow: inset 12px 14px 26px rgba(255,255,255,0.50), inset -14px -16px 32px rgba(0,0,0,0.20), 0 26px 60px rgba(0,0,0,0.40); }
+
+    /* one editor window, built as a piece of software rather than drawn as a diagram:
+       a truncated path, a row that runs out of room, and one status that is currently a dash */
+    #f3-win { left: 148px; top: 132px; width: 1624px; height: 748px; border-radius: 30px; overflow: hidden; }
+    #f3-chrome { position: absolute; left: 0; top: 0; right: 0; height: 74px;
+      border-bottom: 1px solid rgba(255,255,255,0.14); display: flex; align-items: center; padding: 0 28px; gap: 12px; }
+    .f3-tl { width: 15px; height: 15px; border-radius: 8px; }
+    #f3-cplate { width: 132px; height: 40px; margin-left: 20px; border-radius: 10px; }
+    #f3-cplate img { height: 22px; width: auto; display: block; }
+    .f3-tab { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 21px;
+      letter-spacing: 0.10em; color: var(--ink-mute); padding: 9px 20px; border-radius: 12px; }
+    #f3-tab2 { color: var(--clay-ink); background: var(--lilac); }
+
+    #f3-side { position: absolute; left: 0; top: 74px; bottom: 0; width: 372px;
+      border-right: 1px solid rgba(255,255,255,0.14); padding: 26px 0; }
+    .f3-file { height: 46px; display: flex; align-items: center; padding: 0 28px; gap: 14px;
+      font-family: "JetBrains Mono", monospace; font-size: 21px; color: var(--ink-soft);
+      white-space: pre; overflow: hidden; }
+    .f3-file span { overflow: hidden; text-overflow: ellipsis; }
+    .f3-fdot { width: 8px; height: 8px; border-radius: 5px; background: var(--ink-mute); flex: none; }
+
+    #f3-main { position: absolute; left: 372px; top: 74px; right: 0; bottom: 0; padding: 30px 38px; }
+    #f3-main > #f3-prhead, #f3-main > #f3-prmeta { position: relative; }
+    #f3-prhead { display: flex; align-items: baseline; gap: 20px; }
+    #f3-prid { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 27px; color: var(--coral-lit); }
+    #f3-prtitle { font-weight: 700; font-size: 34px; color: var(--ink); letter-spacing: -0.01em; }
+    #f3-prmeta { position: relative; margin-top: 14px; font-family: "JetBrains Mono", monospace;
+      font-size: 20px; letter-spacing: 0.04em; color: var(--ink-soft); }
+    #f3-ck0, #f3-ck1 { position: absolute; margin-left: 6px; font-weight: 700; }
+    #f3-ck1 { color: var(--mint); }
+    /* anchored inside #f3-main — as a child of #f3-win it spanned the sidebar too */
+    #f3-well { position: absolute; left: 38px; right: 38px; top: 148px; bottom: 30px;
+      background: rgba(255,255,255,0.05); border-radius: 18px; padding: 22px 26px; overflow: hidden; }
+    .f3-ln { font-family: "JetBrains Mono", monospace; font-size: 25px; line-height: 1.62;
+      color: var(--ink-soft); white-space: pre; }
+    .f3-ln .h { color: var(--sky); }
+    .f3-ln .m { color: var(--coral-lit); }
+    .f3-ln .p { color: var(--mint); }
+    #f3-caret { position: absolute; left: 26px; top: 26px; width: 3px; height: 30px; background: var(--ink); }
+
+    #f3-chips { position: absolute; left: 148px; top: 916px; display: flex; gap: 22px; }
+    .f3-chip { padding: 19px 34px; border-radius: 34px; font-family: "JetBrains Mono", monospace;
+      font-weight: 700; font-size: 26px; letter-spacing: 0.10em; color: var(--clay-ink);
+      box-shadow: inset 8px 9px 16px rgba(255,255,255,0.50), inset -9px -10px 20px rgba(0,0,0,0.20), 0 18px 40px rgba(0,0,0,0.38); }
+  </style>
+
+  <div id="root" data-composition-id="03-origin" data-width="1920" data-height="1080">
+    <div id="f3-clip" class="clip" data-start="0" data-duration="12.0" data-track-index="0" data-layout-allow-overflow>
+      <div id="f3-stage">
+        <div id="f3-c1" class="clay"></div>
+        <div id="f3-c2" class="clay"></div>
+        <div id="f3-c3" class="clay"></div>
+
+        <div id="f3-win" class="glass">
+          <div id="f3-chrome">
+            <div class="f3-tl" style="background:#FF5F57"></div>
+            <div class="f3-tl" style="background:#FEBC2E"></div>
+            <div class="f3-tl" style="background:#28C840"></div>
+            <div id="f3-cplate" class="wplate"><img src="public/img/logo-cursor-trim.png" alt="Cursor"></div>
+            <div class="f3-tab" style="margin-left:34px">FILES</div>
+            <div class="f3-tab" id="f3-tab2">CODEBASE</div>
+            <div class="f3-tab">CHAT</div>
+          </div>
+          <div id="f3-side"></div>
+          <div id="f3-main">
+            <div id="f3-prhead">
+              <div id="f3-prid">pr-118</div>
+              <div id="f3-prtitle">Add retry budget to sync worker</div>
+            </div>
+            <div id="f3-prmeta">4 COMMITS &middot; 2 FILES &middot; CHECKS <span id="f3-ck0">&mdash;</span><span id="f3-ck1">PASSING</span></div>
+            <div id="f3-well"><div id="f3-caret"></div></div>
+          </div>
+        </div>
+
+        <div id="f3-chips">
+          <div class="f3-chip" style="background:var(--sky)">BROWSE</div>
+          <div class="f3-chip" style="background:var(--lilac)">OPEN</div>
+          <div class="f3-chip" style="background:var(--amber)">REVIEW</div>
+          <div class="f3-chip" style="background:var(--mint)">MERGE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // ---- SEAM 2 -> 3 ENTRY: cut-the-curve LEFT, +302 on power4.out.
+      tl.fromTo("#f3-stage", { x: 302 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // The primary surface and its headline are NOT faded up: they are at full opacity
+      // from frame zero and ride the cut in on the stage. The seam gate measures MOTION, so
+      // a frame whose content fades up at 0.4s still passes while entering visibly blank.
+
+      tl.fromTo("#f3-c1", { scale: 0.86, y: -60 }, { scale: 1, y: 0, duration: 1.0, ease: "back.out(1.3)" }, 0.30);
+      tl.fromTo("#f3-c2", { scale: 0.86, y: 60 },  { scale: 1, y: 0, duration: 1.0, ease: "back.out(1.3)" }, 0.42);
+      tl.fromTo("#f3-c3", { scale: 0.86, y: 60 },  { scale: 1, y: 0, duration: 1.0, ease: "back.out(1.3)" }, 0.54);
+
+      // the sidebar is real software: a truncated path and a file list that runs past its box
+      var FILES = ["src/", "  sync/worker.ts", "  sync/retry.ts", "  sync/index.ts",
+                   "  api/origin-client.ts", "  api/github-adapter.ts", "test/", "  worker.spec.ts"];
+      var side = document.querySelector("#f3-side"), fileEls = [];
+      FILES.forEach(function (f) {
+        var d = document.createElement("div"); d.className = "f3-file";
+        d.innerHTML = '<div class="f3-fdot"></div><span>' + f + '</span>';
+        side.appendChild(d); fileEls.push(d);
+      });
+
+      tl.fromTo("#f3-win", { y: 40 }, { y: 0, duration: 0.66, ease: "power3.out" }, 0.36);
+      tl.fromTo(fileEls, { autoAlpha: 0, x: -22 }, { autoAlpha: 1, x: 0, duration: 0.40, ease: "power2.out", stagger: 0.055 }, 0.90);
+      tl.fromTo("#f3-tab2", { scale: 0.86 }, { scale: 1, duration: 0.44, ease: "back.out(1.6)" }, 1.30);
+      tl.fromTo("#f3-prid", { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: 0.44, ease: "power2.out" }, 1.58);
+      tl.fromTo("#f3-prtitle", { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: 0.46, ease: "power2.out" }, 1.72);
+      tl.fromTo("#f3-prmeta", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.40, ease: "power2.out" }, 1.96);
+
+      // Scene 3 (3.0-7.4s): the four verbs, each on its spoken cue. Each chip LIGHTS a
+      // region of the window as it lands, so it is labelling something rather than sitting
+      // next to it.
+      var chips = document.querySelectorAll(".f3-chip");
+      var TARGETS = ["#f3-side", "#f3-prhead", "#f3-well", "#f3-prmeta"];
+      [3.00, 3.85, 4.70, 5.55].forEach(function (t, i) {
+        tl.fromTo(chips[i], { autoAlpha: 0, scale: 0.78, y: 22 },
+                            { autoAlpha: 1, scale: 1, y: 0, duration: 0.50, ease: "back.out(1.7)" }, t);
+        tl.fromTo(TARGETS[i], { scale: 1 }, { scale: 1.018, duration: 0.22, ease: "power2.out" }, t + 0.10);
+        tl.to(TARGETS[i], { scale: 1, duration: 0.34, ease: "power2.inOut" }, t + 0.32);
+      });
+
+      // Scene 4 (7.4-11.0s): the diff writes itself, character by character, with a caret
+      // riding the write head. A code block that is simply present was never typed.
+      var LINES = [
+        [["@@ -14,7 +14,9 @@ export async function sync(", "h"]],
+        [["   const res = await origin.push(ref);", ""]],
+        [["-  if (!res.ok) throw new SyncError(res);", "m"]],
+        [["+  if (!res.ok) return budget.retry(res);", "p"]],
+        [["+  budget.consume(res.cost);", "p"]],
+        [["   return res;", ""]]
+      ];
+      var well = document.querySelector("#f3-well"), caret = document.querySelector("#f3-caret");
+      var glyphs = [], rowGlyphs = [];
+      LINES.forEach(function (runs) {
+        var d = document.createElement("div"); d.className = "f3-ln"; var mine = [];
+        runs.forEach(function (run) {
+          for (var i = 0; i < run[0].length; i++) {
+            var g = document.createElement("span");
+            g.className = run[1]; g.style.whiteSpace = "pre"; g.textContent = run[0][i];
+            d.appendChild(g); glyphs.push(g); mine.push(g);
+          }
+        });
+        well.appendChild(d); rowGlyphs.push(mine);
+      });
+      gsap.set(glyphs, { autoAlpha: 0 });
+      var CPS = 72, T0 = 6.15, LH = 40.5, CW = 15.0;
+      tl.to(glyphs, { autoAlpha: 1, duration: 0.01, ease: "none", stagger: 1 / CPS }, T0);
+      var seen = 0;
+      for (var ri = 0; ri < rowGlyphs.length; ri++) {
+        var nch = rowGlyphs[ri].length;
+        tl.to(caret, { y: ri * LH, duration: 0.09, ease: "power2.out" }, T0 + seen / CPS);
+        tl.fromTo(caret, { x: 0 }, { x: nch * CW, duration: nch / CPS, ease: "none" }, T0 + seen / CPS);
+        seen += nch;
+      }
+
+      // Scene 5 (9.3-11.0s): the beat RESOLVES. The checks row flips and the merge chip
+      // answers it — without this the frame types itself out and then waits.
+      gsap.set("#f3-ck1", { autoAlpha: 0 });
+      tl.set("#f3-ck0", { autoAlpha: 0 }, 9.36);
+      tl.fromTo("#f3-ck1", { y: 12 }, { autoAlpha: 1, y: 0, duration: 0.40, ease: "back.out(1.6)" }, 9.36);
+      tl.to("#f3-well", { scale: 1.014, duration: 0.26, ease: "power2.out" }, 9.30);
+      tl.to("#f3-well", { scale: 1, duration: 0.38, ease: "power2.inOut" }, 9.56);
+      tl.fromTo(chips[3], { scale: 1 }, { scale: 1.10, duration: 0.28, ease: "back.out(2)" }, 9.80);
+      tl.to(chips[3], { scale: 1, duration: 0.44, ease: "power2.inOut" }, 10.12);
+      // ---- SEAM 3 -> 4: cut-the-curve LEFT (the current).
+      tl.to("#f3-stage", { x: -238, duration: 0.34, ease: "power4.in" }, 11.66);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["03-origin"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,51 @@
+{
+ "bgm": {
+  "path": "assets/music/bed.mp3",
+  "volume": 1.0,
+  "mode": "retrieve",
+  "source": "ccmixter",
+  "title": "Strange Contemplations",
+  "creator": "PorchCat",
+  "license": "CC BY 3.0",
+  "license_url": "http://creativecommons.org/licenses/by/3.0/",
+  "page": "https://ccmixter.org/files/PorchCat/27233",
+  "duration_s": 99.0,
+  "query": "tense-modern-electronic-pulse-restrained; chosen on measured spectrum (carve 31.8 dB out of the 1-4kHz speech band, 2.7 dB level spread) from 129 measured candidates; source offset 67s so the bed's density lift lands on the mirror cut at 27.5s, its breakdown on the failure beat, and its return exactly on the arrival at 63.0s; ducked offline against the real narration; level baked into the file"
+ },
+ "bgm_pending": false,
+ "voices": [
+  {
+   "frame": 1,
+   "path": "assets/voice/01.wav"
+  },
+  {
+   "frame": 3,
+   "path": "assets/voice/03.wav"
+  },
+  {
+   "frame": 4,
+   "path": "assets/voice/04.wav"
+  },
+  {
+   "frame": 5,
+   "path": "assets/voice/05.wav"
+  },
+  {
+   "frame": 6,
+   "path": "assets/voice/06.wav"
+  },
+  {
+   "frame": 7,
+   "path": "assets/voice/07.wav"
+  },
+  {
+   "frame": 8,
+   "path": "assets/voice/08.wav"
+  },
+  {
+   "frame": 9,
+   "path": "assets/voice/09.wav"
+  }
+ ],
+ "sfx": []
+}

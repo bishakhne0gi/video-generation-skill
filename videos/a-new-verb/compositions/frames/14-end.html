@@ -1,0 +1,138 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --paper:#F4F1EA; --paper2:#E7E1D4; --sheet:#FBF9F4;
+  --ink:#14110E; --ink2:#5A5245; --navy:#16233B;
+  --yellow:#FFEB00; --pen:#DC3220; --pentype:#B32414; --rule:#B8B0A0;
+  background:var(--paper); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* the coloured field travels WITH the stage, so a navy or yellow frame reads as a
+   card sliding over the page rather than as the ground changing colour. */
+.field{position:absolute;inset:0}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:88%;letter-spacing:-.045em;line-height:.90;color:var(--ink)}
+.deck{font-weight:500;line-height:1.26;color:var(--ink2)}
+.quote{font-family:"Serif",Georgia,serif;line-height:1.16;color:var(--ink)}
+.ital{font-family:"Serif",Georgia,serif;font-style:italic}
+.mono{font-family:"JBMono",monospace;color:var(--ink)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink2);font-size:21px}
+.redtype{color:var(--pentype)}
+.onnavy{color:var(--sheet)}
+.onnavy .tag,.onnavy .deck{color:#A9B6C9}
+
+/* ---- PAPER: a sheet is defined by its shadow and its edge, never by a stripe ---- */
+.sheet{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.16), 0 10px 24px rgba(20,17,14,.12)}
+.card{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.14), 0 7px 18px rgba(20,17,14,.10)}
+.hair{position:absolute;background:var(--rule);height:1px}
+.rule2{position:absolute;background:var(--ink);height:3px}
+
+/* ---- THE MARKER: sits BEHIND its phrase, skewed, origin left ---- */
+.mark{position:absolute;background:var(--yellow);z-index:0;transform-origin:0% 50%}
+.marknavy{background:var(--yellow)}
+.phrase{position:relative;z-index:1}
+
+/* ---- THE PEN: strokes only. Never a glyph, never on navy. ---- */
+.pen{position:absolute;pointer-events:none;overflow:visible}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--pen);stroke-linecap:round;
+  stroke-linejoin:round}
+.penY path,.penY line,.penY polyline{stroke:var(--yellow)}
+.penD path,.penD line,.penD polyline{stroke:var(--pentype)}
+.penI path,.penI line,.penI polyline{stroke:var(--ink)}
+
+  </style>
+
+  <div id="root" data-composition-id="14-end" data-start="0" data-width="1920" data-height="1080">
+<div class="field" style="background:var(--yellow)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      <div id="f14-kick" class="ital" style="position:absolute;left:132px;top:88px;font-size:52px;color:var(--ink)">and so,</div>
+      <div id="f14-h" class="hdr" style="position:absolute;left:124px;top:158px;font-size:150px">A READ THAT<br>SAYS SO.</div>
+
+      <div id="f14-hr" class="rule2" style="left:130px;top:452px;width:1000px;height:6px;transform-origin:0% 50%"></div>
+
+      
+      <div id="f14-t0" style="position:absolute;left:130px;top:492px;width:1000px">
+        <div class="deck" style="font-size:38px;font-weight:700;color:var(--ink)">A read with a body now has a verb.</div>
+        <div class="deck" style="font-size:26px;color:#4A4335;margin-top:6px">GET could never carry one. POST could, and lied about what it was.</div>
+      </div>
+      <div id="f14-u0" class="rule2" style="left:130px;top:480px;width:1000px;height:3px;transform-origin:0% 50%"></div>
+      <div id="f14-t1" style="position:absolute;left:130px;top:624px;width:1000px">
+        <div class="deck" style="font-size:38px;font-weight:700;color:var(--ink)">The word is the contract.</div>
+        <div class="deck" style="font-size:26px;color:#4A4335;margin-top:6px">Safe, idempotent, cacheable — declared in the request line, where the path can see it.</div>
+      </div>
+      <div id="f14-u1" class="rule2" style="left:130px;top:612px;width:1000px;height:3px;transform-origin:0% 50%"></div>
+      <div id="f14-t2" style="position:absolute;left:130px;top:756px;width:1000px">
+        <div class="deck" style="font-size:38px;font-weight:700;color:var(--ink)">The cache key is the body.</div>
+        <div class="deck" style="font-size:26px;color:#4A4335;margin-top:6px">Same URI, different content, different entry. That is the price of the feature.</div>
+      </div>
+      <div id="f14-u2" class="rule2" style="left:130px;top:744px;width:1000px;height:3px;transform-origin:0% 50%"></div>
+
+      <!-- the one move a viewer can make on Monday -->
+      <div id="f14-act" style="position:absolute;left:1196px;top:492px;width:624px;height:214px">
+        <div class="card" style="position:absolute;inset:0;background:var(--ink);transform:rotate(0.55deg)"></div>
+        <div style="position:absolute;inset:0;transform:rotate(0.55deg)">
+          <div class="tag" style="position:absolute;left:28px;top:24px;font-size:17px;color:#B9B2A2">START HERE · RFC 10008 §3</div>
+          <div class="mono" style="position:absolute;left:28px;top:66px;font-size:27px;font-weight:700;color:var(--yellow);white-space:nowrap">Accept-Query:</div>
+          <div class="mono" style="position:absolute;left:28px;top:104px;font-size:25px;color:#F4F1EA;white-space:nowrap">&nbsp;&nbsp;application/json</div>
+          <div style="position:absolute;left:28px;top:150px;width:568px;font-size:23px;color:#B9B2A2">Advertise it on the resource. That is how a client finds out.</div>
+        </div>
+      </div>
+
+      <div id="f14-next" style="position:absolute;left:1196px;top:762px;width:624px">
+        <div class="rule2" style="position:relative;width:624px;height:4px"></div>
+        <div class="tag" style="position:absolute;left:0;top:22px;font-size:19px">NEXT · EPISODE 28</div>
+        <div class="hdr" style="position:absolute;left:0;top:54px;font-size:104px;white-space:nowrap">SUBAGENTS</div>
+      </div>
+
+      <div id="f14-mark" class="mono" style="position:absolute;left:130px;top:902px;font-size:23px;font-weight:700;letter-spacing:.16em;color:#4A4335">SHIP IT · EPISODE 27 · A NEW VERB</div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — ACT BREAK lift. Rises from below through a softer scale curve
+      // than the travel, so the pull-back reads as the page being turned up and over.
+      tl.fromTo("#stage", { y: 372 }, { y: 0, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#stage", { scale: 0.86 }, { scale: 1, duration: 0.78, ease: "power2.out" }, 0);
+      // the two carriers ride the cut at full opacity and only settle
+      tl.fromTo("#f14-h", { y: 22 }, { y: 0, duration: 0.56, ease: "power3.out" }, 0);
+      tl.fromTo("#f14-kick", { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: 0.42, ease: "power3.out" }, 0.26);
+      gsap.set("#f14-t0", { autoAlpha: 0 });
+      tl.fromTo("#f14-t0", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, 1.10);
+      tl.fromTo("#f14-u0", { scaleX: 0 }, { scaleX: 1, duration: 0.90, ease: "power3.out" }, 1.20);
+      gsap.set("#f14-t1", { autoAlpha: 0 });
+      tl.fromTo("#f14-t1", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, 2.60);
+      tl.fromTo("#f14-u1", { scaleX: 0 }, { scaleX: 1, duration: 0.90, ease: "power3.out" }, 2.70);
+      gsap.set("#f14-t2", { autoAlpha: 0 });
+      tl.fromTo("#f14-t2", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, 4.10);
+      tl.fromTo("#f14-u2", { scaleX: 0 }, { scaleX: 1, duration: 0.90, ease: "power3.out" }, 4.20);
+      gsap.set("#f14-act", { autoAlpha: 0 });
+      tl.fromTo("#f14-act", { autoAlpha: 0, scale: 0.90, rotation: -4 }, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.34, ease: "steps(5)" }, 6.10);
+      gsap.set("#f14-next", { autoAlpha: 0 });
+      tl.fromTo("#f14-next", { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.42, ease: "power3.out" }, 7.40);
+      gsap.set("#f14-mark", { autoAlpha: 0 });
+      tl.fromTo("#f14-mark", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.40, ease: "power2.out" }, 8.10);
+      // the film does not simply stop: the last move is the takeaway block settling square
+      gsap.set("#f14-hr", { scaleX: 0 });
+      tl.fromTo("#f14-hr", { scaleX: 0 }, { scaleX: 1, duration: 1.30, ease: "power3.out" }, 8.60);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["14-end"] = tl;
+    })();
+  </script>
+</template>

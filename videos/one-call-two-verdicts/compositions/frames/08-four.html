@@ -1,0 +1,254 @@
+<template>
+  <style>
+@font-face{font-family:"Fraktur";src:url("assets/fonts/Fraktur-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Anton";src:url("assets/fonts/Anton-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Oswald";src:url("assets/fonts/Oswald-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-900.woff2") format("woff2");font-weight:900;font-style:normal;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-700i.woff2") format("woff2");font-weight:700;font-style:italic;font-display:block}
+@font-face{font-family:"Bodoni";src:url("assets/fonts/Bodoni-900.woff2") format("woff2");font-weight:900;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400i.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --news:#E3DDCE; --news2:#D3CBB8; --scrap:#F2EDE1; --plate:#141210;
+  --ink:#171310; --ink2:#4E4638; --stop:#C1272D; --stopt:#A81E24;
+  background:var(--news); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the .clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* The field OVER-SCANS. A frame whose exit shrinks (the reserved Z-back) would
+   otherwise show the stage edge for the length of the cut. -18% covers the largest
+   travel in a 1920-wide frame and costs nothing on the frames that never shrink. */
+.field{position:absolute;inset:-18%}
+
+/* ---- THE PAGE: newsprint is a HALFTONE, not a flat fill --------------------
+   A 4px dot screen in press black at low alpha. Static, always: a halftone that
+   moves is a moire and it will wreck the encode. */
+.screen{position:absolute;inset:-18%;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px, rgba(23,19,16,.115) 0.85px, transparent 0.9px);
+  background-size:4px 4px}
+/* the press never lays ink perfectly evenly */
+.grain{position:absolute;inset:-18%;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle at 2px 3px, rgba(23,19,16,.08) 1px, transparent 1.1px);
+  background-size:11px 9px}
+
+/* ---- TYPE: eight families, one job each ---------------------------------- */
+.mast{font-family:"Fraktur",serif;font-weight:400;line-height:.95;color:var(--ink)}
+.head{font-family:"Anton",sans-serif;font-weight:400;line-height:.88;
+  letter-spacing:-.005em;text-transform:uppercase;color:var(--ink)}
+.head2{font-family:"Oswald",sans-serif;font-weight:700;line-height:.94;
+  letter-spacing:.005em;text-transform:uppercase;color:var(--ink)}
+.quote{font-family:"Playfair",Georgia,serif;font-weight:900;line-height:1.10;color:var(--ink)}
+.qital{font-family:"Playfair",Georgia,serif;font-weight:700;font-style:italic;line-height:1.14}
+/* Bodoni Moda is loaded at optical size 96 — a DISPLAY cut. Below about 80px its
+   hairline stems vanish in the render and N becomes a bare diagonal, 1 a bare stem.
+   .fig is for BIG figures only; anything smaller uses .head2 (Oswald). Verified by
+   measuring the render, not by looking at the font in a browser. */
+.fig{font-family:"Bodoni",serif;font-weight:900;line-height:.86;color:var(--ink)}
+.body{font-family:"PTSerif",Georgia,serif;font-weight:400;line-height:1.30;color:var(--ink)}
+.bodyb{font-family:"PTSerif",Georgia,serif;font-weight:700;line-height:1.28}
+.bodyi{font-family:"PTSerif",Georgia,serif;font-style:italic;line-height:1.30}
+.mono{font-family:"Courier",monospace;font-weight:400;color:var(--ink)}
+.monob{font-family:"Courier",monospace;font-weight:700}
+.slug{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.20em;
+  text-transform:uppercase;font-size:20px;color:var(--ink2)}
+.red{color:var(--stopt)}      /* red as a LETTER — the only red allowed to be type */
+.faint{color:var(--ink2)}
+.rev{color:var(--scrap)}      /* reversed out of the black plate */
+.rev .faint{color:#A79E8D}
+.rev .slug{color:#A79E8D}
+
+/* ---- RULES: press furniture. Never a glyph. ------------------------------ */
+.rule{position:absolute;background:var(--ink);height:3px}
+.hair{position:absolute;background:var(--ink2);height:1px;opacity:.55}
+.rrule{position:absolute;background:var(--stop);height:5px}
+.revrule{position:absolute;background:var(--scrap);height:3px}
+
+/* ---- A CUTTING ----------------------------------------------------------
+   Four layers, and all four are required. The drop-shadow lives on a SIBLING,
+   not in box-shadow: box-shadow follows the border box, so on a clip-path shape
+   it draws a rectangle behind a torn edge — the single loudest tell in the register. */
+.cutw{position:absolute}                                   /* the slap wrapper */
+.cutsh{position:absolute;inset:0;background:rgba(23,19,16,.34);filter:blur(7px)}
+.cutfib{position:absolute;inset:0;background:#FFFCF4}      /* the torn fibre lip */
+.cutface{position:absolute;inset:0;background:var(--scrap);overflow:hidden}
+.cutbody{position:absolute;inset:0}
+
+/* ---- MISREGISTRATION -----------------------------------------------------
+   The one "effect" in the film, and it is a real press artifact: the spot plate lands
+   a hair off the black one. Carried as a TEXT-SHADOW on the headline itself, never as
+   a duplicated element — a second copy of the words in the same place is two text
+   blocks the layout gate is right to reject, and it doubles what a contrast checker
+   has to reason about. One impression, one fringe. */
+
+/* ---- THE STAMP ---------------------------------------------------------- */
+/* on the black plate the stamp turns CREAM: red type on plate measures 3.20:1 and
+   this register does not put red type on black. */
+.stampw{border-color:var(--scrap)!important;color:var(--scrap)!important}
+.stamp{position:absolute;border:4px solid var(--stop);color:var(--stopt);
+  font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:.10em;
+  text-transform:uppercase;opacity:.88;display:flex;align-items:center;
+  justify-content:center;white-space:nowrap}
+
+/* ---- THE PEN: red strokes drawn on the page. Never a glyph. -------------- */
+/* z-index 5 is load-bearing: a cutting is z-index 2, so a pen with auto z-index
+   draws UNDERNEATH the very thing it is marking and is invisible in the render. */
+.pen{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;overflow:visible;z-index:5}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--stop);stroke-linecap:round;
+  stroke-linejoin:round}
+.penk path,.penk line,.penk polyline{stroke:var(--ink)}
+.penw path,.penw line,.penw polyline{stroke:var(--scrap)}
+
+  </style>
+
+  <div id="root" data-composition-id="08-four" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="field" data-layout-allow-overflow style="background:var(--news2)"></div><div class="screen" data-layout-allow-overflow ></div><div class="grain" data-layout-allow-overflow></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-kick" class="slug" style="position:absolute;left:120px;top:110px;color:var(--stopt)">1994 &middot; THE REBUTTAL</div>
+      <div id="s-rule" class="rrule" style="left:120px;top:146px;width:132px;transform-origin:0% 50%"></div>
+      <div id="s-head" class="head" style="position:absolute;left:120px;top:186px;width:1300px;font-size:86px;z-index:1;text-shadow:3px 2px 0 rgba(193,39,45,.42)">FOUR THINGS<br>YOU CANNOT HIDE</div>
+      <div id="s-deck" class="body" style="position:absolute;left:122px;top:374.8px;width:1320px;font-size:31px">Ten years on, Sun Microsystems Laboratories answers Xerox PARC, and the answer is a list.</div>
+
+      
+      <div id="f8-c0" class="cutw" style="left:150px;top:440px;width:380px;height:352px;z-index:2;transform:rotate(0.78deg)">
+        <div id="f8-c0-sh"  class="cutsh"  style="clip-path:polygon(0.0px 2.3px,76.0px 1.8px,152.0px -0.9px,228.0px 0.4px,304.0px 2.2px,380.3px 0.0px,382.1px 70.4px,379.1px 140.8px,381.2px 211.2px,378.1px 281.6px,380.0px 352.4px,304.0px 354.4px,228.0px 352.7px,152.0px 349.8px,76.0px 350.9px,2.4px 352.0px,1.4px 281.6px,-1.3px 211.2px,-0.1px 140.8px,-0.8px 70.4px)"></div>
+        <div id="f8-c0-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px -0.3px,77.0px -2.1px,154.0px 0.9px,231.0px -1.2px,308.0px 1.9px,385.4px 0.0px,387.4px 71.4px,385.7px 142.8px,382.8px 214.2px,383.9px 285.6px,385.0px 354.6px,308.0px 355.6px,231.0px 358.3px,154.0px 357.1px,77.0px 357.8px,0.8px 357.0px,2.6px 285.6px,0.5px 214.2px,0.4px 142.8px,-1.2px 71.4px)"></div>
+        <div id="f8-c0-fc"  class="cutface" style="background:var(--scrap);clip-path:polygon(0.0px 2.3px,76.0px 1.8px,152.0px -0.9px,228.0px 0.4px,304.0px 2.2px,380.3px 0.0px,382.1px 70.4px,379.1px 140.8px,381.2px 211.2px,378.1px 281.6px,380.0px 352.4px,304.0px 354.4px,228.0px 352.7px,152.0px 349.8px,76.0px 350.9px,2.4px 352.0px,1.4px 281.6px,-1.3px 211.2px,-0.1px 140.8px,-0.8px 70.4px)">
+          <div class="cutbody" style="padding:0px">
+            <div class="head2 faint" style="position:absolute;left:26px;top:22px;font-size:46px">01</div>
+            <div class="head2 " style="position:absolute;left:26px;top:82px;width:330px;font-size:34px">LATENCY</div>
+            <div class="hair" style="left:26px;top:136px;width:330px"></div>
+            <div class="body" style="position:absolute;left:26px;top:152px;width:330px;font-size:20px;color:var(--ink2)">Nanoseconds become milliseconds. Four orders of magnitude, and no amount of API design makes it go away.</div></div>
+        </div>
+      </div>
+      <div id="f8-c1" class="cutw" style="left:560px;top:440px;width:380px;height:352px;z-index:2;transform:rotate(1.74deg)">
+        <div id="f8-c1-sh"  class="cutsh"  style="clip-path:polygon(0.0px -0.7px,76.0px -2.2px,152.0px 1.2px,228.0px -0.4px,304.0px 1.4px,378.5px 0.0px,381.7px 70.4px,382.5px 140.8px,381.0px 211.2px,379.4px 281.6px,380.0px 350.5px,304.0px 354.0px,228.0px 349.7px,152.0px 353.0px,76.0px 350.3px,1.9px 352.0px,2.4px 281.6px,0.2px 211.2px,-2.4px 140.8px,0.3px 70.4px)"></div>
+        <div id="f8-c1-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px 1.5px,77.0px -1.7px,154.0px -2.5px,231.0px -1.0px,308.0px 0.6px,383.5px 0.0px,387.0px 71.4px,382.7px 142.8px,386.0px 214.2px,383.3px 285.6px,385.0px 355.1px,308.0px 354.6px,231.0px 356.8px,154.0px 359.4px,77.0px 356.7px,-1.2px 357.0px,-1.6px 285.6px,0.6px 214.2px,2.2px 142.8px,-0.4px 71.4px)"></div>
+        <div id="f8-c1-fc"  class="cutface" style="background:var(--scrap);clip-path:polygon(0.0px -0.7px,76.0px -2.2px,152.0px 1.2px,228.0px -0.4px,304.0px 1.4px,378.5px 0.0px,381.7px 70.4px,382.5px 140.8px,381.0px 211.2px,379.4px 281.6px,380.0px 350.5px,304.0px 354.0px,228.0px 349.7px,152.0px 353.0px,76.0px 350.3px,1.9px 352.0px,2.4px 281.6px,0.2px 211.2px,-2.4px 140.8px,0.3px 70.4px)">
+          <div class="cutbody" style="padding:0px">
+            <div class="head2 faint" style="position:absolute;left:26px;top:22px;font-size:46px">02</div>
+            <div class="head2 " style="position:absolute;left:26px;top:82px;width:330px;font-size:34px">MEMORY<br>ACCESS</div>
+            <div class="hair" style="left:26px;top:172px;width:330px"></div>
+            <div class="body" style="position:absolute;left:26px;top:188px;width:330px;font-size:20px;color:var(--ink2)">A pointer means nothing on the other machine. Everything is copied &mdash; and a copy is stale on arrival.</div></div>
+        </div>
+      </div>
+      <div id="f8-c2" class="cutw" style="left:970px;top:440px;width:380px;height:352px;z-index:2;transform:rotate(-1.43deg)">
+        <div id="f8-c2-sh"  class="cutsh"  style="clip-path:polygon(0.0px 0.6px,76.0px 2.3px,152.0px 0.0px,228.0px 2.4px,304.0px 1.0px,378.6px 0.0px,381.4px 70.4px,381.5px 140.8px,379.6px 211.2px,380.7px 281.6px,380.0px 351.0px,304.0px 350.7px,228.0px 351.5px,152.0px 351.2px,76.0px 351.9px,-0.2px 352.0px,-1.7px 281.6px,-1.6px 211.2px,-1.1px 140.8px,-0.3px 70.4px)"></div>
+        <div id="f8-c2-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px 1.4px,77.0px -1.4px,154.0px -1.5px,231.0px 0.4px,308.0px -0.7px,384.0px 0.0px,383.7px 71.4px,384.5px 142.8px,384.2px 214.2px,384.9px 285.6px,385.0px 357.2px,308.0px 358.7px,231.0px 358.6px,154.0px 358.1px,77.0px 357.3px,-0.6px 357.0px,-0.3px 285.6px,2.5px 214.2px,-0.5px 142.8px,-2.5px 71.4px)"></div>
+        <div id="f8-c2-fc"  class="cutface" style="background:var(--scrap);clip-path:polygon(0.0px 0.6px,76.0px 2.3px,152.0px 0.0px,228.0px 2.4px,304.0px 1.0px,378.6px 0.0px,381.4px 70.4px,381.5px 140.8px,379.6px 211.2px,380.7px 281.6px,380.0px 351.0px,304.0px 350.7px,228.0px 351.5px,152.0px 351.2px,76.0px 351.9px,-0.2px 352.0px,-1.7px 281.6px,-1.6px 211.2px,-1.1px 140.8px,-0.3px 70.4px)">
+          <div class="cutbody" style="padding:0px">
+            <div class="head2 faint" style="position:absolute;left:26px;top:22px;font-size:46px">03</div>
+            <div class="head2 " style="position:absolute;left:26px;top:82px;width:330px;font-size:34px">CONCURRENCY</div>
+            <div class="hair" style="left:26px;top:136px;width:330px"></div>
+            <div class="body" style="position:absolute;left:26px;top:152px;width:330px;font-size:20px;color:var(--ink2)">The other side is not waiting for you. It serves everybody else, in an order you do not control.</div></div>
+        </div>
+      </div>
+      <div id="f8-c3" class="cutw" style="left:1380px;top:440px;width:380px;height:352px;z-index:2;transform:rotate(-0.15deg)">
+        <div id="f8-c3-sh"  class="cutsh"  style="clip-path:polygon(0.0px -1.5px,25.3px 1.9px,50.7px 2.6px,76.0px 5.8px,101.3px 5.8px,126.7px 8.7px,152.0px -2.7px,177.3px 7.1px,202.7px 2.0px,228.0px 1.0px,253.3px -2.6px,278.7px 0.3px,304.0px 4.1px,329.3px -5.6px,354.7px -3.2px,384.0px 0.0px,380.4px 25.1px,374.8px 50.3px,371.4px 75.4px,379.1px 100.6px,385.9px 125.7px,382.0px 150.9px,374.6px 176.0px,376.2px 201.1px,388.7px 226.3px,371.8px 251.4px,377.2px 276.6px,385.6px 301.7px,378.3px 326.9px,380.0px 351.2px,354.7px 354.7px,329.3px 352.0px,304.0px 348.3px,278.7px 356.9px,253.3px 359.4px,228.0px 351.9px,202.7px 353.2px,177.3px 353.7px,152.0px 356.8px,126.7px 345.2px,101.3px 349.3px,76.0px 351.2px,50.7px 356.3px,25.3px 356.1px,1.2px 352.0px,-0.0px 326.9px,7.8px 301.7px,2.9px 276.6px,3.9px 251.4px,7.3px 226.3px,-5.7px 201.1px,-2.9px 176.0px,5.3px 150.9px,1.1px 125.7px,-1.2px 100.6px,-3.1px 75.4px,1.2px 50.3px,-2.5px 25.1px)"></div>
+        <div id="f8-c3-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px -0.3px,25.7px 3.1px,51.3px 3.8px,77.0px -3.8px,102.7px -0.4px,128.3px -1.6px,154.0px -6.5px,179.7px -1.8px,205.3px 6.9px,231.0px -3.0px,256.7px -0.8px,282.3px 4.2px,308.0px 4.4px,333.7px -7.2px,359.3px 7.0px,391.2px 0.0px,391.2px 25.5px,389.3px 51.0px,381.6px 76.5px,388.7px 102.0px,379.5px 127.5px,380.1px 153.0px,391.1px 178.5px,386.7px 204.0px,386.2px 229.5px,386.2px 255.0px,381.6px 280.5px,380.7px 306.0px,380.1px 331.5px,385.0px 362.6px,359.3px 362.7px,333.7px 361.1px,308.0px 352.2px,282.3px 351.0px,256.7px 353.9px,231.0px 352.9px,205.3px 349.4px,179.7px 359.7px,154.0px 350.9px,128.3px 358.7px,102.7px 366.7px,77.0px 353.5px,51.3px 354.0px,25.7px 351.6px,-3.2px 357.0px,1.9px 331.5px,1.6px 306.0px,-0.8px 280.5px,4.8px 255.0px,0.1px 229.5px,3.3px 204.0px,5.0px 178.5px,-7.0px 153.0px,6.0px 127.5px,7.6px 102.0px,0.2px 76.5px,-2.9px 51.0px,1.0px 25.5px)"></div>
+        <div id="f8-c3-fc"  class="cutface" style="background:var(--scrap);clip-path:polygon(0.0px -1.5px,25.3px 1.9px,50.7px 2.6px,76.0px 5.8px,101.3px 5.8px,126.7px 8.7px,152.0px -2.7px,177.3px 7.1px,202.7px 2.0px,228.0px 1.0px,253.3px -2.6px,278.7px 0.3px,304.0px 4.1px,329.3px -5.6px,354.7px -3.2px,384.0px 0.0px,380.4px 25.1px,374.8px 50.3px,371.4px 75.4px,379.1px 100.6px,385.9px 125.7px,382.0px 150.9px,374.6px 176.0px,376.2px 201.1px,388.7px 226.3px,371.8px 251.4px,377.2px 276.6px,385.6px 301.7px,378.3px 326.9px,380.0px 351.2px,354.7px 354.7px,329.3px 352.0px,304.0px 348.3px,278.7px 356.9px,253.3px 359.4px,228.0px 351.9px,202.7px 353.2px,177.3px 353.7px,152.0px 356.8px,126.7px 345.2px,101.3px 349.3px,76.0px 351.2px,50.7px 356.3px,25.3px 356.1px,1.2px 352.0px,-0.0px 326.9px,7.8px 301.7px,2.9px 276.6px,3.9px 251.4px,7.3px 226.3px,-5.7px 201.1px,-2.9px 176.0px,5.3px 150.9px,1.1px 125.7px,-1.2px 100.6px,-3.1px 75.4px,1.2px 50.3px,-2.5px 25.1px)">
+          <div class="cutbody" style="padding:0px">
+            <div class="head2 red" style="position:absolute;left:26px;top:22px;font-size:46px">04</div>
+            <div class="head2 red" style="position:absolute;left:26px;top:82px;width:330px;font-size:34px">PARTIAL<br>FAILURE</div>
+            <div class="hair" style="left:26px;top:172px;width:330px"></div>
+            <div class="qital" style="position:absolute;left:26px;top:188px;width:330px;font-size:25px;color:var(--ink)">&ldquo;Partial failure is a central reality of distributed computing.&rdquo;</div></div>
+        </div>
+      </div>
+
+      <svg id="f8-ring-svg" class="pen " viewBox="0 0 1920 1080"><path id="f8-ring" d="M1746.8,495.6 L1755.8,507.7 L1763.4,520.5 L1769.7,533.9 L1774.8,547.6 L1778.8,561.5 L1781.8,575.7 L1783.8,589.9 L1784.8,604.2 L1784.7,618.5 L1783.4,632.7 L1780.9,646.8 L1777.0,660.6 L1771.8,674.1 L1765.1,686.9 L1757.2,699.1 L1748.1,710.4 L1738.1,721.0 L1727.4,730.9 L1716.3,740.0 L1704.7,748.7 L1693.0,756.9 L1681.1,765.0 L1668.9,772.8 L1656.4,780.5 L1643.4,787.9 L1629.8,794.9 L1615.4,801.2 L1600.4,806.5 L1584.8,810.5 L1568.6,812.9 L1552.2,813.6 L1535.8,812.3 L1519.7,809.2 L1504.3,804.3 L1489.5,797.8 L1475.7,789.9 L1462.9,781.1 L1450.9,771.5 L1439.8,761.4 L1429.4,751.0 L1419.6,740.4 L1410.3,729.5 L1401.5,718.4 L1393.3,706.9 L1385.6,695.1 L1378.8,682.8 L1372.8,670.1 L1368.0,657.0 L1364.4,643.5 L1362.0,629.8 L1361.0,615.9 L1361.1,602.0 L1362.3,588.1 L1364.5,574.3 L1367.5,560.6 L1371.4,547.0 L1376.1,533.5 L1381.6,520.1 L1388.0,507.0 L1395.5,494.1 L1404.2,481.8 L1414.2,470.2 L1425.5,459.5 L1438.1,450.1 L1451.8,442.2 L1466.5,435.8 L1481.9,431.1 L1497.7,428.0 L1513.6,426.3 L1529.5,425.9 L1545.0,426.5 L1560.3,427.7 L1575.2,429.4 L1589.9,431.3 L1604.4,433.4 L1619.0,435.6 L1633.6,438.2 L1648.3,441.1 L1663.1,444.8 L1677.7,449.3 L1692.2,455.0 L1706.0,461.9 L1719.2,470.1 L1731.3,479.6 L1742.2,490.3 L1751.8,501.9 L1760.0,514.4 L1766.9,527.5 L1772.6,541.1 L1777.1,554.9 L1780.5,569.0 L1783.0,583.2 L1784.4,597.5 L1784.9,611.8 L1784.2,626.0 L1782.3,640.2 L1779.0,654.2 L1774.4,667.8 L1768.4,680.9 L1761.1,693.4" stroke-width="5"/></svg>
+      <svg id="f8-s0-svg" class="pen " viewBox="0 0 1920 1080"><path id="f8-s0" d="M176,546.3 Q341.0,552.9 506,547.0" stroke-width="6"/></svg>
+      <svg id="f8-s1-svg" class="pen " viewBox="0 0 1920 1080"><path id="f8-s1" d="M586,549.9 Q751.0,548.9 916,549.5" stroke-width="6"/></svg>
+      <div id="f8-st" class="stamp" style="left:1348px;top:812px;width:436px;height:60px;font-size:25px;transform:rotate(10.17deg);z-index:6">THE ONE THAT MATTERS</div>
+
+      <div id="f8-r" class="rrule" style="left:150px;top:838px;width:1150px;transform-origin:0% 50%"></div>
+      <div id="f8-q" class="quote" style="position:absolute;left:150px;top:864px;width:1160px;font-size:30px">
+        &ldquo;distributed systems require that the programmer be aware of latency, have a different model of memory access, and take into account issues of concurrency and partial failure.&rdquo;</div>
+      <div id="f8-a" class="slug" style="position:absolute;left:150px;top:996px;font-size:16px">SMLI TR-94-29 &middot; ABSTRACT &middot; VERBATIM</div>
+
+      <!-- PT Serif, not Playfair: in this register that alone says "not a quotation" -->
+      <div id="f8-p" class="bodyi" style="position:absolute;left:1348px;top:894px;width:440px;font-size:21px;color:var(--ink2)">
+        The paper allows that the first two could, in principle, be masked. It says the last two cannot.</div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at FULL opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+
+      // SEAM CARRIER — the kicker and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.42, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-head", { y: 15 }, { y: 0, duration: 0.50, ease: "power3.out" }, 0);
+      tl.fromTo("#s-deck", { autoAlpha: 0, y: 17 }, { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 0.30);
+      gsap.set("#f8-c0", { autoAlpha: 0 });
+      tl.set("#f8-c0", { autoAlpha: 1 }, 1.00);
+      gsap.set("#f8-c0", { rotation: 8.55, scale: 1.13, y: -34 });
+      tl.fromTo("#f8-c0", { rotation: 8.55, scale: 1.13, y: -34 }, { rotation: 0.78, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 1.00);
+      gsap.set("#f8-c0-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f8-c0-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 1.033);
+      gsap.set("#f8-c1", { autoAlpha: 0 });
+      tl.set("#f8-c1", { autoAlpha: 1 }, 1.86);
+      gsap.set("#f8-c1", { rotation: 11.83, scale: 1.13, y: -34 });
+      tl.fromTo("#f8-c1", { rotation: 11.83, scale: 1.13, y: -34 }, { rotation: 1.74, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 1.86);
+      gsap.set("#f8-c1-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f8-c1-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 1.893);
+      gsap.set("#f8-c2", { autoAlpha: 0 });
+      tl.set("#f8-c2", { autoAlpha: 1 }, 2.72);
+      gsap.set("#f8-c2", { rotation: 6.05, scale: 1.13, y: -34 });
+      tl.fromTo("#f8-c2", { rotation: 6.05, scale: 1.13, y: -34 }, { rotation: -1.43, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 2.72);
+      gsap.set("#f8-c2-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f8-c2-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 2.753);
+      gsap.set("#f8-c3", { autoAlpha: 0 });
+      tl.set("#f8-c3", { autoAlpha: 1 }, 3.58);
+      gsap.set("#f8-c3", { rotation: -11.35, scale: 1.13, y: -34 });
+      tl.fromTo("#f8-c3", { rotation: -11.35, scale: 1.13, y: -34 }, { rotation: -0.15, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 3.58);
+      gsap.set("#f8-c3-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f8-c3-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 3.613);
+      // the fourth is what the rest of the film is about, so the pen rings it and
+      // nothing else — one mark, on the thing that earns it
+      var pen_f8ring_d = anime.svg.createDrawable("#f8-ring");
+      var pen_f8ring = anime.animate(pen_f8ring_d, { draw: ["0 0", "0 1"], duration: 860, ease: anime.steps(13), autoplay: false });
+      var P_pen_f8ring = { p: 0 };
+      tl.to(P_pen_f8ring, { p: 1, duration: 0.86, ease: "none", onUpdate: function () { pen_f8ring.seek(P_pen_f8ring.p * pen_f8ring.duration); } }, 4.72);
+      gsap.set("#f8-st", { rotation: 10.17, scale: 1.30, autoAlpha: 0 });
+      tl.fromTo("#f8-st", { rotation: 10.17, scale: 1.30, autoAlpha: 0 }, { rotation: 10.17, scale: 1, autoAlpha: 0.88, duration: 0.10, ease: "steps(2)" }, 5.86);
+
+      gsap.set("#f8-r", { scaleX: 0 });
+      tl.to("#f8-r", { scaleX: 1, duration: 0.46, ease: "power3.out" }, 6.44);
+      gsap.set("#f8-q", { autoAlpha: 0, y: 16 });
+      tl.to("#f8-q", { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 6.60);
+      gsap.set("#f8-a", { autoAlpha: 0 });
+      tl.to("#f8-a", { autoAlpha: 1, duration: 0.30 }, 7.20);
+
+      // and then the film keeps working: the two that CAN be hidden get struck out
+      var pen_f8s0_d = anime.svg.createDrawable("#f8-s0");
+      var pen_f8s0 = anime.animate(pen_f8s0_d, { draw: ["0 0", "0 1"], duration: 340, ease: anime.steps(5), autoplay: false });
+      var P_pen_f8s0 = { p: 0 };
+      tl.to(P_pen_f8s0, { p: 1, duration: 0.34, ease: "none", onUpdate: function () { pen_f8s0.seek(P_pen_f8s0.p * pen_f8s0.duration); } }, 8.10);
+      var pen_f8s1_d = anime.svg.createDrawable("#f8-s1");
+      var pen_f8s1 = anime.animate(pen_f8s1_d, { draw: ["0 0", "0 1"], duration: 340, ease: anime.steps(5), autoplay: false });
+      var P_pen_f8s1 = { p: 0 };
+      tl.to(P_pen_f8s1, { p: 1, duration: 0.34, ease: "none", onUpdate: function () { pen_f8s1.seek(P_pen_f8s1.p * pen_f8s1.duration); } }, 8.62);
+      gsap.set("#f8-p", { autoAlpha: 0, y: 12 });
+      tl.to("#f8-p", { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, 9.16);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 10.29);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["08-four"] = tl;
+    })();
+  </script>
+</template>

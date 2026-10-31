@@ -1,0 +1,191 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="06-inp" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/lamplit.jpg');opacity:0.5"></div>
+  <div class="scrim" style="background:radial-gradient(78% 90% at 30% 26%, rgba(9,20,19,.30) 0%, rgba(9,20,19,.86) 62%, rgba(9,20,19,.96) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:112px">04 · INTERACTION TO NEXT PAINT</div>
+      <div id="s-rule" class="rule" style="left:118px;top:150px;width:96px;transform-origin:0% 50%"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:118px;top:176px;width:1180px;font-size:82px">Every tap,<br>not the first.</div>
+      <div id="s-lead" class="lead" style="position:absolute;left:120px;top:372px;width:840px;font-size:31px">INP replaced First Input Delay. It measures the whole interaction &mdash; input, handler, and the paint that answers it &mdash; and reports your worst.</div>
+
+      <div id="i-key" style="position:absolute;left:186px;top:592px;width:150px;height:150px;border-radius:16px;
+        background:linear-gradient(178deg,#3B7A64 0%, #23543F 62%, #16352B 100%);
+        box-shadow:inset 2px 2px 6px rgba(176,228,204,.34), inset -3px -4px 8px rgba(0,0,0,.6), 0 12px 0 #12261F, 0 20px 34px rgba(0,0,0,.62)">
+        <div class="mono" style="position:absolute;left:0;top:56px;width:150px;text-align:center;font-size:24px;font-weight:700;color:var(--mint);opacity:.9">TAP</div></div>
+
+      <div id="i-track" style="position:absolute;left:376px;top:648px;width:800px;height:38px;
+        background:rgba(11,16,15,.85);border:1px solid rgba(176,228,204,.14);border-radius:19px;overflow:hidden">
+        <div id="i-fill" style="position:absolute;left:0;top:0;width:800px;height:38px;transform-origin:0% 50%;
+          background:repeating-linear-gradient(112deg, rgba(232,161,60,.42) 0 11px, rgba(232,161,60,.14) 11px 24px)"></div></div>
+      <div id="i-tlbl" class="mono hot" style="position:absolute;left:376px;top:608px;font-size:20px;font-weight:700;letter-spacing:.10em">340ms OF NOTHING HAPPENING</div>
+
+      <div id="i-paint" style="position:absolute;left:1206px;top:600px;width:134px;height:134px;border-radius:12px;
+        border:2px solid var(--mint);background:rgba(176,228,204,.12);display:flex;align-items:center;justify-content:center">
+        <span class="mono" style="font-size:17px;color:var(--mint);letter-spacing:.10em">PAINT</span></div>
+
+      <div id="i-runs" style="position:absolute;left:186px;top:806px;width:990px;height:96px"></div>
+
+      <div class="bezel" style="left:1398px;top:490px;width:348px;height:348px;border-radius:50%"></div>
+      <div class="face"  style="left:1420px;top:512px;width:304px;height:304px;border-radius:50%"></div>
+      <div id="i-ticks" style="position:absolute;left:1420px;top:512px;width:304px;height:304px"></div>
+      <div id="i-needle" class="needle hot" style="left:1569px;top:518px;width:6px;height:146px"></div>
+      <div class="hub" style="left:1557px;top:649px;width:30px;height:30px"></div>
+      <div id="i-read" style="position:absolute;left:1432px;top:734px;width:280px;text-align:center">
+        <div class="mono hot" style="font-size:46px;font-weight:700;line-height:1.18">340ms</div>
+        <div class="mono" style="font-size:16px;letter-spacing:.16em;opacity:.62;margin-top:8px">BUDGET 200ms</div></div>
+      <div id="i-fix" style="position:absolute;left:186px;top:930px;width:1300px">
+        <div class="mono" style="font-size:19px;color:var(--emerald-lit)">
+          break the handler and <span style="color:var(--mint);font-weight:700">await scheduler.yield()</span> &mdash;
+          the paint gets a turn before the work finishes</div>
+        <div id="i-fixbar" style="position:absolute;left:0;top:44px;width:128.79999999999998px;height:20px;border-radius:5px;
+          transform-origin:0% 50%;background:var(--mint)"></div>
+        <div id="i-fixlbl" class="mono" style="position:absolute;left:144.79999999999998px;top:44px;font-size:19px;font-weight:700;color:var(--mint)">92ms &mdash; the same interaction</div></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at full opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // SEAM CARRIER — the box tag and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up: the seam gate measures
+      // MOTION, so a station whose content fades in at 0.1s passes the gate while visibly
+      // entering on an empty frame. Only the rule and the lead line are staged.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30000000000000004);
+      var ticks = document.querySelector("#i-ticks");
+      for (var v = 0; v <= 600; v += 50) {
+        var major = v % 200 === 0, t = document.createElement("div");
+        t.style.cssText = "position:absolute;left:151px;top:12px;width:" + (major?3:2) + "px;height:" + (major?15:9) +
+          "px;background:rgba(176,228,204," + (major?".72":".38") + ");transform-origin:50% 140px;transform:rotate(" +
+          (-120 + (v/600)*240) + "deg)";
+        ticks.appendChild(t);
+      }
+      tl.fromTo("#i-ticks", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.46 }, 0.22);
+      tl.fromTo("#i-key",   { autoAlpha: 0, y: -18 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 0.30);
+      tl.fromTo("#i-paint", { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 0.44, ease: "power3.out" }, 0.44);
+      // the key physically depresses — the cause. Everything after it is the consequence.
+      tl.to("#i-key", { y: 9, duration: 0.10, ease: "power3.in" }, 1.40);
+      tl.to("#i-key", { y: 0, duration: 0.20, ease: "power2.out" }, 1.62);
+      // the wait. It is drawn as time you can watch passing, not as a label.
+      gsap.set("#i-fill", { scaleX: 0 });
+      tl.fromTo("#i-tlbl", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.30 }, 1.52);
+      tl.to("#i-fill", { scaleX: 1, duration: 2.30, ease: "none" }, 1.52);
+      tl.fromTo("#i-needle", { rotation: -120 }, { rotation: 21.44, duration: 0.74, ease: "power3.out" }, 1.52);
+      tl.to("#i-needle", { rotation: 16, duration: 0.42, ease: "elastic.out(1, 0.62)" }, 2.26);
+      // only NOW does the frame answer — the paint lands 0.2s after the bar completes.
+      tl.fromTo("#i-paint", { backgroundColor: "rgba(176,228,204,0.12)" },
+                            { backgroundColor: "rgba(176,228,204,0.62)", duration: 0.22, ease: "power3.out" }, 3.94);
+      tl.fromTo("#i-read", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.42, ease: "power3.out" }, 4.10);
+      // three scored interactions; the worst is the one reported. This is the payoff and
+      // it keeps delivering across the tail rather than landing all at once.
+      var runs = document.querySelector("#i-runs"), V = [96, 340, 148], L = ["open menu", "add to basket", "close"];
+      for (var i = 0; i < 3; i++) {
+        var row = document.createElement("div"), hot = V[i] > 200;
+        row.style.cssText = "position:absolute;left:0;top:" + (i*32) + "px;width:990px;height:24px";
+        row.innerHTML = '<span style="position:absolute;left:0;top:2px;font-family:JBMono,monospace;font-size:17px;color:' +
+          (hot ? "var(--brass)" : "var(--emerald-lit)") + '">' + L[i] + '</span>' +
+          '<span style="position:absolute;left:260px;top:2px;font-family:JBMono,monospace;font-size:17px;font-weight:700;color:' +
+          (hot ? "var(--brass)" : "var(--mint)") + '">' + V[i] + 'ms</span>' +
+          '<div style="position:absolute;left:370px;top:7px;width:' + (V[i] * 1.4) + 'px;height:11px;border-radius:6px;' +
+          'transform-origin:0% 50%;background:' + (hot ? "var(--brass)" : "rgba(64,138,113,.8)") + '"></div>' +
+          (hot ? '<span style="position:absolute;left:' + (390 + V[i]*1.4) + 'px;top:2px;font-family:JBMono,monospace;' +
+            'font-size:15px;letter-spacing:.14em;color:var(--brass)">&larr; YOUR SCORE</span>' : "");
+        runs.appendChild(row);
+        tl.fromTo(row.querySelector("div"), { scaleX: 0 }, { scaleX: 1, duration: 0.52, ease: "power3.out" }, 5.00 + i*0.52);
+        tl.fromTo(row, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.30 }, 4.94 + i*0.52);
+      }
+      // THE FIX — the same tap, handled between chunks. The needle falls back through
+      // the budget and the reading turns from brass to mint.
+      tl.fromTo("#i-fix", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 6.90);
+      tl.fromTo("#i-fixbar", { scaleX: 0 }, { scaleX: 1, duration: 0.52, ease: "power3.out" }, 7.30);
+      tl.fromTo("#i-fixlbl", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.36, ease: "power3.out" }, 7.70);
+      tl.to("#i-key", { y: 9, duration: 0.10, ease: "power3.in" }, 7.30);
+      tl.to("#i-key", { y: 0, duration: 0.18, ease: "power2.out" }, 7.44);
+      tl.to("#i-needle", { rotation: -83.20, duration: 1.10, ease: "power3.inOut" }, 7.40);
+      tl.to("#i-paint", { backgroundColor: "rgba(176,228,204,0.62)", duration: 0.20 }, 7.52);
+      tl.to("#i-paint", { backgroundColor: "rgba(176,228,204,0.12)", duration: 0.40 }, 8.20);
+      // SEAM EXIT — ACT BREAK lift. Travels UP and pulls back to 0.84.
+      tl.to("#stage", { y: -300, duration: 0.46, ease: "power4.in" }, 10.97);
+      tl.to("#stage", { scale: 0.84, duration: 0.52, ease: "power2.in" }, 10.97);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["06-inp"] = tl;
+    })();
+  </script>
+</template>

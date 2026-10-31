@@ -1,0 +1,157 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="01-open" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/interior.jpg');opacity:0.38"></div>
+  <div class="scrim" style="background:radial-gradient(84% 96% at 50% 46%, rgba(9,20,19,.52) 0%, rgba(9,20,19,.93) 66%, rgba(9,20,19,.99) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+
+      <div id="o-strip" class="panel" style="left:96px;top:392px;width:1728px;height:196px"></div>
+      <div id="o-track" style="position:absolute;left:118px;top:498px;width:1684px;height:3px;background:rgba(176,228,204,.22)"></div>
+
+      <div id="o-gap" style="position:absolute;left:488.48px;top:452px;width:1111.44px;height:94px;
+        background:repeating-linear-gradient(115deg, rgba(232,161,60,.30) 0 9px, rgba(232,161,60,0) 9px 20px);
+        border-left:2px solid var(--brass);border-right:2px solid var(--brass);transform-origin:0% 50%"></div>
+
+      <div id="o-m1" style="position:absolute;left:487.48px;top:452px;width:3px;height:94px;background:var(--mint)"></div>
+      <div id="o-m2" style="position:absolute;left:1598.92px;top:452px;width:3px;height:94px;background:var(--mint)"></div>
+
+      <div id="o-l1" style="position:absolute;left:484.48px;top:566px;width:420px">
+        <div class="mono" style="font-size:19px;letter-spacing:.16em;color:var(--mint);opacity:.62">LOOKS FINISHED</div>
+        <div class="mono" style="font-size:44px;font-weight:700;color:var(--mint);margin-top:4px">1.0s</div></div>
+      <div id="o-l2" style="position:absolute;left:1595.92px;top:566px;width:420px">
+        <div class="mono" style="font-size:19px;letter-spacing:.16em;color:var(--mint);opacity:.62">ACTUALLY USABLE</div>
+        <div class="mono" style="font-size:44px;font-weight:700;color:var(--mint);margin-top:4px">4.2s</div></div>
+
+      <div id="o-gaplbl" style="position:absolute;left:488.48px;top:396px;width:1111.44px;text-align:center">
+        <div class="mono hot" style="font-size:26px;font-weight:700;letter-spacing:.20em">3.2s OF NOTHING</div></div>
+
+      <div id="o-blocks" style="position:absolute;left:118px;top:196px;width:1684px;height:132px"></div>
+
+      <div id="o-cur" style="position:absolute;left:1044.2px;top:470px;width:26px;height:38px;
+        background:linear-gradient(148deg,var(--mint) 0%, #6FAF93 100%);
+        clip-path:polygon(0 0,0 100%,27% 76%,45% 100%,64% 88%,46% 62%,100% 46%);
+        filter:drop-shadow(0 3px 6px rgba(0,0,0,.7))"></div>
+      <div id="o-alive" style="position:absolute;left:118px;top:700px;width:1684px;text-align:center">
+        <span class="chipmint" style="font-size:19px;padding:9px 18px;letter-spacing:.12em">INTERACTIVE AT LAST</span></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at full opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // the page paints: five blocks land fast and look complete.
+      var bw = [340, 520, 250, 410, 128], bx = 0, blocks = document.querySelector("#o-blocks");
+      for (var i = 0; i < 5; i++) {
+        var b = document.createElement("div");
+        b.style.cssText = "position:absolute;left:" + bx + "px;top:" + (i===0?0:(i<3?0:74)) +
+          "px;width:" + bw[i] + "px;height:" + (i===0?60:(i<3?60:44)) +
+          "px;background:#0B100F;border:1px solid rgba(176,228,204,.16);border-radius:8px";
+        blocks.appendChild(b); bx += bw[i] + 26; if (i === 2) bx = 0;
+        tl.fromTo(b, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.36, ease: "power3.out" }, 0.24 + i * 0.09);
+      }
+      // the ruler, then the two events it separates.
+      gsap.set("#o-track", { transformOrigin: "0% 50%" });
+      tl.fromTo("#o-track", { scaleX: 0 }, { scaleX: 1, duration: 0.72, ease: "power3.out" }, 0.86);
+      tl.fromTo("#o-m1", { autoAlpha: 0, scaleY: 0 }, { autoAlpha: 1, scaleY: 1, duration: 0.34, ease: "back.out(1.8)" }, 1.42);
+      tl.fromTo("#o-l1", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, 1.54);
+      // the gap opens — the one brass element in the frame, and it has earned it.
+      tl.fromTo("#o-gap", { scaleX: 0 }, { scaleX: 1, duration: 0.92, ease: "power2.inOut" }, 2.30);
+      tl.fromTo("#o-m2", { autoAlpha: 0, scaleY: 0 }, { autoAlpha: 1, scaleY: 1, duration: 0.34, ease: "back.out(1.8)" }, 3.10);
+      tl.fromTo("#o-l2", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, 3.22);
+      tl.fromTo("#o-gaplbl", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.44, ease: "power2.out" }, 3.70);
+      // the cursor clicks inside the gap, four times, and nothing answers. This is the
+      // sustained motion of the beat AND the argument — not a decorative pointer.
+      tl.fromTo("#o-cur", { autoAlpha: 0, x: -60, y: 40 }, { autoAlpha: 1, x: 0, y: 0, duration: 0.52, ease: "power3.out" }, 4.10);
+      for (var c = 0; c < 4; c++) {
+        tl.to("#o-cur", { scale: 0.84, duration: 0.09, ease: "power2.in" }, 4.80 + c * 0.62);
+        tl.to("#o-cur", { scale: 1, duration: 0.16, ease: "power2.out" }, 4.89 + c * 0.62);
+      }
+      // it finally wakes. The click that lands is the one the whole episode is about.
+      tl.to("#o-cur", { scale: 0.84, duration: 0.09, ease: "power2.in" }, 7.42);
+      tl.to("#o-cur", { scale: 1, duration: 0.16, ease: "power2.out" }, 7.51);
+      tl.fromTo("#o-alive", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "back.out(1.5)" }, 7.62);
+      tl.to("#o-gap", { autoAlpha: 0.34, duration: 0.60, ease: "power2.out" }, 7.70);
+      tl.fromTo("#o-m2", { boxShadow: "none" }, { duration: 0.01 }, 7.70);
+      for (var k2 = 0; k2 < 5; k2++)
+        tl.to(blocks.children[k2], { backgroundColor: "rgba(176,228,204,0.16)", duration: 0.34, ease: "power2.out" }, 7.66 + k2*0.07);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 9.66);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["01-open"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,171 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="16-third" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/lamplit.jpg');opacity:0.5"></div>
+  <div class="scrim" style="background:radial-gradient(78% 90% at 30% 26%, rgba(9,20,19,.30) 0%, rgba(9,20,19,.86) 62%, rgba(9,20,19,.96) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:112px">14 · THIRD PARTIES</div>
+      <div id="s-rule" class="rule" style="left:118px;top:150px;width:96px;transform-origin:0% 50%"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:118px;top:176px;width:1180px;font-size:82px">Code you ship<br>but never read.</div>
+      <div id="s-lead" class="lead" style="position:absolute;left:120px;top:372px;width:840px;font-size:31px">Every tag runs on your thread, inside your budget, with your users' attention. Nobody owns them, so nobody removes them.</div>
+
+      <div id="x-panel" class="panel" style="left:118px;top:552px;width:1684px;height:396px"></div>
+      <div id="x-head" style="position:absolute;left:158px;top:578px;width:1604px">
+        <span class="mono" style="position:absolute;left:0;font-size:15px;letter-spacing:.16em;opacity:.55">TAG</span>
+        <span class="mono" style="position:absolute;left:420px;font-size:15px;letter-spacing:.16em;opacity:.55">TRANSFER</span>
+        <span class="mono" style="position:absolute;left:600px;font-size:15px;letter-spacing:.16em;opacity:.55">MAIN THREAD</span>
+        <span class="mono" style="position:absolute;left:1130px;font-size:15px;letter-spacing:.16em;opacity:.55">WHY IT IS THERE</span></div>
+      <div id="x-rows" style="position:absolute;left:158px;top:614px;width:1604px;height:262px"></div>
+      <div id="x-tot" style="position:absolute;left:158px;top:884px;width:1604px;display:flex;justify-content:space-between;align-items:baseline">
+        <span class="mono" style="font-size:17px;letter-spacing:.16em;opacity:.6">FIVE TAGS YOU DID NOT WRITE</span>
+        <span class="mono hot" style="font-size:34px;font-weight:700;line-height:1.18">620 KB &middot; 1.06s of thread</span></div>
+
+      <div id="x-tot2" style="position:relative;position:absolute;left:900px;top:884px;width:704px;text-align:right;height:48px;font-family:'JBMono',monospace;font-size:34px;font-weight:700;line-height:1.18;color:var(--mint)"><span id="x-tot2-0" style="position:absolute;left:0;top:0;white-space:nowrap">620 KB &middot; 1.06s of thread</span><span id="x-tot2-1" style="position:absolute;left:0;top:0;white-space:nowrap">428 KB &middot; 0.72s of thread</span><span id="x-tot2-2" style="position:absolute;left:0;top:0;white-space:nowrap">264 KB &middot; 0.40s of thread</span><span id="x-tot2-3" style="position:absolute;left:0;top:0;white-space:nowrap">196 KB &middot; 0.21s of thread</span></div>
+      <div id="x-audit" style="position:absolute;left:158px;top:952px;width:1000px">
+        <div class="mono" style="font-size:19px;color:var(--emerald-lit)">
+          <span style="color:var(--mint);font-weight:700">audit them every quarter</span> &mdash; three of these five had no owner left in the company</div></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at full opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // SEAM CARRIER — the box tag and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up: the seam gate measures
+      // MOTION, so a station whose content fades in at 0.1s passes the gate while visibly
+      // entering on an empty frame. Only the rule and the lead line are staged.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30000000000000004);
+      tl.fromTo("#x-panel", { autoAlpha: 0, scale: 0.98 }, { autoAlpha: 1, scale: 1, duration: 0.54, ease: "power3.out" }, 0.10);
+      tl.fromTo("#x-head",  { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.38 }, 0.28);
+      var T = [{"n":"tag manager","kb":68,"ms":210,"why":"loads the four below"},{"n":"session replay","kb":184,"ms":340,"why":"records every mouse move"},{"n":"chat widget","kb":240,"ms":180,"why":"used by 0.4% of visits"},{"n":"A/B testing","kb":96,"ms":290,"why":"blocking, to stop a flicker"},{"n":"campaign pixel","kb":32,"ms":40,"why":"campaign ended in March","dead":true}], wrap = document.querySelector("#x-rows");
+      for (var i = 0; i < T.length; i++) {
+        var t = T[i], row = document.createElement("div");
+        row.style.cssText = "position:absolute;left:0;top:" + (i*52) + "px;width:1604px;height:44px";
+        row.innerHTML =
+          '<span style="position:absolute;left:0;top:6px;font-family:JBMono,monospace;font-size:20px;color:' +
+            (t.dead ? "var(--brass)" : "var(--mint)") + '">' + t.n + '</span>' +
+          '<span style="position:absolute;left:420px;top:6px;font-family:JBMono,monospace;font-size:20px;' +
+            'color:var(--emerald-lit)">' + t.kb + ' KB</span>' +
+          '<div class="bar" style="position:absolute;left:600px;top:10px;width:' + (t.ms*1.32) + 'px;height:20px;border-radius:4px;' +
+            'transform-origin:0% 50%;background:rgba(232,161,60,.7)"></div>' +
+          '<span style="position:absolute;left:' + (612 + t.ms*1.32) + 'px;top:6px;font-family:JBMono,monospace;' +
+            'font-size:18px;font-weight:700;color:var(--brass)">' + t.ms + 'ms</span>' +
+          '<span style="position:absolute;left:1130px;top:8px;font-family:JBMono,monospace;font-size:17px;color:' +
+            (t.dead ? "var(--brass)" : "var(--mint)") + ';opacity:' + (t.dead ? ".95" : ".48") + '">' + t.why + '</span>';
+        wrap.appendChild(row);
+        tl.fromTo(row, { autoAlpha: 0, x: -18 }, { autoAlpha: 1, x: 0, duration: 0.40, ease: "power3.out" }, 0.72 + i*0.40);
+        tl.fromTo(row.querySelector(".bar"), { scaleX: 0 }, { scaleX: 1, duration: 0.46, ease: "power3.out" }, 0.80 + i*0.40);
+      }
+      tl.fromTo("#x-tot", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 3.20);
+      // the dead pixel is struck through last — the beat's payoff, and the one that gets
+      // the laugh. It keeps the tail alive instead of ending on the total.
+      var dead = wrap.children[4], line = document.createElement("div");
+      line.style.cssText = "position:absolute;left:-6px;top:22px;width:1130px;height:2px;background:var(--brass);transform-origin:0% 50%";
+      dead.appendChild(line);
+      tl.fromTo(line, { scaleX: 0 }, { scaleX: 1, duration: 0.52, ease: "power3.inOut" }, 4.20);
+      tl.to(dead, { autoAlpha: 0.42, duration: 0.50, ease: "power2.out" }, 4.60);
+      // THE FIX — the audit. Tags come off one at a time and the total falls with them,
+      // which keeps the beat delivering right through its tail.
+      tl.fromTo("#x-audit", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 5.60);
+      tl.set("#x-tot", { autoAlpha: 0 }, 6.10);
+      for (var _r = 0; _r < 4; _r++) gsap.set("#x-tot2-" + _r, { autoAlpha: 0 });
+      tl.set("#x-tot2-0", { autoAlpha: 1 }, 6.10);
+      tl.set("#x-tot2-1", { autoAlpha: 1 }, 6.92);
+      tl.set("#x-tot2-0", { autoAlpha: 0 }, 6.92);
+      tl.set("#x-tot2-2", { autoAlpha: 1 }, 7.74);
+      tl.set("#x-tot2-1", { autoAlpha: 0 }, 7.74);
+      tl.set("#x-tot2-3", { autoAlpha: 1 }, 8.56);
+      tl.set("#x-tot2-2", { autoAlpha: 0 }, 8.56);
+      var kill = [1, 3, 2];
+      for (var y2 = 0; y2 < kill.length; y2++) {
+        var row2 = wrap.children[kill[y2]], kt = 6.30 + y2*0.82;
+        var ln2 = document.createElement("div");
+        ln2.style.cssText = "position:absolute;left:-6px;top:22px;width:1130px;height:2px;background:var(--brass);transform-origin:0% 50%";
+        row2.appendChild(ln2);
+        tl.fromTo(ln2, { scaleX: 0 }, { scaleX: 1, duration: 0.40, ease: "power3.inOut" }, kt);
+        tl.to(row2, { autoAlpha: 0.30, x: -26, duration: 0.46, ease: "power2.out" }, kt + 0.34);
+      }
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 10.37);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["16-third"] = tl;
+    })();
+  </script>
+</template>

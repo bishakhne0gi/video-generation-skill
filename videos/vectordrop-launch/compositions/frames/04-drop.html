@@ -1,0 +1,178 @@
+<template>
+  <style>
+.lego-base{background-color:#1a1c22}
+/* The studs read as a dot screen at film scale, so the plate uses the OTHER
+   half of the motif: the bricks themselves, in running bond, staggered course
+   to course. Boxes, not dots — and far quieter at the same opacity. */
+.lego-studs{
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%2260%22%20viewBox%3D%220%200%20120%2060%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%221%22%20opacity%3D%220.5%22%3E%3Crect%20x%3D%220.5%22%20y%3D%220.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3Crect%20x%3D%2260.5%22%20y%3D%220.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3Crect%20x%3D%22-29.5%22%20y%3D%2230.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3Crect%20x%3D%2230.5%22%20y%3D%2230.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3Crect%20x%3D%2290.5%22%20y%3D%2230.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  background-size:120px 60px}
+.lego-vignette{
+  background:
+    linear-gradient(to bottom, transparent 55%, rgba(26,28,34,0.6) 75%, #1a1c22 90%, #161516 100%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(0,0,0,0.3) 100%)}
+
+@font-face{font-family:Geist;src:url("assets/fonts/Geist-400.woff2")format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:Geist;src:url("assets/fonts/Geist-500.woff2")format("woff2");font-weight:500;font-display:block}
+@font-face{font-family:Geist;src:url("assets/fonts/Geist-600.woff2")format("woff2");font-weight:600;font-display:block}
+@font-face{font-family:GeistMono;src:url("assets/fonts/GeistMono-400.woff2")format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:GeistMono;src:url("assets/fonts/GeistMono-500.woff2")format("woff2");font-weight:500;font-display:block}
+@font-face{font-family:AuxMono;src:url("assets/fonts/AuxMono-Regular.ttf")format("truetype");font-weight:400;font-display:block}
+
+*{margin:0;padding:0;box-sizing:border-box}
+#root{width:1920px;height:1080px;overflow:hidden;background:#161516;
+  font-family:Geist,-apple-system,sans-serif;color:#FFFFFF;
+  letter-spacing:-0.011em;-webkit-font-smoothing:antialiased}
+
+/* ---- grounds -------------------------------------------------------------
+   Every ground over-scans by 18%: a frame whose seam enters from below 1.0
+   would otherwise expose the stage edge. */
+.ground{position:absolute;inset:-18%}
+.g-void  {background:#0D0D0D}
+.g-app   {background:#161516}
+.g-canvas{background:#1E1E1E}
+.g-bloom {background:#161516}
+
+/* The two ambient blobs, straight out of DESIGN.md — 70vw top-right and
+   50vw bottom-left, at the documented alphas. They are the brand's own
+   atmosphere, not a gradient I picked. */
+.blob{position:absolute;border-radius:50%;filter:blur(10px)}
+.blob-a{width:1340px;height:1340px;top:-380px;right:-260px;
+  background:radial-gradient(circle,rgba(13,148,136,0.14) 0%,rgba(20,184,166,0.07) 45%,transparent 70%)}
+.blob-b{width:960px;height:960px;bottom:-190px;left:-130px;
+  background:radial-gradient(circle,rgba(8,145,178,0.10) 0%,rgba(13,148,136,0.05) 45%,transparent 70%)}
+.blob-hot{opacity:2.1}
+
+/* Grain must MOVE. A static tile renders identical noise on all 3,200 frames,
+   which reads as dirt on the lens rather than as film. This one is 3x
+   oversized and translated by the timeline. */
+.grain{position:absolute;left:-640px;top:-360px;width:3200px;height:1800px;
+  opacity:0.055;pointer-events:none;mix-blend-mode:overlay;
+  background-image:url("assets/plates/noise.png");background-repeat:repeat}
+
+.vig{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 78% 70% at 50% 46%,transparent 40%,rgba(0,0,0,0.55) 100%)}
+
+/* ---- type ---------------------------------------------------------------- */
+.stage{position:absolute;inset:0}
+.inner{position:absolute;inset:0}
+
+.hdr{font-weight:500;font-size:86px;line-height:1.06;letter-spacing:-0.025em;color:#FFFFFF}
+.hdr-xl{font-weight:500;font-size:132px;line-height:1.02;letter-spacing:-0.028em}
+.lead{font-size:27px;line-height:1.56;color:rgba(255,255,255,0.62);max-width:760px;letter-spacing:-0.008em}
+.grad{background:linear-gradient(135deg,#0D9488 0%,#14B8A6 60%,#0891B2 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* AuxMono is the product's own UI micro-face — it is what makes a VectorDrop
+   screen recognisable at a glance, so every chip and label in the film uses it. */
+.tag{font-family:AuxMono,GeistMono,monospace;font-size:15px;letter-spacing:0.19em;
+  text-transform:uppercase;color:rgba(255,255,255,0.62)}
+.tag-teal{color:#2DD4BF}
+.mono{font-family:GeistMono,monospace;font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
+.rule{height:1px;background:rgba(255,255,255,0.08);transform-origin:left center}
+
+/* ---- product surfaces ----------------------------------------------------
+   One black and a 1px hairline for every panel in the film. Nothing carries a
+   coloured edge: colour belongs to the content, never to a container. */
+.panel{background:#131313;border:1px solid rgba(255,255,255,0.08);border-radius:16px}
+.panel-deep{background:#0D0D0D;border:1px solid rgba(255,255,255,0.08);border-radius:16px}
+.win{background:#0D0D0D;border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden}
+.winbar{height:46px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;
+  padding:0 16px;gap:8px;background:rgba(255,255,255,0.015)}
+.dot{width:11px;height:11px;border-radius:50%}
+.chip{display:inline-flex;align-items:center;gap:9px;padding:8px 15px;border-radius:8px;
+  border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);
+  font-family:AuxMono,monospace;font-size:14px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.62)}
+.chip-on{border-color:rgba(20,184,166,0.30);background:rgba(20,184,166,0.07);color:#2DD4BF}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:22px;padding:13px 30px;
+  background:#fff;color:#000;font-family:AuxMono,monospace;font-size:15px;
+  letter-spacing:0.03em;text-transform:uppercase}
+.btn-ghost{background:transparent;color:rgba(255,255,255,0.62);border:1px dashed rgba(255,255,255,0.22)}
+
+/* The oversized macOS cursor. It is the film's only actor, so it is 2.4x life
+   size — at 1:1 a pointer is invisible at this distance. */
+.cursor{position:absolute;width:56px;height:56px;pointer-events:none;z-index:90;
+  filter:drop-shadow(0 3px 7px rgba(0,0,0,0.62))}
+</style>
+  <div id="root" data-composition-id="04-drop" data-start="0" data-width="1920" data-height="1080">
+    <div class="ground g-app"></div>
+    <video id="drop-plate" src="assets/plates/brick-macro.mp4" muted playsinline
+      data-start="0" data-duration="7.500" data-track-index="0" data-volume="0"
+      style="position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;
+             opacity:0.052;mix-blend-mode:screen;pointer-events:none"></video>
+    <div class="blob blob-a"></div>
+    <div class="blob blob-b"></div>
+    <div id="grain" class="grain"></div>
+    <div class="vig"></div>
+    <div id="stage" class="stage"><div class="inner">
+
+      <div style="position:absolute;left:0;right:0;top:0;height:78px;border-bottom:1px solid rgba(255,255,255,0.08);
+           display:flex;align-items:center;padding:0 74px">
+        <div style="display:flex;align-items:center;gap:15px">
+          <svg viewBox="0 0 28 28" width="30" height="30" xmlns="http://www.w3.org/2000/svg" fill="none">
+     <path fill="#fff" d="M6 9.32256L8.08064 8.13363L10.1613 9.32256L10.018 21.5092L12.1924 22.6517L16.4032 20.3202V17.8433L18.5829 16.5553L18.3848 2.08986L20.5645 1L22.8433 2.08986V16.7534L20.7131 17.8433V20.3202L18.5829 21.4811V23.788L12.2419 27.5529L9.96313 26.1784L7.98156 24.9832L6 23.788V9.32256Z"/>
+   </svg><span style="font-size:24px;font-weight:500;letter-spacing:-0.02em">VectorDrop</span>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:13px">
+          <div class="chip chip-on" id="credits">3 CREDITS</div>
+          <div class="chip">SIGN OUT</div>
+        </div>
+      </div>
+      <div style="position:absolute;left:250px;top:150px">
+        <div class="hdr" id="s-hdr" style="font-size:62px"><span class="grad" style="display:inline-block;padding-bottom:0.06em">Drop the image in.</span></div>
+        <div class="lead" id="s-lead" style="margin-top:16px;font-size:24px">That is the entire interface.</div>
+      </div>
+
+      <div id="dz" style="position:absolute;left:250px;top:300px;width:1420px;height:430px;
+           border:1px solid rgba(255,255,255,0.08);border-radius:4px;background:rgba(255,255,255,0.012);
+           display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px">
+        <div id="dz-ring" style="position:absolute;inset:-2px;border:2px solid #14B8A6;
+             border-radius:6px;opacity:0"></div>
+        <div style="font-size:34px;color:rgba(255,255,255,0.62)">Drop your image here or click to browse</div>
+        <div class="tag" style="font-size:15px;color:rgba(255,255,255,0.55)">JPEG &nbsp;·&nbsp; PNG &nbsp;·&nbsp; WEBP &nbsp;—&nbsp; UP TO 10 MB</div>
+        <div class="btn" style="margin-top:8px">BROWSE FILES</div>
+      </div>
+      <div id="file" style="position:absolute;left:872px;top:428px;width:176px;opacity:0">
+        <div style="width:176px;height:176px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;background:#0D0D0D">
+          <img src="assets/plates/source.jpg" width="176" height="176" style="display:block"/>
+        </div>
+        <div class="mono" style="margin-top:11px;font-size:15px;color:rgba(255,255,255,0.62);text-align:center">elon.jpg</div>
+      </div>
+      <div id="cur" class="cursor"><svg viewBox="0 0 24 24" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5.5 2.2 L5.5 19.4 L9.8 15.4 L12.6 21.6 L15.8 20.2 L13.0 14.1 L18.8 14.1 Z"
+    fill="#fff" stroke="#0b0b0b" stroke-width="1.05" stroke-linejoin="round"/></svg></div>
+    </div></div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function(){
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#stage", { y: 250, scale: 0.94 }, { y: 0, scale: 1, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#grain", { x: 0, y: 0 },
+        { x: -128, y: -72, duration: 7.50, ease: "none" }, 0);
+      tl.fromTo("#s-hdr",  { y: 18 }, { y: 0, duration: 0.56, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.54, ease: "power3.out" }, 0.26);
+      tl.fromTo("#dz", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.62, ease: "power3.out" }, 0.34);
+
+      // cursor arrives carrying the file, drops it, and the ring answers 0.2s later
+      tl.set("#cur", { x: -140, y: 470 }, 0);
+      tl.to("#cur", { x: 905, y: 470, duration: 0.9, ease: "power2.inOut" }, 2.050);
+      tl.to("#cur", { x: 960, y: 512, duration: 0.55, ease: "power2.inOut" }, 2.950);
+
+      tl.fromTo("#file", { autoAlpha: 0, x: -1020, y: 0, scale: 0.82 },
+        { autoAlpha: 1, x: 0, y: 0, scale: 1, duration: 0.90, ease: "power2.inOut" }, 2.05);
+      tl.to("#file", { x: 55, y: 42, duration: 0.55, ease: "power2.inOut" }, 2.95);
+      tl.to("#cur", { scale: 0.82, duration: 0.07, ease: "power2.in" }, 3.520);
+      tl.to("#cur", { scale: 1, duration: 0.17, ease: "back.out(2.6)" }, 3.590);
+      tl.to("#file", { autoAlpha: 0, scale: 0.90, duration: 0.30, ease: "power2.in" }, 3.62);
+      tl.fromTo("#dz-ring", { autoAlpha: 0, scale: 0.985 }, { autoAlpha: 1, scale: 1, duration: 0.30, ease: "power3.out" }, 3.72);
+      tl.to("#dz-ring", { autoAlpha: 0, duration: 0.55, ease: "power2.inOut" }, 4.70);
+      tl.to("#cur", { x: 1280, y: 690, duration: 0.8, ease: "power2.inOut" }, 4.300);
+
+      tl.to("#cur", { autoAlpha: 0, duration: 0.30 }, 5.60);
+
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 7.160);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["04-drop"] = tl;
+    })();
+  </script>
+</template>

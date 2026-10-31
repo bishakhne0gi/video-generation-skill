@@ -1,0 +1,212 @@
+<template>
+  <style>
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-900.woff2") format("woff2"); font-weight: 900; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --paper: #F4EBD9; --paper-warm: #FBF6EA; --cloud: #FDFBF4;
+      --ink: #3B2F2A; --ink-soft: #6B5A4E;
+      --sky: #7FB4DC; --sky-deep: #2E5F8A;
+      --meadow: #7FA653; --meadow-deep: #3F6B34;
+      --terracotta: #C4552F; --terracotta-lit: #EE8557; --terracotta-ink: #9E4324;
+      --night: #1E2A38; --night-mute: #A8BACB;
+    }
+
+    /* the continuity object — one real segment from the film's own manifest, pinned
+       bottom-left. The id never moves; only the state word changes. */
+    .seg-pill {
+      position: absolute; left: 96px; bottom: 74px;
+      display: flex; align-items: center; gap: 16px;
+      padding: 13px 26px; border-radius: 999px;
+      background: var(--paper-warm); box-shadow: 0 10px 30px rgba(59,47,42,0.22);
+      font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--ink);
+    }
+    .seg-pill b { font-weight: 700; }
+    .seg-pill i { display: block; width: 1px; height: 20px; background: rgba(59,47,42,0.22); }
+    .seg-state { position: relative; display: inline-block; width: 186px; height: 24px; }
+    .seg-state span {
+      position: absolute; left: 0; top: 0; white-space: nowrap;
+      font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      font-size: 15px; line-height: 24px; color: var(--terracotta-ink);
+    }
+
+    .grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.055; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='170'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='170' height='170' filter='url(%23n)'/></svg>");
+    }
+
+    #f4-wind { position: absolute; inset: -18%; }
+    #f4-plate { position: absolute; inset: 0; background: url("public/img/mill.jpg") center/cover no-repeat; }
+    /* the meadow register keeps the paint at full strength and puts the vectors in a
+       card, rather than washing the whole plate back. */
+    #f4-veil { position: absolute; inset: -18%; background: linear-gradient(180deg, rgba(59,47,42,0.05) 0%, rgba(59,47,42,0.30) 62%, rgba(59,47,42,0.46) 100%); }
+
+    #f4-stage { position: absolute; inset: 0; }
+
+    /* the heading sits over the plate's brightest region (open sky), where --cloud
+       measured 2.67:1. A scrim anchored to the type is the fix; choosing a colour that
+       survives both ends of the plate would just mean choosing grey. */
+    #f4-scrim {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 46% 40% at 27% 20%, rgba(24,34,46,0.86) 0%, rgba(24,34,46,0.54) 52%, rgba(24,34,46,0) 76%);
+    }
+
+    #f4-head {
+      position: absolute; left: 104px; top: 96px;
+      font-family: "Zen Maru Gothic", sans-serif; font-weight: 900;
+      font-size: 96px; line-height: 0.98; letter-spacing: -0.02em;
+      color: var(--cloud); text-shadow: 0 8px 36px rgba(30,42,56,0.55);
+    }
+    #f4-head em { font-style: normal; color: var(--terracotta-lit); }
+    #f4-sub {
+      position: absolute; left: 108px; top: 232px;
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 500;
+      font-size: 36px; color: var(--cloud); text-shadow: 0 4px 22px rgba(30,42,56,0.6);
+    }
+
+    /* the film strip. One continuous band that stops, then separates into eight
+       labelled segments. Each segment is its own element from t=0 — the gaps are what
+       animate, via x offsets, because `width` is not animatable. */
+    #f4-strip { position: absolute; left: 0; top: 596px; width: 1920px; height: 214px; }
+    .f4-seg {
+      position: absolute; top: 0; width: 208px; height: 214px;
+      border-radius: 10px; background: var(--paper-warm);
+      box-shadow: 0 14px 34px rgba(30,42,56,0.34);
+      overflow: hidden;
+    }
+    /* the sprocket band — what makes eight rounded rectangles read as FILM. */
+    .f4-seg::before, .f4-seg::after {
+      content: ""; position: absolute; left: 0; width: 208px; height: 22px;
+      background-image: radial-gradient(circle 5px at 14px 11px, rgba(59,47,42,0.34) 0 5px, rgba(0,0,0,0) 6px);
+      background-size: 30px 22px; background-repeat: repeat-x;
+    }
+    .f4-seg::before { top: 0; }
+    .f4-seg::after { bottom: 0; }
+    .f4-body {
+      position: absolute; left: 0; right: 0; top: 22px; bottom: 22px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
+      background: linear-gradient(180deg, #DCE7EF 0%, #C3D6E4 100%);
+    }
+    .f4-id {
+      font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 17px;
+      color: var(--ink); letter-spacing: -0.01em;
+    }
+    .f4-dur {
+      padding: 4px 12px; border-radius: 999px; background: rgba(59,47,42,0.10);
+      font-family: "JetBrains Mono", monospace; font-weight: 400; font-size: 15px;
+      color: var(--ink); font-variant-numeric: tabular-nums;
+    }
+    /* the continuity segment is the one that stays lit. Colour on CONTENT, never on the
+       container edge — so it is the body that warms, not a border. */
+    #f4-seg3 .f4-body { background: linear-gradient(180deg, #FBE3D3 0%, #F2C6AC 100%); }
+    #f4-seg3 .f4-id { color: var(--terracotta); }
+
+    #f4-cap {
+      position: absolute; left: 108px; top: 858px;
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 400;
+      font-size: 22px; color: var(--cloud); text-shadow: 0 3px 16px rgba(30,42,56,0.7);
+    }
+  </style>
+
+  <div id="root" data-composition-id="04-segments" data-width="1920" data-height="1080">
+    <div id="f4-clip" class="clip" data-start="0" data-duration="12.0" data-track-index="0" data-layout-allow-overflow data-layout-allow-overlap data-layout-allow-occlusion>
+      <div id="f4-stage">
+        <div id="f4-wind"><div id="f4-plate"></div></div>
+        <div id="f4-veil"></div>
+        <div id="f4-scrim"></div>
+
+        <div id="f4-head">The film is <em>never sent.</em></div>
+        <div id="f4-sub">It is cut into segments, and those are what travel.</div>
+
+        <div id="f4-strip"></div>
+
+        <div id="f4-cap">6-second target duration &middot; Apple HLS Authoring Specification</div>
+
+        <div class="seg-pill" id="f4-pill">
+          <b>seg-00412.m4s</b><i></i>
+          <span class="seg-state"><span>encoded</span></span>
+        </div>
+
+        <div class="grain"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // ---- build the strip. Eight segments, laid butt-to-butt at t=0 so the band reads
+      // as ONE continuous film; the separation later is an x offset per segment, because
+      // `width` is not animatable and animating a gap would need one.
+      var strip = document.getElementById("f4-strip");
+      var W = 208, N = 8, X0 = 176;
+      var segs = [];
+      for (var i = 0; i < N; i++) {
+        var d = document.createElement("div");
+        d.className = "f4-seg";
+        d.id = "f4-seg" + i;
+        d.style.left = (X0 + i * W) + "px";
+        d.innerHTML = '<div class="f4-body">' +
+          '<div class="f4-id">seg-004' + String(9 + i).padStart(2, "0") + '.m4s</div>' +
+          '<div class="f4-dur">6.006s</div></div>';
+        strip.appendChild(d); segs.push(d);
+      }
+      // the ids and durations only become readable once the strip stops — while it is
+      // travelling they would be unreadable anyway, and showing them early wastes the reveal.
+      var ids = strip.querySelectorAll(".f4-id, .f4-dur");
+      gsap.set(ids, { autoAlpha: 0 });
+
+      // ---- SEAM 3 -> 4 ENTRY: INVERSE ZOOM (z -1). Frame 03 pulled BACK to 0.86; this
+      // side enters from 1.18 and settles DOWN to 1.0 — both halves are receding, so they
+      // share the scale-velocity sign and the eye reads one continuous pull-back. Entering
+      // from below 1.0 would be a mirrored zoom: two opposed moves abutted at a cut.
+      // The plate and the strip are at FULL OPACITY from t=0 — the frame rides its cut.
+      tl.fromTo("#f4-stage", { scale: 1.18 }, { scale: 1.0, duration: 0.46, ease: "power4.out" }, 0);
+      tl.fromTo("#f4-head", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.22);
+      tl.fromTo("#f4-sub", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 0.62);
+
+      tl.fromTo("#f4-wind", { xPercent: -0.6 }, { xPercent: 0.9, duration: 12.0, ease: "none" }, 0);
+
+      // Scene 2 (2.0-3.6s): the strip travels left, decelerates and STOPS. Then 0.8s of
+      // held frame — the stillness before the climax, the cheapest emphasis in the kit.
+      tl.fromTo("#f4-strip", { x: 300 }, { x: 0, duration: 1.5, ease: "power3.out" }, 2.0);
+
+      // Scene 3 (3.6-6.8s): the separation. Eight gaps open at once in a 60ms cascade,
+      // left to right. Each segment slides to its own slot; the strip becomes pieces.
+      var GAP = 22;
+      segs.forEach(function (el, i) {
+        var shift = (i - (N - 1) / 2) * GAP;
+        tl.to(el, { x: shift, duration: 0.52, ease: "power3.out" }, 3.6 + i * 0.06);
+      });
+      tl.to(ids, { autoAlpha: 1, duration: 0.34, ease: "power2.out", stagger: 0.06 }, 4.0);
+
+      // Scene 4 (6.8-9.6s): the convoy. The pieces lift and travel right toward the frame
+      // edge — the crates leaving the mill. seg-00412 is the one that stays put and stays
+      // lit: it is the continuity object and the film follows it from here to the end.
+      segs.forEach(function (el, i) {
+        if (i === 3) return;
+        var shift = (i - (N - 1) / 2) * GAP;
+        tl.to(el, { x: shift + 150 + i * 26, y: -34, autoAlpha: 0.28, duration: 1.5, ease: "power2.in" }, 6.8 + i * 0.07);
+      });
+      tl.to("#f4-seg3", { y: -18, scale: 1.06, duration: 0.7, ease: "power2.out" }, 7.1);
+      tl.fromTo("#f4-pill", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.42, ease: "power3.out" }, 7.4);
+
+      // Scene 5 (9.6-12.0s): the source caption settles, then the frame holds.
+      tl.fromTo("#f4-cap", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power2.out" }, 9.6);
+
+      // ---- SEAM 4 -> 5: back to the current, LEFT.
+      tl.to("#f4-stage", { x: -238, duration: 0.34, ease: "power4.in" }, 11.66);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["04-segments"] = tl;
+    })();
+  </script>
+</template>

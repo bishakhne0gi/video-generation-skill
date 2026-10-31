@@ -1,0 +1,201 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-600.woff2") format("woff2"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --canvas: #f9f7f3; --bone: #f3f0e8; --card: #ffffff; --dark: #202020;
+      --hair: rgba(32,32,32,0.12); --primary: #ea2804; --glow: #ff6a3d;
+      --ink: #202020; --body: #3a3a3a; --charcoal: #575757; --mute: #646464; --ash: #8d8d8d;
+      --on-dark: #fcfcfc; --success: #2b9a66;
+    }
+    #f3-ground { position: absolute; inset: 0; background: var(--canvas); }
+    #f3-stage { position: absolute; inset: 0; }
+
+    /* the one soft drop shadow in the system exists to lift photography, and only that */
+    #f3-photo {
+      position: absolute; left: 1216px; top: 200px; width: 624px; height: 636px;
+      border-radius: 10px; overflow: hidden;
+      box-shadow: 0 8px 24px rgba(32,32,32,0.08);
+      background: url("public/img/frontdesk.jpg") center/cover no-repeat;
+    }
+    #f3-photocap {
+      position: absolute; left: 1216px; top: 852px; width: 624px;
+      font-family: "JetBrains Mono", monospace; font-size: 14px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--mute);
+    }
+
+    #f3-kicker {
+      position: absolute; left: 96px; top: 104px;
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--charcoal);
+    }
+    #f3-head {
+      position: absolute; left: 96px; top: 152px; width: 1020px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+      font-size: 66px; line-height: 1.0; letter-spacing: -0.02em; color: var(--ink);
+    }
+
+    /* three step-cards. Elevation 1 — white on cream, 1px hairline, NO coloured edge. */
+    .f3-card {
+      position: absolute; left: 96px; width: 1020px; height: 138px;
+      background: var(--card); border: 1px solid var(--hair); border-radius: 10px;
+    }
+    .f3-idx {
+      position: absolute; left: 28px; top: 26px;
+      font-family: "JetBrains Mono", monospace; font-size: 15px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute);
+    }
+    .f3-what {
+      position: absolute; left: 28px; top: 62px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 700;
+      font-size: 34px; line-height: 1.1; letter-spacing: -0.015em; color: var(--ink);
+    }
+    .f3-data {
+      position: absolute; right: 28px; top: 54px; text-align: right;
+      font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--body);
+    }
+    .f3-data s { text-decoration: none; color: var(--success); font-weight: 700; }
+    .f3-data em { font-style: normal; color: var(--mute); }
+
+    /* the definition, built from its three nouns */
+    #f3-def {
+      position: absolute; left: 96px; top: 776px; display: flex; align-items: baseline; gap: 22px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 700;
+      font-size: 44px; line-height: 1.0; letter-spacing: -0.02em; color: var(--ink);
+    }
+    #f3-def i { font-style: normal; color: var(--primary); font-size: 34px; }
+    #f3-defcap {
+      position: absolute; left: 96px; top: 844px;
+      font-family: "Inter", sans-serif; font-size: 24px; color: var(--charcoal);
+    }
+
+    /* the continuity object */
+    #f3-chip {
+      position: absolute; right: 80px; top: 72px; display: flex; align-items: center; gap: 12px;
+      padding: 10px 22px; border-radius: 9999px;
+      background: var(--card); border: 1px solid var(--hair);
+      font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 500; color: var(--charcoal);
+    }
+    #f3-chip i { width: 9px; height: 9px; border-radius: 9999px; background: #bbbbbb; display: block; }
+    #f3-chip u { text-decoration: none; font-size: 15px; font-weight: 700; letter-spacing: 0.14em; color: var(--mute); }
+    /* the status value: one span per state, stacked in a fixed slot and toggled by
+       zero-duration sets. Fully seekable — never tl.call, never an innerText tween. */
+    #f3-slot { position: relative; display: block; width: 74px; height: 28px; }
+    #f3-slot b { position: absolute; left: 0; top: 0; font-weight: 500; }
+    #f3-slot .s0 { color: var(--mute); }
+    #f3-slot .s1 { color: var(--primary); font-weight: 700; }
+    #f3-slot .s2 { color: var(--charcoal); }
+    #f3-chipnote {
+      position: absolute; right: 80px; top: 130px; text-align: right;
+      font-family: "JetBrains Mono", monospace; font-size: 15px; letter-spacing: 0.06em; color: var(--primary);
+    }
+
+    #f3-grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.05; mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    }
+  </style>
+
+  <div id="root" data-composition-id="03-desk" data-width="1920" data-height="1080">
+    <div id="f3-ground" class="clip" data-start="0" data-duration="11.9" data-track-index="0"></div>
+
+    <div id="f3-stage">
+      <div id="f3-photo"></div>
+      <div id="f3-photocap">The front desk &mdash; where identity is checked once</div>
+
+      <div id="f3-kicker">02 / The front desk &middot; AuthN</div>
+      <div id="f3-head">Authentication happens<br />in exactly one place.</div>
+
+      <div class="f3-card" id="f3-c1" style="top: 306px;">
+        <div class="f3-idx">01 / The claim</div>
+        <div class="f3-what">You assert who you are</div>
+        <div class="f3-data">passport &middot; C4419827</div>
+      </div>
+      <div class="f3-card" id="f3-c2" style="top: 462px;">
+        <div class="f3-idx">02 / The check</div>
+        <div class="f3-what">The desk verifies it</div>
+        <div class="f3-data">photo <s>&check;</s>&ensp;name <s>&check;</s>&ensp;booking <s>&check;</s></div>
+      </div>
+      <div class="f3-card" id="f3-c3" style="top: 618px;">
+        <div class="f3-idx">03 / The credential</div>
+        <div class="f3-what">A card is issued</div>
+        <div class="f3-data">4A&middot;9F&middot;22&middot;E1<br /><em>doors 412 &middot; gym &middot; pool</em></div>
+      </div>
+
+      <div id="f3-def"><span>A claim.</span><i>&#47;</i><span>A check.</span><i>&#47;</i><span>A credential.</span></div>
+      <div id="f3-defcap">That is the whole of it. Nothing here mentions a door.</div>
+
+      <div id="f3-chip"><i></i><u>HTTP</u><span id="f3-slot"><b class="s0">&mdash;&mdash;</b><b class="s1">401</b><b class="s2">200</b></span></div>
+      <div id="f3-chipnote">no valid credentials</div>
+
+      <div id="f3-grain"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      var chipDot = "#f3-chip i";
+      // only state 0 is visible at mount; the others are set on, one at a time
+      gsap.set("#f3-slot .s1, #f3-slot .s2", { autoAlpha: 0 });
+      gsap.set("#f3-chipnote", { autoAlpha: 0 });
+
+      // ---- SEAM 2 -> 3 ENTRY: cut-the-curve LEFT, matched to frame 02's exit (-232 on
+      // power4.in). Enters from +295 mid-flight, never from rest.
+      tl.fromTo("#f3-stage", { x: 295 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+
+      // ---- Scene 1 (0.0–2.4s): the frame opens nearly empty — the photograph and one
+      // kicker. Asymmetric 60/40.
+                  // photo, kicker and headline ride the stage in at full opacity — see above.
+      tl.fromTo("#f3-chip", { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 0.36, ease: "back.out(1.5)" }, 0.72);
+      tl.fromTo("#f3-photocap", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: "none" }, 1.0);
+
+      // ---- Scene 2 (2.4–4.6s): card one, on "Hand over a passport".
+      tl.fromTo("#f3-c1", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 2.4);
+
+      // ---- Scene 3 (4.6–6.8s): card two, on "They check it" — and the ONE place in the
+      // film where 401 is the live state: this is what failing THIS check looks like.
+      tl.fromTo("#f3-c2", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 4.6);
+      tl.to(chipDot, { backgroundColor: "#ea2804", duration: 0.24, ease: "power2.out" }, 5.25);
+      tl.set("#f3-slot .s0", { autoAlpha: 0 }, 5.25);
+      tl.set("#f3-slot .s1", { autoAlpha: 1 }, 5.25);
+      tl.fromTo("#f3-chipnote", { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out" }, 5.32);
+
+      // ---- Scene 4 (6.8–9.4s): card three, on "they issue a card". The door list on it is
+      // planted here; frame 04 spends it. The status returns to a neutral 200.
+      tl.fromTo("#f3-c3", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 6.8);
+      tl.set("#f3-slot .s1", { autoAlpha: 0 }, 7.5);
+      tl.set("#f3-slot .s2", { autoAlpha: 1 }, 7.5);
+      tl.to(chipDot, { backgroundColor: "#2b9a66", duration: 0.24, ease: "power2.out" }, 7.5);
+      tl.to("#f3-chipnote", { autoAlpha: 0, duration: 0.24, ease: "none" }, 7.44);
+
+      // ---- Scene 5 (9.4–11.9s): the definition arrives one noun per beat, then held.
+      tl.fromTo("#f3-def span:nth-child(1)", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 9.4);
+      tl.fromTo("#f3-def i:nth-of-type(1)", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, 9.66);
+      tl.fromTo("#f3-def span:nth-child(3)", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 9.76);
+      tl.fromTo("#f3-def i:nth-of-type(2)", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, 10.02);
+      tl.fromTo("#f3-def span:nth-child(5)", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 10.12);
+      tl.fromTo("#f3-defcap", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: "none" }, 10.54);
+      // the cards recede a half-step so the definition owns the frame — content dims, never
+      // the surfaces (a white card at partial opacity over cream just goes flat).
+      tl.to(".f3-card .f3-what, .f3-card .f3-data, .f3-card .f3-idx", { opacity: 0.55, duration: 0.5, ease: "power2.out" }, 9.9);
+
+      // ---- SEAM 3 -> 4 : INVERSE ZOOM (z -1) — the ARRIVAL, the thesis landing. Both
+      // sides must share the scale-velocity SIGN, so this side SHRINKS on the way out and
+      // frame 04 enters at 1.42 shrinking to 1. A grow-from-small entry here would be a
+      // mirrored vector, which is the most common way this seam is got wrong.
+      tl.to("#f3-stage", { scale: 0.74, autoAlpha: 0, duration: 0.4, ease: "power3.in" }, 11.5);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["03-desk"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,80 @@
+{
+  "_": "EP 16 — SNS + SQS. The EP 15 construction, unchanged, because it works: one continuous canvas the camera travels on a serpentine, stations rather than slides, one stroke-icon family so no box is ever a labelled rectangle, the DESIGN.md marketing surface (bloom field, hero card, product panels, the box pattern), and a continuity chip that follows ONE message from published to deleted. Nine stations instead of thirteen — this is a 90-second episode, so the arc is tighter and every station carries exactly one idea. EVERY NUMBER ON SCREEN IS REAL AND SOURCED (docs.aws.amazon.com sqs/sns developer guides): visibility timeout defaults to 30 seconds and maxes at 12 hours; retention defaults to 4 days and maxes at 14; max message size is 256 KB; long polling waits up to 20 seconds; SQS standard requests are $0.40 per million after the first million free; FIFO queues do 300 messages a second, 3,000 with batches of 10, and dedupe on a 5-minute window; standard queues are at-least-once with best-effort ordering; a redrive policy moves a message to the dead-letter queue after maxReceiveCount receives.",
+  "series": "Ship It",
+  "episode": "EP 16",
+  "title": "Shout Once.",
+  "titleAccent": "Once.",
+  "subtitle": "SNS fans it out. SQS holds it until you are ready.",
+  "hook": "One publish. Many queues. Nobody waiting on anybody.",
+  "cta": "cosx",
+  "next": "Next: the outbox pattern, and the write you almost lost",
+  "_theme": "stripe-mesh again — the second episode on this palette, which is what makes it a series rather than a template. The continuity is the construction and the cue set; what changes per episode is the value journey and which bloom carries each act. EP15 ran cream → canvas → cool → canvas → saturated. EP16 runs saturated → canvas → dark (the failure act) → canvas → saturated.",
+  "theme": "stripe-mesh",
+  "fps": 30,
+  "_voice": "Unchanged from EP 13/14/15 — same voice id, same model, same settings. v2 cannot perform audio tags, which is what keeps the directive register structural rather than a setting that drifts.",
+  "voice": "nlyULslzTRhqlyv46oPj",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1616,
+  "_music": "Same 84bpm grid as EP 13/14/15 so scene lengths snap identically across the run.",
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.15,
+    "open": 0.34,
+    "mood": "calm-focus",
+    "bpm": 84,
+    "startAt": 0
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "Nine lines. Directive throughout — the narrator hands you the thing in order. Definition then consequence, one clause a sentence, and an instruction verb opening eight of the nine.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Watch what a direct call costs you. Five services to notify…\nand any one of them can fail your write."
+    },
+    {
+      "scene": 2,
+      "text": "Publish once, to a topic. SNS copies that message into every queue subscribed to it."
+    },
+    {
+      "scene": 3,
+      "text": "Read what arrives. A body, message attributes, and a receipt handle you need to delete it."
+    },
+    {
+      "scene": 4,
+      "text": "Filter at the subscription. A policy keeps events out of the queue…\ninstead of out of your code."
+    },
+    {
+      "scene": 5,
+      "text": "The queue is a shock absorber. Producers spike, consumers drain, and nothing is dropped in between."
+    },
+    {
+      "scene": 6,
+      "text": "Take a message and it goes invisible for thirty seconds. Miss that window, and it comes back."
+    },
+    {
+      "scene": 7,
+      "text": "Set maxReceiveCount. After that many failed reads, the message moves to a dead-letter queue."
+    },
+    {
+      "scene": 8,
+      "text": "Standard queues are at-least-once, and unordered. Need strict order? Use FIFO, and pay in throughput."
+    },
+    {
+      "scene": 9,
+      "text": "Turn on long polling. Twenty seconds of wait removes the empty receives, and most of your bill."
+    }
+  ],
+  "_shots": "No Kling in this register. EP15 proved the marketing-surface construction carries a full episode on graphics alone: the bloom field is the texture, the grain is per-frame, and the depth comes from real product panels rather than footage. Nothing to generate, nothing to grade.",
+  "shots": []
+}

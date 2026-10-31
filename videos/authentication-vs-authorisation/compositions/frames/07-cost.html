@@ -1,0 +1,179 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --canvas: #f9f7f3; --bone: #f3f0e8; --card: #ffffff; --dark: #202020;
+      --hair: rgba(32,32,32,0.12); --primary: #ea2804;
+      --ink: #202020; --body: #3a3a3a; --charcoal: #575757; --mute: #646464; --ash: #8d8d8d;
+    }
+    #f7-ground { position: absolute; inset: 0; background: var(--canvas); }
+    #f7-stage { position: absolute; inset: 0; }
+
+    #f7-kicker {
+      position: absolute; left: 96px; top: 104px;
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--charcoal);
+    }
+    #f7-rank {
+      position: absolute; left: 96px; top: 152px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+      font-size: 96px; line-height: 1.0; letter-spacing: -0.03em; color: var(--ink);
+    }
+    #f7-ranklab {
+      position: absolute; left: 250px; top: 196px; width: 420px;
+      font-family: "Inter", sans-serif; font-size: 25px; line-height: 1.35; color: var(--body);
+    }
+
+    /* the figure. Tabular numerals so a count-up does not jitter the glyph widths. */
+    #f7-fig {
+      position: absolute; left: 96px; top: 356px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+      font-size: 158px; line-height: 1.0; letter-spacing: -0.035em; color: var(--ink);
+      font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
+    }
+    #f7-figlab {
+      position: absolute; left: 100px; top: 528px;
+      font-family: "JetBrains Mono", monospace; font-size: 21px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute);
+    }
+    /* the thin progress track: the figure against the whole 2025 dataset */
+    #f7-track {
+      position: absolute; left: 100px; top: 580px; width: 900px; height: 6px;
+      background: var(--bone); border-radius: 9999px; overflow: hidden;
+    }
+    #f7-fill { position: absolute; left: 0; top: 0; width: 900px; height: 6px; background: var(--primary); transform-origin: left center; }
+    #f7-trackcap {
+      position: absolute; left: 100px; top: 600px; width: 900px;
+      display: flex; justify-content: space-between;
+      font-family: "JetBrains Mono", monospace; font-size: 15px; letter-spacing: 0.06em; color: var(--mute);
+    }
+
+    /* the sourced breakdown rail — the figure never appears without what authorises it */
+    #f7-rail { position: absolute; left: 1104px; top: 220px; width: 720px; }
+    .f7-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 19px 0 17px; border-bottom: 1px solid var(--hair);
+      font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--body);
+    }
+    .f7-row b { font-weight: 700; color: var(--ink); font-size: 26px; font-variant-numeric: tabular-nums; }
+
+    #f7-quote {
+      position: absolute; left: 1104px; top: 596px; width: 720px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 700;
+      font-size: 34px; line-height: 1.22; letter-spacing: -0.015em; color: var(--ink);
+    }
+    #f7-quote em { font-style: normal; color: var(--primary); }
+    #f7-src {
+      position: absolute; left: 1104px; top: 812px; width: 720px;
+      font-family: "JetBrains Mono", monospace; font-size: 15px; letter-spacing: 0.06em;
+      line-height: 1.5; color: var(--mute);
+    }
+
+    #f7-chip {
+      position: absolute; right: 80px; top: 72px; display: flex; align-items: center; gap: 12px;
+      padding: 10px 22px; border-radius: 9999px;
+      background: var(--card); border: 1px solid var(--hair);
+      font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--charcoal);
+    }
+    #f7-chip i { width: 9px; height: 9px; border-radius: 9999px; background: var(--primary); display: block; }
+    #f7-chip u { text-decoration: none; font-size: 15px; font-weight: 700; letter-spacing: 0.14em; color: var(--mute); }
+    #f7-chip b { font-weight: 700; color: var(--primary); }
+
+    #f7-grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.05; mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.87' numOctaves='3' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    }
+  </style>
+
+  <div id="root" data-composition-id="07-cost" data-width="1920" data-height="1080">
+    <div id="f7-ground" class="clip" data-start="0" data-duration="10.6" data-track-index="0"></div>
+
+    <div id="f7-stage">
+      <div id="f7-kicker">06 / What it costs &middot; OWASP Top 10 2025</div>
+      <div id="f7-rank">#1</div>
+      <div id="f7-ranklab">Broken Access Control &mdash; and it held the position from 2021.</div>
+
+      <div id="f7-fig">0</div>
+      <div id="f7-figlab">recorded occurrences</div>
+      <div id="f7-track"><div id="f7-fill"></div></div>
+      <div id="f7-trackcap"><span>A01 alone</span><span>the 2025 dataset</span></div>
+
+      <div id="f7-rail">
+        <div class="f7-row"><span>CWEs mapped</span><b>40</b></div>
+        <div class="f7-row"><span>Total CVEs</span><b>32,654</b></div>
+        <div class="f7-row"><span>Applications tested with it</span><b>100%</b></div>
+        <div class="f7-row"><span>Average incidence rate</span><b>3.74%</b></div>
+      </div>
+
+      <div id="f7-quote">&ldquo;Enforce <em>record ownership</em> rather than allowing users to create, read, update, or delete any record.&rdquo;</div>
+      <div id="f7-src">OWASP Top 10 2025 &middot; A01:2025 Broken Access Control<br />Every figure on this frame is from that page. None is measured here.</div>
+
+      <div id="f7-chip"><i></i><u>HTTP</u><b>403</b></div>
+      <div id="f7-grain"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      gsap.set("#f7-fig, #f7-figlab, #f7-track, #f7-trackcap", { autoAlpha: 0 });
+      gsap.set(".f7-row", { autoAlpha: 0 });
+      gsap.set("#f7-quote, #f7-src", { autoAlpha: 0 });
+      gsap.set("#f7-fill", { scaleX: 0 });
+
+      // ---- SEAM 6 -> 7 ENTRY: cut-the-curve LEFT, matched to frame 06's exit.
+      tl.fromTo("#f7-stage", { x: 295 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+
+      // ---- Scene 1 (0.0–2.0s): the kicker and the rank. Rule-of-thirds; the right rail is
+      // still empty.
+                  // kicker, rank and its label ride the stage in at full opacity.
+      tl.fromTo("#f7-chip", { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 0.34, ease: "back.out(1.5)" }, 0.86);
+
+      // ---- Scene 2 (2.0–5.2s): the count-up. 3.2s — long enough to read as a QUANTITY
+      // rather than as a transition. The track fills alongside it, and the label lands as
+      // the number finishes.
+      var TARGET = 1839701;
+      var counter = { v: 0 };
+      var figEl = document.getElementById("f7-fig");
+      tl.to("#f7-fig", { autoAlpha: 1, duration: 0.2 }, 2.0);
+      tl.to(counter, {
+        v: TARGET, duration: 3.2, ease: "power2.out",
+        onUpdate: function () {
+          figEl.textContent = Math.round(counter.v).toLocaleString("en-GB");
+        },
+      }, 2.0);
+      tl.to("#f7-fill", { scaleX: 1, duration: 3.2, ease: "power2.out" }, 2.0);
+      tl.to("#f7-track", { autoAlpha: 1, duration: 0.2 }, 2.0);
+      tl.fromTo("#f7-figlab", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 4.9);
+      tl.fromTo("#f7-trackcap", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 5.1);
+
+      // ---- Scene 3 (5.2–7.6s): the rail builds, one sourced row per beat. The figure is
+      // still counting as this begins, so the frame is never doing only one thing.
+      tl.fromTo(".f7-row:nth-child(1)", { autoAlpha: 0, x: 22 }, { autoAlpha: 1, x: 0, duration: 0.34, ease: "power3.out" }, 4.3);
+      tl.fromTo(".f7-row:nth-child(2)", { autoAlpha: 0, x: 22 }, { autoAlpha: 1, x: 0, duration: 0.34, ease: "power3.out" }, 4.62);
+      tl.fromTo(".f7-row:nth-child(3)", { autoAlpha: 0, x: 22 }, { autoAlpha: 1, x: 0, duration: 0.34, ease: "power3.out" }, 4.94);
+      tl.fromTo(".f7-row:nth-child(4)", { autoAlpha: 0, x: 22 }, { autoAlpha: 1, x: 0, duration: 0.34, ease: "power3.out" }, 5.26);
+
+      // ---- Scene 4 (7.6–10.6s): OWASP's own prevention wording — the same fix frame 06
+      // just typed, written as policy. That is the whole reason this frame exists.
+      tl.fromTo("#f7-quote", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 6.6);
+      tl.fromTo("#f7-src", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 7.4);
+      // then held.
+
+      // ---- SEAM 7 -> 8 : cut UP (y -1) — elevation into the conclusion. Spent once.
+      tl.to("#f7-stage", { y: -196, duration: 0.36, ease: "power4.in" }, 10.24);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["07-cost"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,116 @@
+{
+  "_": "EP 09 — Uber's DOMA. Visual register: iluli / MOWE Studio flat collage — true-black field, ONE dominant flat colour per scene, geometric beams and sparkle dots, one hero object per beat with a soft drop shadow. Uber's own brand colours (base.uber.com). Uber Move is proprietary and unlicensable, so the display face is Plus Jakarta Sans. No footage: every frame is Remotion vector, which is what this style actually wants.",
+  "series": "Ship It",
+  "episode": "EP 09",
+  "title": "Uber broke the monolith. Then the pieces broke them.",
+  "titleAccent": "pieces",
+  "subtitle": "Two thousand microservices, fifty-service debugging, and the one rule that fixed it",
+  "hook": "“Can't live with them, can't live without them.”",
+  "cta": "Read the DOMA post",
+  "next": "Follow for more",
+  "theme": "uber-dark",
+  "fps": 30,
+  "voice": "MjAff57sfV5MRLNOeIpA",
+  "voiceModel": "eleven_v3",
+  "voiceSettings": {
+    "stability": 0.5,
+    "similarity_boost": 0.8,
+    "style": 0.45,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 909,
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.17,
+    "mood": "dark-tech"
+  },
+  "audio": {
+    "vo": true,
+    "music": true
+  },
+  "_vo": "20 beats. Rahil S, eleven_v3. Tags on 11 of 20 lines so the register CHANGES across the arc — confiding open, flat evidence, held turn, lifted payoff, quieter limitation. Contractions throughout; a synthetic mouth reads 'it isn't' as human and 'it is not' as legal.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "[whispers] One bug… fifty services. Twelve teams. [serious] That's what it took to find where it started."
+    },
+    {
+      "scene": 2,
+      "text": "Uber didn't have a scaling problem… [curious] They had the problem they created by SOLVING their scaling problem."
+    },
+    {
+      "scene": 3,
+      "text": "Chapter one. The escape."
+    },
+    {
+      "scene": 4,
+      "text": "Twenty thirteen. Two monoliths ran all of Uber. [serious] One bad regression could take the whole company down."
+    },
+    {
+      "scene": 5,
+      "text": "Deploys were painful. Rollbacks, constant. Every team's fate tied to every other team's code."
+    },
+    {
+      "scene": 6,
+      "text": "[excited] So they broke it apart. Independent deploys. Isolated failures. Teams that could finally move alone."
+    },
+    {
+      "scene": 7,
+      "text": "And it worked. [curious] That's the part everyone forgets… For years, it genuinely worked."
+    },
+    {
+      "scene": 8,
+      "text": "Chapter two. The cost."
+    },
+    {
+      "scene": 9,
+      "text": "By twenty twenty… twenty-two hundred critical microservices. Calls running many layers deep."
+    },
+    {
+      "scene": 10,
+      "text": "[serious] Finding one root cause meant fifty services, across twelve teams. The half-life of a service? Eighteen months."
+    },
+    {
+      "scene": 11,
+      "text": "And the worst of them only LOOKED independent. Deploy them together… or don't deploy at all."
+    },
+    {
+      "scene": 12,
+      "text": "[serious] Uber has a name for that. A networked monolith. All of the cost of distribution… none of the freedom."
+    },
+    {
+      "scene": 13,
+      "text": "So the instinct is to go back. [deadpan] Uber's own answer is blunt. There is no turning back."
+    },
+    {
+      "scene": 14,
+      "text": "Chapter three. Domains."
+    },
+    {
+      "scene": 15,
+      "text": "[curious] They stopped counting services… and started drawing domains. Twenty-two hundred services became seventy."
+    },
+    {
+      "scene": 16,
+      "text": "Five layers. One rule. A layer may only depend on the layers beneath it."
+    },
+    {
+      "scene": 17,
+      "text": "Every domain gets one door. And you extend it without touching it. Plugins for logic. Protobuf for data."
+    },
+    {
+      "scene": 18,
+      "text": "[excited] One team went from three DAYS to three hours. Onboarding down by up to half. Support costs down an order of magnitude."
+    },
+    {
+      "scene": 19,
+      "text": "[resigned] It isn't free. Half the domains are still unbuilt… and this is org design wearing an architecture diagram."
+    },
+    {
+      "scene": 20,
+      "text": "Microservices were never the mistake. [serious] Having no rule about who may depend on whom… THAT was the mistake."
+    }
+  ],
+  "_shots": "No Kling credentials in this environment, and this style does not want photoreal footage. Every beat is vector.",
+  "shots": []
+}

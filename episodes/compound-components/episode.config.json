@@ -1,0 +1,145 @@
+{
+  "_": "EP 12 — compound components, told through CosX's own unfinished migration. THE WORLD IS ONE SOURCE FILE: a tall column of code the camera SCROLLS down, six hundred lines that never end, and in act three it breaks into short siblings laid side by side. Vertical travel for the monolith, horizontal spread for the composition. Same palette, tempo, voice and type as EP11 so the playlist reads as a series; only the MATERIAL family changes. Facts come from references/ep12-facts.md, which is first-party: the founder's own account of the codebase. The unflattering ending stays in.",
+  "series": "Ship It",
+  "episode": "EP 12",
+  "title": "The component that knew too much.",
+  "titleAccent": "too much",
+  "subtitle": "Why every boolean prop doubles your states, and the pattern that stops it",
+  "hook": "“The component knew about every case it might ever be asked to be.”",
+  "cta": "cosx",
+  "next": "Next: the regular expression that broke the internet",
+  "theme": "white-light",
+  "fps": 30,
+  "_voice": "Unchanged from EP10 and EP11. Series continuity is the point.",
+  "voice": "MjAff57sfV5MRLNOeIpA",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1212,
+  "_music": "Same 84 bpm grid as EP11 so scene lengths snap identically. New bed, same tempo.",
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.15,
+    "open": 0.34,
+    "startAt": 8,
+    "mood": "driving-build",
+    "bpm": 84
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "TEACHING FIRST. The pattern is the subject; CosX is the evidence. The arc is define the failure, show the failing call site, name the pattern, show the composed call site, give the two gotchas everyone hits, say when NOT to use it, then close with our own unfinished migration as proof rather than as the topic. Beats 2 and 12 are silent so the score lifts.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Watch a component that knows every case it might ever be asked to be.\nIt works. It is also finished."
+    },
+    {
+      "scene": 2,
+      "text": "Every boolean prop you add does not add a case. It DOUBLES them.\nFour flags is sixteen states."
+    },
+    {
+      "scene": 3,
+      "text": "Most of those states are meaningless. All of them compile… That is how a component reaches six hundred lines."
+    },
+    {
+      "scene": 4,
+      "text": "Chapter one. What breaks."
+    },
+    {
+      "scene": 5,
+      "text": "Look at the call site. You cannot tell what this renders without opening the component. The props describe branches, not a thing."
+    },
+    {
+      "scene": 6,
+      "text": "Chapter two. The pattern."
+    },
+    {
+      "scene": 7,
+      "text": "This is a compound component.\nOne parent owns the state. The children read it and render themselves."
+    },
+    {
+      "scene": 8,
+      "text": "You compose only the pieces you need. A trigger. A panel. A row.\nA new variant is a sibling… never a flag."
+    },
+    {
+      "scene": 9,
+      "text": "Two things will bite you. If the caller passes a value, defer to it. Otherwise keep your own. Same component either way."
+    },
+    {
+      "scene": 10,
+      "text": "And a child outside its parent must not fail quietly.\nThrow at once. Name the parent it needs."
+    },
+    {
+      "scene": 11,
+      "text": "Reach for this when the parts share state. A card with named slots needs no context at all. Do not add ceremony you do not need."
+    },
+    {
+      "scene": 12,
+      "text": "We adopted it unevenly. Our composed pieces still sit beside the monolith they replaced. Next: the regular expression that broke the internet."
+    }
+  ],
+  "_shots": "SEVEN JOBS, only two of them video. The sixteen-state grid and the code are now RENDERED, not photographed: showing real prop combinations teaches, a photo of sixteen blocks only illustrates. Kling supplies material and light; Remotion supplies every readable thing. One prompt family (matte machined parts, seamless studio sweep, one soft key light) so the whole film shares a look.",
+  "shots": [
+    {
+      "id": "ep12_open",
+      "_": "VIDEO. The component that does everything: one object with every mechanism deployed at once. Real material and real depth of field, which is exactly what Remotion cannot fake.",
+      "kind": "video",
+      "prompt": "Extreme macro of a matte black multi-tool with every single blade and implement fanned open at once, dense overlapping steel, seamless dark studio sweep, one soft key light from upper left, slow rotation, shallow depth of field, photoreal, 24fps film look. No text, no lettering, no logos, no brand marks.",
+      "duration": 5,
+      "mode": "pro",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep12_payoff",
+      "_": "VIDEO. Separate parts meeting cleanly. The composed answer, as material.",
+      "kind": "video",
+      "prompt": "Four separate matte black geometric blocks sliding slowly together into one clean assembly on a seamless white studio sweep, precise machined edges, one soft key light, slow dolly in, shallow depth of field, photoreal, 24fps film look. No text, no lettering, no logos.",
+      "duration": 5,
+      "mode": "pro",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep12_monolith",
+      "_": "STILL. The single slab: one component that knows everything. Remotion scales, masks and cracks it.",
+      "kind": "image",
+      "prompt": "One large solid matte black monolithic block, slightly worn machined surface, standing on a seamless white studio sweep, single soft key light from upper left, long soft shadow, photoreal product photography, centred, generous negative space. No text, no logos.",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep12_pieces",
+      "_": "STILL. The same material, separated into parts. The composed vocabulary.",
+      "kind": "image",
+      "prompt": "Five separate matte black geometric blocks of different sizes arranged apart from each other on a seamless white studio sweep, precise machined edges, single soft key light from upper left, soft shadows, photoreal product photography, generous negative space. No text, no logos.",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep12_tex_paper",
+      "_": "THEME ELEMENT for the light acts. Material, not scene.",
+      "kind": "image",
+      "prompt": "Extreme macro of a seamless white studio paper sweep under raking light, soft gradient falloff, faint paper grain, no subject, abstract material study, photoreal.",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep12_tex_dark",
+      "_": "THEME ELEMENT for act two, the explosion. Near black.",
+      "kind": "image",
+      "prompt": "Extreme macro of matte black moulded plastic surface under raking light, faint texture, near-black field, one soft highlight sweeping across, no subject, abstract material study, photoreal.",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep12_close",
+      "_": "STILL. The quiet end-card surface, with room for the mark.",
+      "kind": "image",
+      "prompt": "Empty seamless white studio sweep with a single soft shadow falling from the left, nothing in frame, warm neutral light, photoreal, generous empty space. No text, no objects, no logos.",
+      "aspect": "16:9"
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="07-path" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/interior.jpg');opacity:0.38"></div>
+  <div class="scrim" style="background:radial-gradient(84% 96% at 50% 46%, rgba(9,20,19,.52) 0%, rgba(9,20,19,.93) 66%, rgba(9,20,19,.99) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:112px">05 · THE CRITICAL PATH</div>
+      <div id="s-rule" class="rule" style="left:118px;top:150px;width:96px;transform-origin:0% 50%"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:118px;top:176px;width:1180px;font-size:82px">Everything that<br>blocks the paint.</div>
+      <div id="s-lead" class="lead" style="position:absolute;left:120px;top:372px;width:840px;font-size:31px">A chained request cannot start until its parent finishes. Every link costs a full round trip, and the chain is nearly always deeper than you think.</div>
+
+      <div id="p-case" class="panel" style="left:932px;top:344px;width:812px;height:440px"></div>
+      <div id="p-paper" style="position:absolute;left:956px;top:368px;width:764px;height:392px;
+        background:repeating-linear-gradient(90deg, rgba(176,228,204,.07) 0 1px, rgba(176,228,204,0) 1px 43px);
+        border-radius:4px"></div>
+      <div id="p-rows" style="position:absolute;left:980px;top:396px;width:716px;height:310px"></div>
+      <div id="p-pen" style="position:absolute;left:980px;top:356px;width:3px;height:366px;
+        background:linear-gradient(180deg,var(--brass),rgba(232,161,60,.15));box-shadow:0 0 12px rgba(232,161,60,.5)"></div>
+      <div id="p-nib" style="position:absolute;left:973px;top:344px;width:17px;height:22px;
+        background:linear-gradient(180deg,#F0C07A,#8A5A18);clip-path:polygon(0 0,100% 0,50% 100%);
+        filter:drop-shadow(0 2px 4px rgba(0,0,0,.7))"></div>
+
+      <div id="p-tot" style="position:absolute;left:980px;top:740px;width:716px;display:flex;justify-content:space-between">
+        <div class="mono" style="font-size:17px;letter-spacing:.15em;opacity:.6">4 CHAINED REQUESTS</div>
+        <div class="mono hot" style="font-size:30px;font-weight:700">4.10s</div></div>
+
+      <div id="p-fix" style="position:absolute;left:118px;top:742px;width:764px">
+        <div class="mono" style="font-size:18px;letter-spacing:.15em;color:var(--emerald-lit);opacity:.75">FLATTENED &mdash; PRECONNECT, INLINE, PRELOAD</div>
+        <div id="p-fixbars" style="position:relative;width:764px;height:104px;margin-top:16px"></div>
+        <div id="p-fixtot" class="mono" style="font-size:30px;font-weight:700;color:var(--mint);margin-top:10px">1.42s</div></div>
+      <div id="p-sweep" style="position:absolute;left:932px;top:344px;width:179px;height:440px;
+    background:linear-gradient(90deg,rgba(176,228,204,0),rgba(176,228,204,.16),rgba(176,228,204,0));pointer-events:none"></div>
+      <div id="p-why" style="position:absolute;left:118px;top:930px;width:820px">
+        <div class="mono" style="font-size:18px;color:var(--emerald-lit);line-height:1.7">
+          each link is a full round trip &mdash; <span style="color:var(--mint);font-weight:700">4 &times; 180ms</span> of pure latency,<br>
+          before a single byte of your CSS is parsed</div></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — ACT BREAK lift. Rises from below through a softer scale curve
+      // than the travel, so the pull-back reads as the camera stepping up and over.
+      tl.fromTo("#stage", { y: 372, scale: 0.84 }, { y: 0, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#stage", { scale: 0.84 }, { scale: 1, duration: 0.78, ease: "power2.out" }, 0);
+      // SEAM CARRIER — the box tag and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up: the seam gate measures
+      // MOTION, so a station whose content fades in at 0.1s passes the gate while visibly
+      // entering on an empty frame. Only the rule and the lead line are staged.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30000000000000004);
+      tl.fromTo("#p-case",  { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.56, ease: "power3.out" }, 0.08);
+      tl.fromTo("#p-paper", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.44 }, 0.24);
+      var CH = [{"n":"index.html","s":0,"d":0.62},{"n":"app.css","s":0.62,"d":0.74},{"n":"theme.css","s":1.36,"d":0.68},{"n":"brand.woff2","s":2.04,"d":0.81},{"n":"first paint","s":2.85,"d":1.25}], rows = document.querySelector("#p-rows"), T0 = 0.90, SPD = 0.62;
+      for (var i = 0; i < CH.length; i++) {
+        var c = CH[i], last = i === CH.length - 1;
+        var row = document.createElement("div");
+        row.style.cssText = "position:absolute;left:0;top:" + (i*62) + "px;width:716px;height:62px";
+        row.innerHTML = '<span style="position:absolute;left:0;top:9px;font-family:JBMono,monospace;font-size:17px;color:' +
+            (last ? "var(--brass)" : "var(--emerald-lit)") + '">' + c.n + '</span>' +
+          '<div class="bar" style="position:absolute;left:' + (188 + c.s*172) + 'px;top:6px;width:' + (c.d*172) +
+            'px;height:26px;border-radius:5px;transform-origin:0% 50%;background:' +
+            (last ? "rgba(232,161,60,.85)" : "rgba(64,138,113,.86)") + '"></div>' +
+          '<span style="position:absolute;left:' + (196 + (c.s+c.d)*172) + 'px;top:10px;font-family:JBMono,monospace;' +
+            'font-size:15px;opacity:.65;color:var(--mint)">' + c.d.toFixed(2) + 's</span>';
+        rows.appendChild(row);
+        // the pen draws each bar in real time — the recorder IS the animation.
+        tl.fromTo(row, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.18 }, T0 + c.s*SPD);
+        tl.fromTo(row.querySelector(".bar"), { scaleX: 0 }, { scaleX: 1, duration: c.d*SPD, ease: "none" }, T0 + c.s*SPD);
+      }
+      // the pen head travels the whole width once, in step with the bars it is drawing.
+      tl.fromTo("#p-pen", { x: 188 }, { x: 188 + 4.10*172, duration: 4.10*SPD, ease: "none" }, T0);
+      tl.fromTo("#p-nib", { x: 188 }, { x: 188 + 4.10*172, duration: 4.10*SPD, ease: "none" }, T0);
+      tl.fromTo("#p-tot", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, T0 + 4.10*SPD + 0.10);
+      // the fix: the SAME work with the chain removed. Bars stack instead of stepping.
+      var fx = document.querySelector("#p-fixbars"), FW = [0.62, 0.74, 0.68, 0.81];
+      for (var j = 0; j < 4; j++) {
+        var b = document.createElement("div");
+        b.style.cssText = "position:absolute;left:0;top:" + (j*26) + "px;width:" + (FW[j]*172) +
+          "px;height:18px;border-radius:4px;transform-origin:0% 50%;background:rgba(64,138,113,.9)";
+        fx.appendChild(b);
+        tl.fromTo(b, { scaleX: 0 }, { scaleX: 1, duration: 0.42, ease: "power3.out" }, 4.60 + j*0.09);
+      }
+      tl.fromTo("#p-fix", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 4.42);
+      tl.fromTo("#p-fixtot", { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 0.46, ease: "back.out(1.5)" }, 5.30);
+      // the recorder keeps running: the pen makes a second pass over the flattened
+      // chain, so the beat is still drawing right up to the cut.
+      tl.fromTo("#p-why", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 6.30);
+      tl.fromTo("#p-pen", { x: 188 }, { x: 188 + 1.42*172, duration: 1.30, ease: "power2.inOut" }, 6.60);
+      tl.fromTo("#p-nib", { x: 188 }, { x: 188 + 1.42*172, duration: 1.30, ease: "power2.inOut" }, 6.60);
+      for (var z = 0; z < 4; z++)
+        tl.fromTo(fx.children[z], { scaleX: 0 }, { scaleX: 1, duration: 0.34, ease: "none" }, 6.60 + z*0.10);
+      tl.fromTo("#p-sweep", { x: 0, autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, 8.1);
+      tl.fromTo("#p-sweep", { x: 0 }, { x: 633, duration: 1.9, ease: "none", repeat: 0 }, 8.1);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 10.37);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["07-path"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,298 @@
+<template>
+  <style>
+@font-face{font-family:Archivo;src:url("assets/fonts/Archivo.woff2")format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:InterV;src:url("assets/fonts/Inter.woff2")format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:JBMono;src:url("assets/fonts/JetBrainsMono.woff2")format("woff2");font-weight:100 900;font-display:block}
+
+*{margin:0;padding:0;box-sizing:border-box}
+#root{width:1920px;height:1080px;overflow:hidden;background:#0B0F16;
+  font-family:InterV,-apple-system,sans-serif;color:#0C1927;
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+
+/* ---- grounds -------------------------------------------------------------
+   Over-scanned by 18% so a seam entering from off-frame never exposes the
+   stage edge. */
+.ground{position:absolute;inset:-18%}
+.g-dark {background:#0B0F16}
+.g-paper{background:#FFFFFF}
+.g-brand{background:#4940FF}
+
+/* The atmosphere. On dark it is one soft indigo bloom off the upper right —
+   the product's own accent, at an alpha you should never quite notice. */
+.bloom{position:absolute;border-radius:50%;filter:blur(12px);pointer-events:none}
+.bloom-a{width:1500px;height:1500px;top:-460px;right:-320px;
+  background:radial-gradient(circle,rgba(73,64,255,0.20) 0%,rgba(73,64,255,0.08) 46%,transparent 70%)}
+.bloom-b{width:1020px;height:1020px;bottom:-260px;left:-180px;
+  background:radial-gradient(circle,rgba(73,64,255,0.11) 0%,rgba(73,64,255,0.04) 46%,transparent 70%)}
+/* on the white act the bloom inverts to a cool paper tint, or the frame glares */
+.bloom-p{background:radial-gradient(circle,rgba(73,64,255,0.055) 0%,rgba(73,64,255,0.02) 46%,transparent 70%)}
+
+/* Grain must MOVE. A static tile renders identical noise on every frame, which
+   reads as dirt on the lens rather than as film. 3x oversized, translated by
+   the timeline. */
+.grain{position:absolute;left:-640px;top:-360px;width:3200px;height:1800px;
+  pointer-events:none;background-image:url("assets/plates/noise.png");background-repeat:repeat}
+.grain-d{opacity:0.052;mix-blend-mode:overlay}
+.grain-l{opacity:0.030;mix-blend-mode:multiply}
+
+.vig{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 72% at 50% 46%,transparent 42%,rgba(0,0,0,0.50) 100%)}
+.vig-l{background:radial-gradient(ellipse 82% 74% at 50% 46%,transparent 46%,rgba(12,25,39,0.10) 100%)}
+
+/* ---- type ----------------------------------------------------------------
+   Archivo 700 at -0.03em is the product's own display setting, measured off
+   the hero h1. Inter carries every piece of UI. JetBrains Mono carries every
+   number, id, filename and dimension — the register the audience trusts. */
+.stage{position:absolute;inset:0}
+.inner{position:absolute;inset:0}
+
+.hdr{font-family:Archivo,sans-serif;font-weight:700;font-size:92px;line-height:1.04;
+  letter-spacing:-0.03em;color:#0C1927}
+.hdr-xl{font-size:132px;line-height:1.0}
+.hdr-on{color:#FFFFFF}
+.lead{font-size:27px;line-height:1.5;color:rgba(12,25,39,0.70);letter-spacing:-0.006em;max-width:820px}
+.lead-on{color:rgba(255,255,255,0.62)}
+
+/* The brand's marker band. A solid accent rectangle behind the glyphs, with the
+   type sitting on top — this is the hero's own move and the film's title card
+   is built on it. Skewless, sharp-cornered, and it wipes in from the left. */
+.mark{position:relative;display:inline-block;padding:0.02em 0.10em 0.10em}
+.mark-bg{position:absolute;left:0;top:0.08em;right:0;bottom:0.10em;background:#4940FF;
+  transform-origin:left center}
+.mark-tx{position:relative}
+
+.tag{font-family:JBMono,monospace;font-size:15px;letter-spacing:0.20em;
+  text-transform:uppercase;color:rgba(12,25,39,0.62)}
+.tag-on{color:rgba(255,255,255,0.46)}
+.tag-ac{color:#3A32E0}
+.mono{font-family:JBMono,monospace;font-variant-numeric:tabular-nums;letter-spacing:-0.005em}
+.rule{height:1px;background:#E3EAF3;transform-origin:left center}
+.rule-on{background:rgba(255,255,255,0.09)}
+
+/* ---- product surfaces ----------------------------------------------------
+   One ground and a 1px hairline for every panel in the film. Nothing carries a
+   coloured edge: colour belongs to the content, never to a container. Radius is
+   2px because that is what the product does. */
+.win{background:#FFFFFF;border:1px solid #E3EAF3;border-radius:2px;overflow:hidden}
+.win-d{background:#12171F;border:1px solid rgba(255,255,255,0.09);border-radius:2px;overflow:hidden}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:44px;padding:0 14px;
+  border-radius:2px;border:1px solid #E3EAF3;background:#FFFFFF;color:#0C1927;
+  font-family:InterV,sans-serif;font-size:14px;font-weight:500;white-space:nowrap}
+.btn-on{background:#4940FF;border-color:#4940FF;color:#fff}
+.btn-off{color:rgba(12,25,39,0.62);background:#FFFFFF}
+.btn-lg{height:52px;padding:0 20px;font-size:16px}
+.chip{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:2px;
+  border:1px solid #E3EAF3;background:#FFFFFF;font-size:13px;font-weight:500;color:rgba(12,25,39,0.70)}
+.chip-d{border-color:rgba(255,255,255,0.09);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.62)}
+
+/* The oversized macOS pointer. It is the film's only actor, so it runs 2.3x
+   life size — at 1:1 a cursor is invisible at this viewing distance. */
+.cursor{position:absolute;width:54px;height:54px;pointer-events:none;z-index:95;
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,0.45))}
+</style>
+  <div id="root" data-composition-id="04-fix" data-start="0" data-width="1920" data-height="1080">
+    <div class="ground g-paper" data-layout-allow-overflow></div>
+    <div class="bloom bloom-a bloom-p" data-layout-allow-overflow></div>
+    <div class="bloom bloom-b bloom-p" data-layout-allow-overflow></div>
+    <div id="p4-grain" class="grain grain-l" data-layout-allow-overflow></div>
+    <div class="vig vig-l"></div>
+    <div id="stage" class="stage"><div class="inner">
+
+      <div id="ed" class="win" style="position:absolute;left:210px;top:96px;width:1500px;height:888px">
+
+        <div style="height:68px;display:flex;align-items:center;padding:0 12px;
+                    border-bottom:1px solid #E3EAF3">
+
+          <div id="ed-brush" class="btn btn-on" style="margin-right:8px">
+            <span style="display:flex;opacity:1"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5 3 21l6.5-1.5z"/><path d="M14 4.5 19.5 10 11 18.5 5.5 13z"/></svg></span>Brush</div>
+
+          <div id="ed-box" class="btn" style="margin-right:8px">
+            <span style="display:flex;opacity:0.75"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V4h4M17 4h4v4M21 16v4h-4M7 20H3v-4" stroke-dasharray="0"/></svg></span>Box</div>
+
+          <div id="ed-snip" class="btn" style="margin-right:8px">
+            <span style="display:flex;opacity:0.75"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13a3 3 0 0 1 3 3v9"/><path d="M8 4v13a3 3 0 0 0 3 3h9"/></svg></span>Snip</div>
+          <span style="font-size:14px;color:rgba(12,25,39,0.70);margin:0 14px 0 20px">Size</span>
+          <div style="position:relative;width:150px;height:4px;background:#E3EAF3;border-radius:2px">
+            <div id="ed-fill" style="position:absolute;left:0;top:0;height:4px;width:34px;
+                 background:#4940FF;border-radius:2px;transform-origin:left center"></div>
+            <div id="ed-knob" style="position:absolute;left:26px;top:-7px;width:18px;height:18px;
+                 border-radius:50%;background:#4940FF"></div>
+          </div>
+          <span id="ed-size" class="mono" style="font-size:12px;color:rgba(12,25,39,0.70);margin-left:14px;width:44px">24px</span>
+          <span style="flex:1"></span>
+          <div class="btn btn-off" style="width:44px;padding:0;margin-right:8px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h10a5 5 0 0 1 0 10h-3"/><path d="M4 10l4-4M4 10l4 4"/></svg></div>
+          <div class="btn btn-off" style="width:44px;padding:0;margin-right:8px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10H10a5 5 0 0 0 0 10h3"/><path d="M20 10l-4-4M20 10l-4 4"/></svg></div>
+          <div class="btn btn-off" style="width:44px;padding:0;margin-right:14px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20H5l-2-2 9-9 6 6-5 5z"/><path d="M21 20h-9"/></svg></div>
+          <div class="btn" style="margin-right:8px"><span style="display:flex;opacity:0.75"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m3 17 5-4 4 3 3-2 6 4"/></svg></span>New image</div>
+          <div id="ed-remove" class="btn" style="background:rgba(73,64,255,0.34);border-color:transparent;color:#fff">
+            <span style="display:flex"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2c.6 4.9 2.5 6.8 7.4 7.4-4.9.6-6.8 2.5-7.4 7.4-.6-4.9-2.5-6.8-7.4-7.4C9.5 8.8 11.4 6.9 12 2z"/><path d="M18.6 15.2c.3 2.4 1.2 3.3 3.6 3.6-2.4.3-3.3 1.2-3.6 3.6-.3-2.4-1.2-3.3-3.6-3.6 2.4-.3 3.3-1.2 3.6-3.6z"/></svg></span>Remove</div>
+        </div>
+
+        <div style="position:relative;height:744px;background:#E3EAF3;overflow:hidden">
+          <div id="ed-plate" style="position:absolute;left:50%;top:50%;width:744px;height:744px;
+               margin-left:-372px;margin-top:-372px;background:#000;overflow:hidden">
+
+            <img id="ed-img" src="assets/demo/planet.png" width="744" height="744"
+                 style="display:block;width:744px;height:744px;object-fit:cover"/>
+
+        <div id="ed-mark" style="position:absolute;right:22px;bottom:18px;
+             display:flex;align-items:center;gap:9px;
+             color:rgba(255,255,255,0.92);filter:drop-shadow(0 1px 3px rgba(0,0,0,0.55))">
+          <span style="display:flex;transform:scale(1.15);transform-origin:right center"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2c.6 4.9 2.5 6.8 7.4 7.4-4.9.6-6.8 2.5-7.4 7.4-.6-4.9-2.5-6.8-7.4-7.4C9.5 8.8 11.4 6.9 12 2z"/><path d="M18.6 15.2c.3 2.4 1.2 3.3 3.6 3.6-2.4.3-3.3 1.2-3.6 3.6-.3-2.4-1.2-3.3-3.6-3.6 2.4-.3 3.3-1.2 3.6-3.6z"/></svg></span>
+          <span style="font-size:19px;font-weight:600;letter-spacing:-0.01em">Gemini</span>
+        </div>
+            <div id="ed-sweep" data-layout-allow-overflow style="position:absolute;left:0;top:0;
+                 width:200px;height:744px;opacity:0;
+                 background:linear-gradient(90deg,transparent,rgba(139,132,255,0.42),rgba(255,255,255,0.30),rgba(139,132,255,0.42),transparent)"></div>
+
+          </div>
+          <div class="mono" style="position:absolute;left:16px;bottom:14px;font-size:14px;color:#0C1927;
+               background:#FFFFFF;border:1px solid #E3EAF3;border-radius:2px;padding:5px 10px">1080 x 1079 &middot; 69%</div>
+        </div>
+
+        <div style="height:76px;display:flex;align-items:center;padding:0 16px;
+                    border-top:1px solid #E3EAF3">
+          <div id="ed-dl" class="btn btn-on btn-lg"><span style="display:flex"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 12 5 5 5-5"/><path d="M4 20h16"/></svg></span>Download</div>
+          <span style="flex:1"></span>
+          <span style="font-size:14px;color:rgba(12,25,39,0.62)">Cleaned on your device. A copy is saved to our storage.</span>
+        </div>
+      </div>
+      <div id="ed-stroke" style="position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none">
+
+        <div id="ed-dot0" style="position:absolute;left:1183px;top:859px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot1" style="position:absolute;left:1192px;top:862.1333076385099px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot2" style="position:absolute;left:1201px;top:862.8953905235128px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot3" style="position:absolute;left:1210px;top:860.7095195209354px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot4" style="position:absolute;left:1219px;top:857.2299182268206px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot5" style="position:absolute;left:1228px;top:855.0898795293397px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot6" style="position:absolute;left:1237px;top:855.9089420497761px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot7" style="position:absolute;left:1246px;top:859.0672556019374px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot8" style="position:absolute;left:1255px;top:862.1746714553966px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot9" style="position:absolute;left:1264px;top:862.8795592433803px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot10" style="position:absolute;left:1273px;top:860.648473940967px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot11" style="position:absolute;left:1282px;top:857.1698564248987px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+        <div id="ed-dot12" style="position:absolute;left:1291px;top:855.076255079734px;
+             width:38px;height:38px;border-radius:50%;background:rgba(73,64,255,0.42);filter:blur(2px);opacity:0"></div>
+      </div>
+
+      <!-- the three claims. Each is a fact printed on the product's own page,
+           set in mono because that is the register the audience trusts. -->
+      <div style="position:absolute;left:210px;top:1014px;display:flex;gap:12px">
+        <span id="ed-c0" class="chip" style="opacity:0"><span class="mono" style="color:#3A32E0">01</span>Runs on your device</span>
+        <span id="ed-c1" class="chip" style="opacity:0"><span class="mono" style="color:#3A32E0">02</span>Full original resolution</span>
+        <span id="ed-c2" class="chip" style="opacity:0"><span class="mono" style="color:#3A32E0">03</span>No sign-up</span>
+      </div>
+
+      <div id="cur" class="cursor"><svg viewBox="0 0 24 24" width="54" height="54" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5.5 2.2 L5.5 19.4 L9.8 15.4 L12.6 21.6 L15.8 20.2 L13.0 14.1 L18.8 14.1 Z"
+    fill="#fff" stroke="#0b0b0b" stroke-width="1.05" stroke-linejoin="round"/></svg></div>
+    </div></div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function(){
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#stage", { scale: 1.18 }, { scale: 1, duration: 0.48, ease: "power4.out" }, 0);
+      tl.fromTo("#p4-grain", { x: 0, y: 0 },
+        { x: -128, y: -74, duration: 6.72, ease: "none" }, 0);
+
+      // the editor is already up on the cut — it rides the seam in rather than
+      // assembling itself, because the seam IS this beat's entrance.
+      tl.fromTo("#ed", { y: 18 }, { y: 0, duration: 0.50, ease: "power3.out" }, 0);
+
+      // 1 — the cursor enters from off-frame carrying intent, and goes straight
+      //     to the mark. It never wanders and it never fades up.
+      tl.set("#cur", { x: -120, y: 700 }, 0);
+      tl.to("#cur", { x: 1300, y: 872, duration: 1.05, ease: "power2.inOut" }, 0.460);
+
+
+      // 2 — it paints. The dots land under the pointer as it travels, so the
+      //     stroke is being made rather than being revealed.
+      // the two halves of the stroke are butt-jointed, so the second is handed
+      // the pointer a frame after the first lets go of it — tweens that share a
+      // property must never share an instant.
+      tl.to("#cur", { x: 1200, y: 883, duration: 0.40, ease: "power1.inOut" }, 1.62);
+      tl.to("#cur", { x: 1304, y: 880, duration: 0.43, ease: "power1.inOut" }, 2.05);
+      tl.set("#ed-dot0", { autoAlpha: 1 }, 1.620);
+      tl.set("#ed-dot1", { autoAlpha: 1 }, 1.686);
+      tl.set("#ed-dot2", { autoAlpha: 1 }, 1.752);
+      tl.set("#ed-dot3", { autoAlpha: 1 }, 1.818);
+      tl.set("#ed-dot4", { autoAlpha: 1 }, 1.885);
+      tl.set("#ed-dot5", { autoAlpha: 1 }, 1.951);
+      tl.set("#ed-dot6", { autoAlpha: 1 }, 2.017);
+      tl.set("#ed-dot7", { autoAlpha: 1 }, 2.083);
+      tl.set("#ed-dot8", { autoAlpha: 1 }, 2.149);
+      tl.set("#ed-dot9", { autoAlpha: 1 }, 2.215);
+      tl.set("#ed-dot10", { autoAlpha: 1 }, 2.282);
+      tl.set("#ed-dot11", { autoAlpha: 1 }, 2.348);
+      tl.set("#ed-dot12", { autoAlpha: 1 }, 2.414);
+
+      // 3 — the selection exists, so the primary action becomes available. The
+      //     button lighting up is CAUSED by the stroke finishing.
+      tl.to("#ed-remove", { backgroundColor: "#4940FF", duration: 0.26, ease: "none" }, 2.60);
+
+      // 4 — the cursor crosses to Remove and taps it.
+      tl.to("#cur", { x: 1554, y: 152, duration: 0.72, ease: "power2.inOut" }, 2.680);
+
+      tl.to("#cur", { scale: 0.80, duration: 0.07, ease: "power2.in" }, 3.320);
+      tl.to("#cur", { scale: 1, duration: 0.18, ease: "back.out(2.8)" }, 3.390);
+
+      // 5 — the fill. The stroke and the mark leave together and the pixels
+      //     under them are simply the image: nothing swaps, nothing cuts.
+      tl.to("#ed-stroke", { autoAlpha: 0, duration: 0.34, ease: "power2.inOut" }, 3.56);
+      tl.to("#ed-mark", { autoAlpha: 0, duration: 0.42, ease: "power2.inOut" }, 3.56);
+      // one pass of the model working, sweeping the region it was given
+      tl.set("#ed-sweep", { autoAlpha: 0 }, 0);
+      // autoAlpha must be named in the DESTINATION too: a cold render worker
+      // restores the authored hidden state, so a fromTo that only turns the
+      // element on in its from-vars can encode as permanently invisible.
+      tl.fromTo("#ed-sweep", { autoAlpha: 1, x: -200 },
+        { autoAlpha: 1, x: 744, duration: 0.86, ease: "power1.inOut" }, 3.56);
+      tl.to("#ed-sweep", { autoAlpha: 0, duration: 0.16 }, 4.44);
+
+      // and the button holds a working state while it runs, so the control that
+      // caused the change is visibly still responsible for it
+      tl.to("#ed-remove", { autoAlpha: 0.55, duration: 0.30, ease: "power2.inOut" }, 3.60);
+      tl.to("#ed-remove", { autoAlpha: 1, duration: 0.30, ease: "power2.inOut" }, 4.08);
+
+      // 6 — the three claims, staged so the beat keeps delivering to its last
+      //     frame instead of finishing early and sitting there.
+      tl.fromTo("#ed-c0", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 4.18);
+      tl.fromTo("#ed-c1", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 4.34);
+      tl.fromTo("#ed-c2", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 4.50);
+
+      // 7 — the cursor goes to Download and presses it. The film's last cause.
+      tl.to("#cur", { x: 318, y: 934, duration: 0.78, ease: "power2.inOut" }, 4.460);
+
+      tl.to("#cur", { scale: 0.80, duration: 0.07, ease: "power2.in" }, 5.420);
+      tl.to("#cur", { scale: 1, duration: 0.18, ease: "back.out(2.8)" }, 5.490);
+      tl.to("#ed-dl", { scale: 0.975, duration: 0.09, ease: "power2.in" }, 5.42);
+      tl.to("#ed-dl", { scale: 1, duration: 0.22, ease: "back.out(3)" }, 5.51);
+      tl.to("#cur", { autoAlpha: 0, duration: 0.26 }, 5.80);
+
+      tl.to("#stage", { x: -236, duration: 0.32, ease: "power4.in" }, 6.404);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["04-fix"] = tl;
+    })();
+  </script>
+</template>

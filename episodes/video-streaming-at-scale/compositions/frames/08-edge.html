@@ -1,0 +1,197 @@
+<template>
+  <style>
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-900.woff2") format("woff2"); font-weight: 900; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --paper: #F4EBD9; --paper-warm: #FBF6EA; --cloud: #FDFBF4;
+      --ink: #3B2F2A; --ink-soft: #6B5A4E;
+      --sky: #7FB4DC; --sky-deep: #2E5F8A;
+      --meadow: #7FA653; --meadow-deep: #3F6B34;
+      --terracotta: #C4552F; --terracotta-lit: #EE8557; --terracotta-ink: #9E4324;
+      --night: #1E2A38; --night-mute: #A8BACB;
+    }
+
+    /* the continuity object — one real segment from the film's own manifest, pinned
+       bottom-left. The id never moves; only the state word changes. */
+    .seg-pill {
+      position: absolute; left: 96px; bottom: 74px;
+      display: flex; align-items: center; gap: 16px;
+      padding: 13px 26px; border-radius: 999px;
+      background: var(--paper-warm); box-shadow: 0 10px 30px rgba(59,47,42,0.22);
+      font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--ink);
+    }
+    .seg-pill b { font-weight: 700; }
+    .seg-pill i { display: block; width: 1px; height: 20px; background: rgba(59,47,42,0.22); }
+    .seg-state { position: relative; display: inline-block; width: 186px; height: 24px; }
+    .seg-state span {
+      position: absolute; left: 0; top: 0; white-space: nowrap;
+      font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      font-size: 15px; line-height: 24px; color: var(--terracotta-ink);
+    }
+
+    .grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.055; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='170'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='170' height='170' filter='url(%23n)'/></svg>");
+    }
+
+    #f8-cam { position: absolute; inset: 0; }
+    #f8-wind { position: absolute; inset: -18%; }
+    #f8-plate { position: absolute; inset: 0; background: url("public/img/village-dusk.jpg") center/cover no-repeat; }
+    #f8-veil { position: absolute; inset: -18%; background: linear-gradient(180deg, rgba(30,42,56,0.34) 0%, rgba(30,42,56,0.08) 42%, rgba(30,42,56,0.30) 100%); }
+
+    #f8-stage { position: absolute; inset: 0; }
+
+    #f8-head {
+      position: absolute; left: 104px; top: 92px; width: 820px;
+      font-family: "Zen Maru Gothic", sans-serif; font-weight: 900;
+      font-size: 86px; line-height: 1.0; letter-spacing: -0.02em;
+      color: var(--cloud); text-shadow: 0 8px 40px rgba(30,42,56,0.72);
+    }
+
+    /* the request blooms — one per lit window, deterministic lattice over the hillside */
+    .f8-req {
+      position: absolute; width: 10px; height: 10px; border-radius: 999px;
+      background: #FFD9A0; box-shadow: 0 0 16px 6px rgba(255,196,120,0.55);
+    }
+
+    /* the two counters. Same family, same size, same alignment — the whole frame is that
+       comparison, and it needs no arrow between them. */
+    #f8-panel {
+      position: absolute; right: 104px; top: 150px; width: 660px;
+      border-radius: 14px; background: rgba(251,246,234,0.94);
+      border: 1px solid rgba(59,47,42,0.10);
+      box-shadow: 0 26px 64px rgba(30,42,56,0.42);
+      padding: 44px 46px; box-sizing: border-box;
+    }
+    .f8-row { position: relative; }
+    .f8-lab {
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 700;
+      font-size: 15px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft);
+    }
+    .f8-fig {
+      margin-top: 20px;
+      font-family: "JetBrains Mono", monospace; font-weight: 700;
+      font-size: 84px; line-height: 1.14; letter-spacing: -0.02em;
+      color: var(--ink); font-variant-numeric: tabular-nums;
+    }
+    #f8-fig2 { color: var(--terracotta); }
+    .f8-sub {
+      margin-top: 10px;
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 400;
+      font-size: 20px; line-height: 1.4; color: var(--ink-soft);
+    }
+    #f8-hr { margin: 34px 0; height: 1px; background: rgba(59,47,42,0.14); transform-origin: 0% 50%; }
+
+    #f8-cap {
+      position: absolute; left: 108px; top: 900px;
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 500;
+      font-size: 34px; color: var(--cloud); text-shadow: 0 4px 24px rgba(30,42,56,0.75);
+    }
+  </style>
+
+  <div id="root" data-composition-id="08-edge" data-width="1920" data-height="1080">
+    <div id="f8-clip" class="clip" data-start="0" data-duration="12.0" data-track-index="0" data-layout-allow-overflow>
+      <div id="f8-stage">
+        <div id="f8-cam">
+          <div id="f8-wind"><div id="f8-plate"></div></div>
+        </div>
+        <div id="f8-veil"></div>
+        <div id="f8-reqs"></div>
+
+        <div id="f8-head">Put the copies near people.</div>
+
+        <div id="f8-panel">
+          <div class="f8-row">
+            <div class="f8-lab">viewers, this second</div>
+            <div class="f8-fig" id="f8-fig1">0</div>
+            <div class="f8-sub">each one served by a cache in their own region</div>
+          </div>
+          <div id="f8-hr"></div>
+          <div class="f8-row">
+            <div class="f8-lab">fetches from the origin</div>
+            <div class="f8-fig" id="f8-fig2">1</div>
+            <div class="f8-sub">the same segment, already at the edge</div>
+          </div>
+        </div>
+
+        <div id="f8-cap">One fetch. A million deliveries.</div>
+
+        <div class="seg-pill" id="f8-pill">
+          <b>seg-00412.m4s</b><i></i>
+          <span class="seg-state"><span>cached</span></span>
+        </div>
+
+        <div class="grain"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // ---- the request blooms. Deterministic placement over the hillside's lit tiers.
+      var host = document.getElementById("f8-reqs");
+      var reqs = [];
+      for (var i = 0; i < 96; i++) {
+        var h = (i * 2246822519) % 4294967296;
+        var jx = ((h >>> 7) & 255) / 255, jy = ((h >>> 15) & 255) / 255;
+        var col = i % 16, row = (i / 16) | 0;
+        var x = 46 + col * 118 + (jx - 0.5) * 92;
+        var y = 300 + row * 118 + (jy - 0.5) * 84;
+        var d = document.createElement("div");
+        d.className = "f8-req";
+        d.style.left = x + "px"; d.style.top = y + "px"; d.style.opacity = "0";
+        host.appendChild(d); reqs.push(d);
+      }
+
+      gsap.set(["#f8-panel", "#f8-cap", "#f8-pill"], { autoAlpha: 0 });
+      gsap.set("#f8-hr", { scaleX: 0 });
+
+      // ---- SEAM 7 -> 8 ENTRY: cut-the-curve LEFT. Frame 07 exited at -238 on power4.in;
+      // this enters from +302 on power4.out. The plate is full-bleed and lit from t=0 and
+      // the heading rides in with it — the frame never enters blank.
+      tl.fromTo("#f8-stage", { x: 302 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      tl.fromTo("#f8-head", { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 0.26);
+
+      // the film's SECOND and last camera move: a slow lateral drift right across the lit
+      // hillside while the caches light up. Motivated — the camera is counting them.
+      tl.fromTo("#f8-cam", { x: 0, scale: 1.06 }, { x: -46, scale: 1.0, duration: 6.4, ease: "power1.inOut" }, 0.4);
+      tl.fromTo("#f8-wind", { xPercent: -0.8 }, { xPercent: 0.7, duration: 12.0, ease: "none" }, 0);
+
+      // Scene 2 (2.4-6.2s): the requests bloom outward and the first counter runs.
+      tl.to(reqs, { autoAlpha: 1, duration: 0.42, ease: "power2.out", stagger: 0.012 }, 2.4);
+      tl.to("#f8-panel", { autoAlpha: 1, duration: 0.42, ease: "power2.out" }, 2.6);
+      var c1 = { v: 0 };
+      tl.to(c1, {
+        v: 1000000, duration: 1.1, ease: "power2.out",
+        onUpdate: function () {
+          document.getElementById("f8-fig1").textContent = Math.round(c1.v).toLocaleString("en-US");
+        }
+      }, 3.0);
+
+      // Scene 3 (6.2-9.0s): the second figure arrives at the SAME size in the SAME family,
+      // and simply does not move. The asymmetry is the argument; no arrow is needed.
+      tl.to("#f8-hr", { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, 6.2);
+
+      // Scene 4 (9.0-12.0s): the line, the continuity object, then stillness.
+      tl.to("#f8-cap", { autoAlpha: 1, duration: 0.46, ease: "power2.out" }, 9.0);
+      tl.fromTo("#f8-pill", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out" }, 9.3);
+
+      // ---- SEAM 8 -> 9: UP. The third and final reserved vector, spent once, here:
+      // elevation into the conclusion. The film climbs out of the valley to the hilltop.
+      tl.to("#f8-stage", { y: -206, duration: 0.34, ease: "power4.in" }, 11.66);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["08-edge"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,19 @@
+HTTP/2 200 
+accept-ranges: bytes
+access-control-allow-origin: https://excalidraw.com
+age: 65374
+cache-control: public, max-age=0, must-revalidate
+content-disposition: inline
+content-type: text/html; charset=utf-8
+date: Sun, 23 Aug 2026 18:16:11 GMT
+etag: "048dfd962c80b256c88cecf254e4a4e3"
+feature-policy: *
+last-modified: Sat, 22 Aug 2026 23:26:24 GMT
+referrer-policy: origin
+server: Vercel
+strict-transport-security: max-age=63072000
+x-content-type-options: nosniff
+x-vercel-cache: HIT
+x-vercel-id: bom1::nbvwc-1787508971736-95e03ff1f534
+content-length: 6862
+

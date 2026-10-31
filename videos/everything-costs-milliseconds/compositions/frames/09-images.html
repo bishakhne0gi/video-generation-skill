@@ -1,0 +1,197 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="09-images" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/interior.jpg');opacity:0.38"></div>
+  <div class="scrim" style="background:radial-gradient(84% 96% at 50% 46%, rgba(9,20,19,.52) 0%, rgba(9,20,19,.93) 66%, rgba(9,20,19,.99) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:112px">07 · IMAGES</div>
+      <div id="s-rule" class="rule" style="left:118px;top:150px;width:96px;transform-origin:0% 50%"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:118px;top:176px;width:1180px;font-size:82px">The heaviest<br>thing you ship.</div>
+      <div id="s-lead" class="lead" style="position:absolute;left:120px;top:372px;width:840px;font-size:31px">One hero image usually outweighs all of your JavaScript. Pick the format, pick the size, and tell the browser which one matters.</div>
+
+      <div id="g-box" class="panel" style="left:1034px;top:362px;width:810px;height:298px;padding:0"></div>
+      <div id="g-lit" style="position:absolute;left:1058px;top:386px;width:762px;height:250px;border-radius:6px;
+        background-image:url('assets/plates/negatives.jpg');background-size:cover;background-position:center;opacity:.30"></div>
+      <div id="g-litwash" style="position:absolute;left:1058px;top:386px;width:762px;height:250px;border-radius:6px;
+        background:linear-gradient(180deg, rgba(9,20,19,.70), rgba(9,20,19,.90))"></div>
+      <div id="g-ladder" style="position:absolute;left:1086px;top:412px;width:706px"></div>
+
+      <div id="g-srcset" class="panel" style="left:1034px;top:684px;width:786px;height:262px;background:#080C0B"></div>
+      <div id="g-sslines" style="position:absolute;left:1062px;top:712px;width:730px"></div>
+
+      <div id="g-fold" style="position:absolute;left:118px;top:596px;width:790px">
+        <div class="mono" style="font-size:18px;letter-spacing:.15em;opacity:.62;color:var(--emerald-lit)">THE FOLD DECIDES THE ATTRIBUTE</div>
+        <div id="g-folddiag" style="position:relative;width:790px;height:348px;margin-top:18px"></div></div>
+      <div id="g-tot" style="position:absolute;left:118px;top:966px;width:1000px">
+        <span class="mono" style="font-size:17px;letter-spacing:.15em;opacity:.55">TOTAL IMAGE WEIGHT ON THE PAGE</span>
+        <div id="g-w" style="position:relative;position:absolute;left:520px;top:-10px;width:340px;height:52px;font-family:'JBMono',monospace;font-size:40px;font-weight:700;color:var(--mint)"><span id="g-w-0" style="position:absolute;left:0;top:0;white-space:nowrap">1.94 MB</span><span id="g-w-1" style="position:absolute;left:0;top:0;white-space:nowrap">1.41 MB</span><span id="g-w-2" style="position:absolute;left:0;top:0;white-space:nowrap">0.98 MB</span><span id="g-w-3" style="position:absolute;left:0;top:0;white-space:nowrap">0.64 MB</span></div></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at full opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // SEAM CARRIER — the box tag and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up: the seam gate measures
+      // MOTION, so a station whose content fades in at 0.1s passes the gate while visibly
+      // entering on an empty frame. Only the rule and the lead line are staged.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30000000000000004);
+      tl.fromTo("#g-box", { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.54, ease: "power3.out" }, 0.10);
+      tl.fromTo("#g-lit", { autoAlpha: 0 }, { autoAlpha: 0.30, duration: 0.62, ease: "power2.out" }, 0.22);
+      // the format ladder: same picture, three encodings, real bytes.
+      var F = [{ n: "hero.jpg", kb: 214, w: 1.00 }, { n: "hero.webp", kb: 128, w: 0.60 }, { n: "hero.avif", kb: 74, w: 0.35 }];
+      var lad = document.querySelector("#g-ladder");
+      for (var i = 0; i < 3; i++) {
+        var f = F[i], best = i === 2, row = document.createElement("div");
+        row.style.cssText = "position:absolute;left:0;top:" + (i*66) + "px;width:706px;height:54px";
+        row.innerHTML =
+          '<span style="position:absolute;left:0;top:14px;font-family:JBMono,monospace;font-size:19px;color:' +
+            (best ? "var(--mint)" : "var(--emerald-lit)") + ';opacity:' + (best ? "1" : ".78") + '">' + f.n + '</span>' +
+          '<div class="bar" style="position:absolute;left:184px;top:12px;width:' + (f.w*380) + 'px;height:28px;border-radius:5px;' +
+            'transform-origin:0% 50%;background:' + (best ? "var(--mint)" : "rgba(64,138,113,.72)") + '"></div>' +
+          '<span style="position:absolute;left:' + (196 + f.w*380) + 'px;top:14px;font-family:JBMono,monospace;font-size:19px;' +
+            'font-weight:700;color:' + (best ? "var(--mint)" : "var(--emerald-lit)") + '">' + f.kb + ' KB</span>';
+        lad.appendChild(row);
+        tl.fromTo(row, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.26 }, 0.90 + i*0.46);
+        tl.fromTo(row.querySelector(".bar"), { scaleX: 0 }, { scaleX: 1, duration: 0.56, ease: "power3.out" }, 0.90 + i*0.46);
+      }
+      // above the fold vs below it — the diagram that decides which attribute you use.
+      tl.fromTo("#g-fold", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 2.70);
+      var fd = document.querySelector("#g-folddiag");
+      var boxes = [
+        { t: 0,   h: 118, lbl: "hero.avif", attr: 'fetchpriority="high"', hot: true },
+        { t: 142, h: 88,  lbl: "gallery/1", attr: 'loading="lazy"', hot: false },
+        { t: 246, h: 88,  lbl: "gallery/2", attr: 'loading="lazy"', hot: false }
+      ];
+      for (var b = 0; b < boxes.length; b++) {
+        var o = boxes[b], el = document.createElement("div");
+        el.style.cssText = "position:absolute;left:0;top:" + o.t + "px;width:520px;height:" + o.h +
+          "px;border-radius:8px;background:rgba(11,16,15,.9);border:1px solid " +
+          (o.hot ? "rgba(232,161,60,.7)" : "rgba(176,228,204,.16)");
+        el.innerHTML = '<span style="position:absolute;left:16px;top:12px;font-family:JBMono,monospace;font-size:17px;color:' +
+          (o.hot ? "var(--brass)" : "var(--emerald-lit)") + '">' + o.lbl + '</span>' +
+          '<span style="position:absolute;left:16px;bottom:12px;font-family:JBMono,monospace;font-size:16px;color:' +
+          (o.hot ? "var(--brass)" : "var(--mint)") + ';opacity:.8">' + o.attr + '</span>';
+        fd.appendChild(el);
+        tl.fromTo(el, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, 3.10 + b*0.24);
+      }
+      var foldline = document.createElement("div");
+      foldline.style.cssText = "position:absolute;left:0;top:126px;width:790px;height:0;border-top:2px dashed rgba(232,161,60,.62);transform-origin:0% 50%";
+      foldline.innerHTML = '<span style="position:absolute;right:0;top:-26px;font-family:JBMono,monospace;font-size:15px;' +
+        'letter-spacing:.16em;color:var(--brass)">THE FOLD</span>';
+      fd.appendChild(foldline);
+      tl.fromTo(foldline, { scaleX: 0 }, { scaleX: 1, duration: 0.60, ease: "power3.out" }, 3.60);
+      // the markup, last: the attribute is the takeaway, not the diagram.
+      tl.fromTo("#g-srcset", { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.48, ease: "power3.out" }, 4.40);
+      var SS = [
+        '<span style="color:#5E8578">&lt;img</span> src=<span style="color:var(--mint)">"hero-800.avif"</span>',
+        '  srcset=<span style="color:var(--mint)">"hero-800.avif 800w,</span>',
+        '          <span style="color:var(--mint)">hero-1440.avif 1440w"</span>',
+        '  sizes=<span style="color:var(--mint)">"(max-width:900px) 100vw, 1440px"</span>',
+        '  width=<span style="color:var(--mint)">"1440"</span> height=<span style="color:var(--mint)">"810"</span>',
+        '  <span class="hot">fetchpriority="high"</span><span style="color:#5E8578">&gt;</span>'
+      ];
+      var ssw = document.querySelector("#g-sslines");
+      for (var k = 0; k < SS.length; k++) {
+        var ln = document.createElement("div");
+        ln.style.cssText = "font-family:JBMono,monospace;font-size:18px;line-height:1.78;color:var(--emerald-lit);white-space:nowrap";
+        ln.innerHTML = SS[k]; ssw.appendChild(ln);
+        tl.fromTo(ln, { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.30, ease: "power3.out" }, 4.62 + k*0.15);
+      }
+      // the page weight falls as the three decisions are applied — the beat keeps
+      // delivering a number right up to the cut.
+      tl.fromTo("#g-tot", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 6.30);
+      for (var _r = 0; _r < 4; _r++) gsap.set("#g-w-" + _r, { autoAlpha: 0 });
+      tl.set("#g-w-0", { autoAlpha: 1 }, 6.60);
+      tl.set("#g-w-1", { autoAlpha: 1 }, 7.34);
+      tl.set("#g-w-0", { autoAlpha: 0 }, 7.34);
+      tl.set("#g-w-2", { autoAlpha: 1 }, 8.08);
+      tl.set("#g-w-1", { autoAlpha: 0 }, 8.08);
+      tl.set("#g-w-3", { autoAlpha: 1 }, 8.82);
+      tl.set("#g-w-2", { autoAlpha: 0 }, 8.82);
+      for (var m = 0; m < 3; m++)
+        tl.to(lad.children[m], { autoAlpha: m === 2 ? 1 : 0.34, duration: 0.44, ease: "power2.out" }, 6.60 + m*0.30);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 10.37);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["09-images"] = tl;
+    })();
+  </script>
+</template>

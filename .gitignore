@@ -1,0 +1,21 @@
+node_modules/
+.env.local
+out/
+public/kling/*.mp4
+public/kling/*.png
+public/audio/vo/*.mp3
+public/audio/music/bed.*
+public/stills/
+
+# media + local envs (too large for GitHub / not source)
+.venv-tts/
+.DS_Store
+*.mp4
+*.mov
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.aac
+**/renders/
+**/node_modules/

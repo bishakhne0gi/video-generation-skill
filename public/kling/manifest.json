@@ -1,0 +1,106 @@
+{
+  "ep08_morph": {
+    "file": "kling/ep08_morph.mp4",
+    "seconds": 5.08
+  },
+  "ep08_open": {
+    "file": "kling/ep08_open.mp4",
+    "seconds": 5.04
+  },
+  "ep10_bags": {
+    "file": "kling/ep10_bags.mp4",
+    "seconds": 5.04
+  },
+  "ep10_crowd": {
+    "file": "kling/ep10_crowd.mp4",
+    "seconds": 5.04
+  },
+  "ep10_datacentre": {
+    "file": "kling/ep10_datacentre.mp4",
+    "seconds": 5.04
+  },
+  "ep10_dawn": {
+    "file": "kling/ep10_dawn.mp4",
+    "seconds": 5.04
+  },
+  "ep10_fireworks": {
+    "file": "kling/ep10_fireworks.mp4",
+    "seconds": 5.04
+  },
+  "ep10_kitchen": {
+    "file": "kling/ep10_kitchen.mp4",
+    "seconds": 5.04
+  },
+  "ep10_morning": {
+    "file": "kling/ep10_morning.mp4",
+    "seconds": 5.04
+  },
+  "ep10_open": {
+    "file": "kling/ep10_open.mp4",
+    "seconds": 5.04
+  },
+  "ep10_opsroom": {
+    "file": "kling/ep10_opsroom.mp4",
+    "seconds": 5.04
+  },
+  "ep10_rack_dark": {
+    "file": "kling/ep10_rack_dark.mp4",
+    "seconds": 5.04
+  },
+  "ep10_rider": {
+    "file": "kling/ep10_rider.mp4",
+    "seconds": 5.04
+  },
+  "ep10_wok": {
+    "file": "kling/ep10_wok.mp4",
+    "seconds": 5.04
+  },
+  "ep11_close": {
+    "file": "kling/ep11_close.mp4",
+    "seconds": 5.04
+  },
+  "ep11_open": {
+    "file": "kling/ep11_open.mp4",
+    "seconds": 5.04
+  },
+  "ep11_payoff": {
+    "file": "kling/ep11_payoff.mp4",
+    "seconds": 5.04
+  },
+  "ep11_tex_dark": {
+    "file": "kling/ep11_tex_dark.mp4",
+    "seconds": 10.04
+  },
+  "ep11_tex_paper": {
+    "file": "kling/ep11_tex_paper.mp4",
+    "seconds": 10.04
+  },
+  "ep12_open": {
+    "file": "kling/ep12_open.mp4",
+    "seconds": 5.04
+  },
+  "ep12_payoff": {
+    "file": "kling/ep12_payoff.mp4",
+    "seconds": 5.04
+  },
+  "ep19_end": {
+    "file": "kling/ep19_end.mp4",
+    "seconds": 10.04
+  },
+  "ep19_open": {
+    "file": "kling/ep19_open.mp4",
+    "seconds": 10.04
+  },
+  "ep19_tex1": {
+    "file": "kling/ep19_tex1.mp4",
+    "seconds": 10.04
+  },
+  "ep19_tex2": {
+    "file": "kling/ep19_tex2.mp4",
+    "seconds": 10.04
+  },
+  "ep19_title": {
+    "file": "kling/ep19_title.mp4",
+    "seconds": 10.04
+  }
+}

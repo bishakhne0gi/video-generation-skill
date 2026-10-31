@@ -1,0 +1,172 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --paper:#F4F1EA; --paper2:#E7E1D4; --sheet:#FBF9F4;
+  --ink:#14110E; --ink2:#5A5245; --navy:#16233B;
+  --yellow:#FFEB00; --pen:#DC3220; --pentype:#B32414; --rule:#B8B0A0;
+  background:var(--paper); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* the coloured field travels WITH the stage, so a navy or yellow frame reads as a
+   card sliding over the page rather than as the ground changing colour. */
+.field{position:absolute;inset:0}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:88%;letter-spacing:-.045em;line-height:.90;color:var(--ink)}
+.deck{font-weight:500;line-height:1.26;color:var(--ink2)}
+.quote{font-family:"Serif",Georgia,serif;line-height:1.16;color:var(--ink)}
+.ital{font-family:"Serif",Georgia,serif;font-style:italic}
+.mono{font-family:"JBMono",monospace;color:var(--ink)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink2);font-size:21px}
+.redtype{color:var(--pentype)}
+.onnavy{color:var(--sheet)}
+.onnavy .tag,.onnavy .deck{color:#A9B6C9}
+
+/* ---- PAPER: a sheet is defined by its shadow and its edge, never by a stripe ---- */
+.sheet{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.16), 0 10px 24px rgba(20,17,14,.12)}
+.card{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.14), 0 7px 18px rgba(20,17,14,.10)}
+.hair{position:absolute;background:var(--rule);height:1px}
+.rule2{position:absolute;background:var(--ink);height:3px}
+
+/* ---- THE MARKER: sits BEHIND its phrase, skewed, origin left ---- */
+.mark{position:absolute;background:var(--yellow);z-index:0;transform-origin:0% 50%}
+.marknavy{background:var(--yellow)}
+.phrase{position:relative;z-index:1}
+
+/* ---- THE PEN: strokes only. Never a glyph, never on navy. ---- */
+.pen{position:absolute;pointer-events:none;overflow:visible}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--pen);stroke-linecap:round;
+  stroke-linejoin:round}
+.penY path,.penY line,.penY polyline{stroke:var(--yellow)}
+.penD path,.penD line,.penD polyline{stroke:var(--pentype)}
+.penI path,.penI line,.penI polyline{stroke:var(--ink)}
+
+  </style>
+
+  <div id="root" data-composition-id="09-query" data-start="0" data-width="1920" data-height="1080">
+<div class="field" style="background:var(--paper2)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:108px">09 · the fix</div>
+      <div id="s-rule" class="rule2" style="left:118px;top:146px;width:104px;transform-origin:0% 50%;"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:114px;top:172px;width:1240px;font-size:88px">CHANGE<br>ONE WORD.</div>
+      
+
+      <div class="sheet" style="left:112px;top:436px;width:716px;height:320px;transform:rotate(0.36deg)"></div>
+      <div style="position:absolute;left:112px;top:436px;width:716px;height:320px;overflow:hidden;transform:rotate(0.36deg)">
+        <div class="tag" style="position:absolute;left:32px;top:24px;font-size:16px">THE REQUEST</div>
+        <div class="hair" style="left:32px;top:54px;width:652px"></div>
+        <div id="f9-was" class="mono" style="position:absolute;left:32px;top:112px;font-size:27px;font-weight:700;color:var(--ink)">POST</div>
+        <div id="f9-now" class="mono" style="position:absolute;left:32px;top:70px;font-size:27px;font-weight:700;color:var(--pentype);opacity:0">QUERY</div>
+        <div id="f9-path" class="mono" style="position:absolute;left:150px;top:112px;font-size:27px;font-weight:700">/products HTTP/1.1</div>
+        <div id="f9-get" class="mono" style="position:absolute;left:32px;top:112px;font-size:27px;font-weight:700;white-space:nowrap;opacity:0">GET /products/q/4f2a</div>
+        <div id="f9-b1" class="mono" style="position:absolute;left:32px;top:152px;font-size:22px;color:var(--ink2);white-space:nowrap">Host: api.shop.example</div><div id="f9-b2" class="mono" style="position:absolute;left:32px;top:192px;font-size:22px;color:var(--ink2);white-space:nowrap">Content-Type: application/json</div><div id="f9-b3" class="mono" style="position:absolute;left:32px;top:232px;font-size:22px;color:var(--ink2);white-space:nowrap"></div><div id="f9-b4" class="mono" style="position:absolute;left:32px;top:272px;font-size:22px;color:var(--ink2);white-space:nowrap">{ "ids": [ … 400 ], "sort": "-rating,price" }</div>
+        <div id="f9-nobody" class="mono" style="position:absolute;left:32px;top:232px;font-size:23px;font-weight:700;color:var(--pentype);white-space:nowrap;opacity:0">no body resent &middot; same answer</div>
+      </div>
+      <div id="f9-same" class="tag" style="position:absolute;left:116px;top:778px;font-size:19px;opacity:0">EVERYTHING BELOW THE VERB IS UNCHANGED</div>
+
+      <div class="sheet" style="left:884px;top:436px;width:924px;height:320px;transform:rotate(0.63deg)"></div>
+      <div style="position:absolute;left:884px;top:436px;width:924px;height:320px;overflow:hidden;transform:rotate(0.63deg)">
+        <div class="tag" style="position:absolute;left:32px;top:24px;font-size:16px">THE RESPONSE</div>
+        <div class="hair" style="left:32px;top:54px;width:860px"></div>
+        <div id="f9-s0" class="mono" style="position:absolute;left:32px;top:76px;font-size:27px;font-weight:700;white-space:nowrap">HTTP/1.1 200 OK</div><div id="f9-s1" class="mono" style="position:absolute;left:32px;top:122px;font-size:25px;color:var(--ink2);white-space:nowrap">Content-Type: application/json</div><div id="f9-s2" class="mono" style="position:absolute;left:32px;top:168px;font-size:25px;font-weight:700;color:var(--ink);white-space:nowrap">Content-Location: /products/r/8f21</div><div id="f9-s3" class="mono" style="position:absolute;left:32px;top:214px;font-size:25px;font-weight:700;color:var(--ink);white-space:nowrap">Location:         /products/q/4f2a</div>
+      </div>
+
+      
+      <div id="f9-n1" class="card" style="left:884px;top:824px;width:430px;height:178px;transform:rotate(-0.93deg)"></div>
+      <div id="f9-n1-t" style="position:absolute;left:884px;top:824px;width:430px;height:178px;transform:rotate(-0.93deg)">
+        <div class="mono" style="position:absolute;left:24px;top:20px;font-size:24px;font-weight:700">Content-Location</div>
+        <div class="deck" style="position:absolute;left:24px;top:58px;width:382px;font-size:25px">The RESULTS. GET this to read the same answer again.</div>
+      </div>
+      
+      <div id="f9-n2" class="card" style="left:1378px;top:824px;width:430px;height:178px;transform:rotate(-0.83deg)"></div>
+      <div id="f9-n2-t" style="position:absolute;left:1378px;top:824px;width:430px;height:178px;transform:rotate(-0.83deg)">
+        <div class="mono" style="position:absolute;left:24px;top:20px;font-size:24px;font-weight:700">Location</div>
+        <div class="deck" style="position:absolute;left:24px;top:58px;width:382px;font-size:25px">The QUERY. GET this to run it again, without resending the body.</div>
+      </div>
+
+      <div style="position:absolute;left:112px;top:846px;width:720px">
+        <div id="f9-mk" class="mark" style="left:-8px;top:8px;width:726px;height:54px"></div>
+        <div class="phrase quote" style="position:relative;font-size:50px">Same body. Same media type.</div>
+      </div>
+
+      <svg id="f9-x-svg" class="pen " style="left:0;top:0;width:1920px;height:1080px" viewBox="0 0 1920 1080">
+      <path id="f9-x" d="M137,564 Q174,557 219,566" stroke-width="6" style="stroke-dasharray:94;stroke-dashoffset:94"/>
+    </svg>
+      <svg id="f9-a1-svg" class="pen " style="left:0;top:0;width:1920px;height:1080px" viewBox="0 0 1920 1080">
+      <path id="f9-a1" d="M1064,816 Q1085.3,751.1 1040,700 M1060.0,709.1 L1040,700 L1046.6,721.0" stroke-width="5" style="stroke-dasharray:197;stroke-dashoffset:197"/>
+    </svg>
+      <svg id="f9-a2-svg" class="pen " style="left:0;top:0;width:1920px;height:1080px" viewBox="0 0 1920 1080">
+      <path id="f9-a2" d="M1520,816 Q1454.7,721.9 1342,702 M1363.3,696.7 L1342,702 L1360.2,714.3" stroke-width="5" style="stroke-dasharray:310;stroke-dashoffset:310"/>
+    </svg>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at FULL opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // SEAM CARRIER — the tag and the headline are at FULL opacity from frame zero and
+      // ride the cut in on the stage. They are never faded up: the gate measures MOTION,
+      // so a frame whose content fades in at 0.1s passes while visibly entering blank.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.46, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 16 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      // the correction: the old verb is struck, the new one written in above it
+
+      gsap.set("#f9-x", { strokeDashoffset: 94 });
+      tl.to("#f9-x", { strokeDashoffset: 0, duration: 0.3, ease: "steps(5)" }, 0.90);
+      tl.fromTo("#f9-now", { autoAlpha: 0, y: 12, rotation: -3 }, { autoAlpha: 1, y: 0, rotation: -1.6, duration: 0.26, ease: "steps(4)" }, 1.24);
+      tl.to("#f9-was", { autoAlpha: 0.40, duration: 0.34, ease: "power2.out" }, 1.24);
+      tl.fromTo("#f9-same", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.24, ease: "steps(4)" }, 1.90);
+      gsap.set("#f9-s0", { autoAlpha: 0 });
+      tl.fromTo("#f9-s0", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.20, ease: "steps(3)" }, 2.40);
+      gsap.set("#f9-s1", { autoAlpha: 0 });
+      tl.fromTo("#f9-s1", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.20, ease: "steps(3)" }, 2.74);
+      gsap.set("#f9-s2", { autoAlpha: 0 });
+      tl.fromTo("#f9-s2", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.20, ease: "steps(3)" }, 3.08);
+      gsap.set("#f9-s3", { autoAlpha: 0 });
+      tl.fromTo("#f9-s3", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.20, ease: "steps(3)" }, 3.42);
+      gsap.set(["#f9-n1","#f9-n1-t","#f9-n2","#f9-n2-t"], { autoAlpha: 0 });
+      tl.to(["#f9-n1","#f9-n1-t"], { autoAlpha: 1, duration: 0.24, ease: "steps(4)" }, 4.60);
+
+      gsap.set("#f9-a1", { strokeDashoffset: 197 });
+      tl.to("#f9-a1", { strokeDashoffset: 0, duration: 0.44, ease: "steps(7)" }, 4.86);
+      tl.to(["#f9-n2","#f9-n2-t"], { autoAlpha: 1, duration: 0.24, ease: "steps(4)" }, 6.10);
+
+      gsap.set("#f9-a2", { strokeDashoffset: 310 });
+      tl.to("#f9-a2", { strokeDashoffset: 0, duration: 0.48, ease: "steps(7)" }, 6.36);
+
+      gsap.set("#f9-mk", { scaleX: 0, skewX: -1.2 });
+      tl.fromTo("#f9-mk", { scaleX: 0, skewX: -1.2 }, { scaleX: 1, skewX: -1.2, duration: 0.46, ease: "steps(7)" }, 6.90);
+      // ---- the second request. Location's whole purpose, performed rather than captioned:
+      // the client switches to GET on the equivalent resource and stops sending the body.
+      tl.to(["#f9-now","#f9-was","#f9-path"], { autoAlpha: 0, duration: 0.20, ease: "steps(3)" }, 7.90);
+      tl.to("#f9-x", { autoAlpha: 0, duration: 0.20, ease: "steps(3)" }, 7.90);
+      tl.fromTo("#f9-get", { autoAlpha: 0, x: -18 }, { autoAlpha: 1, x: 0, duration: 0.26, ease: "steps(4)" }, 8.00);
+      tl.to(["#f9-b2","#f9-b4"], { autoAlpha: 0.16, duration: 0.34, ease: "power2.out", stagger: 0.08 }, 8.10);
+      tl.fromTo("#f9-nobody", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.24, ease: "steps(4)" }, 8.44);
+      tl.to("#f9-n2", { scale: 1.03, duration: 0.30, ease: "power2.out" }, 8.44);
+      tl.to("#f9-n2-t", { scale: 1.03, duration: 0.30, ease: "power2.out" }, 8.44);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 10.09);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["09-query"] = tl;
+    })();
+  </script>
+</template>

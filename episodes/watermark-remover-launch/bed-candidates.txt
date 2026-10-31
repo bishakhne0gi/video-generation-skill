@@ -1,0 +1,8 @@
+b1-awesome-electronic-beat.mp3	Awesome electronic beat	eliot-beats	cc0	59s	https://freesound.org/people/eliot-beats/sounds/544847
+b2-laid-back-electronic-beat.mp3	Laid Back Electronic Beat	Seth_Makes_Sounds	cc0	64s	https://freesound.org/people/Seth_Makes_Sounds/sounds/716499
+b3-very-very-electronic-beat-in.mp3	Very Very Electronic Beat In C.wav	gis_sweden	cc0	198s	https://freesound.org/people/gis_sweden/sounds/512506
+b4-minimal-techno-random-basic-.mp3	Minimal Techno Random Basic 1.wav	RutgerMuller	cc0	284s	https://freesound.org/people/RutgerMuller/sounds/51251
+b5-atmospheric-ambient-spacy-sy.mp3	Atmospheric Ambient Spacy Synth Beat.wav	RutgerMuller	cc0	33s	https://freesound.org/people/RutgerMuller/sounds/51230
+b6-troy-s-downtempo-beat-mp3.mp3	Troy's downtempo beat.mp3	T_roy_920	cc0	49s	https://freesound.org/people/T_roy_920/sounds/425562
+b7-dark-ambient-backgrounding-0.mp3	Dark Ambient backgrounding 001	steaq	cc0	80s	https://freesound.org/people/steaq/sounds/238251
+b8-synth-bass-short-or-intro.mp3	Synth/bass Short or Intro	griffon_designs	cc0	73s	https://freesound.org/people/griffon_designs/sounds/321045

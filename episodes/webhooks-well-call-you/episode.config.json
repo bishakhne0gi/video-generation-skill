@@ -1,0 +1,95 @@
+{
+  "_": "EP 15 — webhooks. The EP 13/14 construction (one continuous vertical strip the camera travels, stations rather than slides, one stroke-icon family, the marquee drag+zoom as the teaching instrument) rebuilt on the DESIGN.md language: gradient-mesh heroes, thin-weight display type with negative tracking, indigo as the only filled CTA colour, tabular figures on every number. The new vocabulary this episode owns is three things: the RIBBON FIELD (the animated 'gg' stripe gradient, full-bleed, behind the title / chapters / end card), the 3D CARD MARQUEE (vertical columns of event cards under a perspective tilt — the firehose you can see), and the HERO CARD (one floating glass panel, one big tabular number, framed the way the reference clip frames it). EVERY NUMBER ON SCREEN IS REAL AND SOURCED: Stripe-Signature is t=<unix>,v1=<hex> HMAC-SHA256 over `${t}.${raw_body}` keyed by whsec_…; the library default tolerance is 5 minutes; Stripe retries with exponential backoff for up to 3 days in live mode; Slack wants 2xx in 3s and retries 3 times; Shopify times out at 5s (1s to connect) and retries 8 times over 4 hours; GitHub wants 2xx in 10s. Ordering is explicitly not guaranteed and delivery is at-least-once — both straight from the docs, both on screen.",
+  "series": "Ship It",
+  "episode": "EP 15",
+  "title": "We'll Call You.",
+  "titleAccent": "You.",
+  "subtitle": "Webhooks — an HTTP request you didn't make, arriving at a route you own",
+  "hook": "Polling is asking. A webhook is being told.",
+  "cta": "cosx",
+  "next": "Next: idempotency keys, and the retry you didn't plan for",
+  "_theme": "NEW palette this episode — `stripe-mesh`, built from DESIGN.md: white canvas, deep-navy ink (#0d253d, never black), indigo #533afd as the single CTA/accent hue, ruby and magenta living only inside the gradient mesh. The series continuity is the construction and the cue set, not the colour; EP13/14 shared mars-cream for two episodes, and this is the deliberate turn.",
+  "theme": "stripe-mesh",
+  "fps": 30,
+  "_voice": "Unchanged from EP 13/14 — same voice id, same model, same settings. v2 cannot perform audio tags, which is what keeps the directive register structural. NOT YET RECORDED: vo-durations.json currently holds calibrated estimates (see scripts/estimate-vo.mjs). Run `node tts.mjs` once the ElevenLabs key is live and the film re-times itself off the real lengths.",
+  "voice": "nlyULslzTRhqlyv46oPj",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1515,
+  "_music": "Same 84bpm grid as EP 13/14 so scene lengths snap identically across the run. Synth bed — offline, deterministic, licence-free — so the film is fully scored before the ElevenLabs key is wired.",
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.15,
+    "open": 0.34,
+    "mood": "calm-focus",
+    "bpm": 84,
+    "startAt": 0
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "TEACHING FIRST, in the order a working endpoint gets built. Why not polling; the mechanism; the delivery itself; subscribe narrowly; the URL is public; verify the signature; sign the RAW body; check the clock; ack before you work; assume duplicates; assume disorder; assume retries; and finally, keep the sweep. Definition then consequence, one clause per sentence, no hedges. Title and end card carry no line, so the bed lifts.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Watch what polling costs you. You ask every fifteen seconds, all day…\nto hear one thing once."
+    },
+    {
+      "scene": 2,
+      "text": "Here is the whole mechanism. The event happens on their side.\nThey POST it to a URL you gave them."
+    },
+    {
+      "scene": 3,
+      "text": "Read the delivery. It is an ordinary POST.\nA signature header, an event id, and the object that changed."
+    },
+    {
+      "scene": 4,
+      "text": "Subscribe to what you handle, and nothing else.\nEvery extra event type is load you agreed to carry."
+    },
+    {
+      "scene": 5,
+      "text": "Now notice the problem. That URL is public.\nAnyone on the internet can POST to it."
+    },
+    {
+      "scene": 6,
+      "text": "So verify the signature. HMAC the timestamp, a dot, and the body…\nkeyed by your endpoint secret."
+    },
+    {
+      "scene": 7,
+      "text": "Sign the RAW body. Parse the JSON first, re-serialise it, and the bytes change.\nEvery signature fails."
+    },
+    {
+      "scene": 8,
+      "text": "Check the timestamp too. Five minutes of tolerance is the default.\nOlder than that, reject the replay."
+    },
+    {
+      "scene": 9,
+      "text": "Return two hundred first. Do the work after.\nSlack gives you three seconds. Shopify five. GitHub ten."
+    },
+    {
+      "scene": 10,
+      "text": "Assume you will see an event twice. Delivery is at-least-once.\nRecord the event id, and skip what you already processed."
+    },
+    {
+      "scene": 11,
+      "text": "Do not trust the order. Events arrive out of sequence.\nReconcile against the object, never against arrival."
+    },
+    {
+      "scene": 12,
+      "text": "A failed delivery comes back. Stripe retries for three days.\nShopify retries eight times in four hours."
+    },
+    {
+      "scene": 13,
+      "text": "So treat webhooks as an optimisation, never as the source of truth.\nKeep the sweep. Run it on a schedule."
+    }
+  ],
+  "shots": []
+}

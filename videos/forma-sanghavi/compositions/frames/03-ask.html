@@ -1,0 +1,358 @@
+<template>
+  <style>
+@font-face{font-family:Figtree;src:url("assets/fonts/Figtree.woff2")format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:Manrope;src:url("assets/fonts/Manrope.woff2")format("woff2");font-weight:100 900;font-display:block}
+
+*{margin:0;padding:0;box-sizing:border-box}
+/* The console is square. Every corner, everywhere — no exceptions. */
+*{border-radius:0}
+#root{width:1920px;height:1080px;overflow:hidden;background:#F4F6F8;
+  font-family:Manrope,ui-sans-serif,system-ui,sans-serif;color:#16191D;
+  -webkit-font-smoothing:antialiased}
+
+/* ---- grounds -------------------------------------------------------------
+   Over-scanned by 18%: a frame whose seam enters from below 1.0 would
+   otherwise expose the stage edge. */
+.ground{position:absolute;inset:-18%}
+.g-paper{background:#F4F6F8}
+.g-app  {background:#F4F6F8}
+.g-bloom{background:#F4F6F8}
+
+/* The page substrate, straight out of DESIGN.md §4: a 5rem grid at ~6%, a top
+   light bleed, and noise. On paper the grid is ink, not white. */
+.grid{position:absolute;inset:-18%;
+  background-image:linear-gradient(rgba(16,24,40,0.12) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(16,24,40,0.12) 1px,transparent 1px);
+  background-size:80px 80px;opacity:0.40}
+.bleed{position:absolute;left:-18%;right:-18%;top:-18%;height:520px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0.92),rgba(255,255,255,0))}
+
+/* The one atmosphere the light console allows: a soft accent pool, never a
+   tint on the ground itself (DESIGN.md §2 — never tint the background). */
+.pool{position:absolute;width:1500px;height:1500px;
+  background:radial-gradient(circle,rgba(0,174,239,0.055) 0%,rgba(0,174,239,0.022) 42%,transparent 68%)}
+.pool-a{top:-560px;right:-380px}
+.pool-b{bottom:-620px;left:-300px}
+.pool-hot{opacity:1.8}
+
+/* Grain must MOVE. A static tile renders identical noise on all 4,200 frames,
+   which reads as dirt on the lens rather than as film. 3x oversized and
+   translated by the timeline. */
+/* 0.10, not the 0.42 a dark film wants. A multiply grain over PAPER darkens
+   the whole ground, and at dark-film strength it turned #F4F6F8 into a grey-blue
+   murk — the console stopped looking printed and started looking dirty. This is
+   the light-ground cousin of dimming a dark panel with opacity. */
+.grain{position:absolute;left:-640px;top:-360px;width:3200px;height:1800px;
+  opacity:0.10;pointer-events:none;mix-blend-mode:multiply;
+  background-image:url("assets/plates/noise.png");background-repeat:repeat}
+
+/* Paper takes a fraction of the vignette a dark frame does, and it has to stay
+   transparent much further out or the corners read as shadow on a white page. */
+.vig{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 92% 88% at 50% 46%,transparent 68%,rgba(16,24,40,0.035) 100%)}
+
+/* ---- type ----------------------------------------------------------------
+   Figtree 600 at -0.02em is the shipped headline, measured on /login and / .
+   Manrope carries everything else. Two families, no third. */
+.stage{position:absolute;inset:0}
+.inner{position:absolute;inset:0}
+
+.hdr{font-family:Figtree,sans-serif;font-weight:600;font-size:82px;line-height:1.05;
+  letter-spacing:-0.02em;color:#0B0D12}
+.hdr-xl{font-size:124px;line-height:1.02}
+.hdr-sm{font-size:56px}
+.lead{font-size:26px;line-height:1.55;color:#4B5563;max-width:820px}
+
+/* The eyebrow: uppercase Manrope 500 at 0.32em, muted. Every panel carries a
+   technical tag — DESIGN.md §10 makes that non-negotiable. */
+.tag{font-family:Manrope,sans-serif;font-weight:500;font-size:15px;
+  letter-spacing:0.32em;text-transform:uppercase;color:#575F6B}
+.tag-sm{font-size:12px;letter-spacing:0.22em}
+.tag-acc{color:#00AEEF}
+.num{font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
+.rule{height:1px;background:rgba(16,24,40,0.12);transform-origin:left center}
+
+/* ---- surfaces ------------------------------------------------------------
+   One white, one hairline, the bevel. Nothing carries a coloured edge:
+   colour belongs to the content, never to a container. */
+.panel{background:#FFFFFF;border:1px solid rgba(16,24,40,0.12);box-shadow:inset 0 1px 0 #fff, inset 0 -1px 0 rgba(16,24,40,0.06)}
+.frame{border:1px solid rgba(16,24,40,0.12)}
+.fill{background:rgba(16,24,40,0.035)}
+
+/* Corner brackets — four 8px L's inset at a frame's corners, purely
+   structural signage (DESIGN.md §5). */
+.br{position:absolute;width:10px;height:10px;pointer-events:none}
+.br-tl{left:-1px;top:-1px;border-left:1px solid #0090C8;border-top:1px solid #0090C8}
+.br-tr{right:-1px;top:-1px;border-right:1px solid #0090C8;border-top:1px solid #0090C8}
+.br-bl{left:-1px;bottom:-1px;border-left:1px solid #0090C8;border-bottom:1px solid #0090C8}
+.br-br{right:-1px;bottom:-1px;border-right:1px solid #0090C8;border-bottom:1px solid #0090C8}
+
+.chip{display:inline-flex;align-items:center;gap:10px;padding:11px 18px;
+  border:1px solid rgba(16,24,40,0.12);box-shadow:inset 0 1px 0 #fff, inset 0 -1px 0 rgba(16,24,40,0.06);background:#FFFFFF;
+  font-size:19px;color:#4B5563;white-space:nowrap}
+.chip-on{border-color:rgba(0,174,239,0.55);background:rgba(0,174,239,0.07);color:#00688F}
+.chip-sm{padding:7px 12px;font-size:15px}
+
+/* The match badge. The console really does fill this one with the accent —
+   verified on screen — so the film does too, and nothing else is filled. */
+.badge{display:inline-block;padding:7px 13px;background:#00AEEF;color:#fff;
+  font-size:17px;font-weight:600}
+
+/* The axis chip: a tinted mark carrying identity, the value in ink. */
+.ax{display:inline-flex;align-items:center;gap:9px;padding:7px 13px;font-size:19px;
+  border:1px solid;font-variant-numeric:tabular-nums}
+.ax b{font-weight:700;font-size:15px}
+
+/* The primary CTA is INK, never the accent (DESIGN.md §2). */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:16px;
+  padding:14px 28px;background:linear-gradient(to bottom,#2b3138,#16191d);color:#fff;
+  font-size:16px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
+
+/* The oversized macOS cursor. It is the film's only actor, so it is well over
+   life size — at 1:1 a pointer is invisible at this distance. */
+.cursor{position:absolute;width:54px;height:54px;pointer-events:none;z-index:90}
+</style>
+  <div id="root" data-composition-id="03-ask" data-start="0" data-width="1920" data-height="1080">
+    <div class="ground g-app"></div>
+    <div class="grid"></div>
+    <div class="bleed"></div>
+    <div class="pool pool-a"></div>
+    <div class="pool pool-b"></div>
+    <div id="ask-grain" class="grain"></div>
+    <div class="vig"></div>
+    <div id="stg2" class="stage"><div class="inner">
+
+      <div style="position:absolute;left:0;right:0;top:0;height:104px;border-bottom:1px solid rgba(16,24,40,0.12);
+           background:#FFFFFF;display:flex;align-items:center;padding:0 56px">
+
+        <div style="display:flex;align-items:center;gap:20px">
+          <img src="assets/brand/sanghavi-logo.png" style="height:44px;width:auto;display:block"/>
+          <div style="width:1px;height:38px;background:rgba(16,24,40,0.12)"></div>
+          <div>
+            <div style="font-size:22px;font-weight:500;color:#0B0D12;line-height:1.1">Forma</div>
+            <div class="tag tag-sm" style="margin-top:3px">RETRIEVAL CONSOLE</div>
+          </div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:26px">
+          <div class="tag tag-sm" style="letter-spacing:0.18em"><span style="color:#00688F">0</span> INTAKES &nbsp;·&nbsp; <span id="tb-count" style="color:#00688F">5,209</span> LASTS</div>
+          <div class="chip chip-sm">REFRESH</div>
+          <div class="tag tag-sm">SIGN OUT</div>
+        </div>
+      </div>
+      <div class="tag" id="eb" style="position:absolute;left:0;right:0;top:236px;text-align:center;font-size:15px">
+        RETRIEVAL &nbsp;·&nbsp; <span style="color:#00688F">5,209</span> LASTS INDEXED</div>
+      <div class="hdr" id="h1" style="position:absolute;left:0;right:0;top:284px;text-align:center;font-size:76px">
+        What are you looking for?</div>
+      <div class="lead" id="h2" style="position:absolute;left:0;right:0;top:396px;text-align:center;max-width:none;font-size:24px">
+        Type naturally and Forma fills the filters below, or set them yourself.</div>
+
+
+      <div id="cp" style="position:absolute;left:360px;top:470px;width:1200px;
+           background:#FFFFFF;border:1px solid rgba(16,24,40,0.12);box-shadow:inset 0 1px 0 #fff, inset 0 -1px 0 rgba(16,24,40,0.06)">
+        <div id="cp-ring" style="position:absolute;inset:-1px;border:1px solid #00AEEF;opacity:0"></div>
+        <div style="min-height:96px;padding:32px 34px 8px;font-size:30px;color:#5C6470"><span style="color:#16191D"><div id="q" style="position:relative;display:inline-block;
+      font-size:30px;line-height:1.2;white-space:nowrap;color:#16191D"><span data-r="0" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="0" style="opacity:0">C</span><span data-r="1" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="1" style="opacity:0">o</span><span data-r="2" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="2" style="opacity:0">l</span><span data-r="3" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="3" style="opacity:0">e</span><span data-r="4" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="4" style="opacity:0">&nbsp;</span><span data-r="5" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="5" style="opacity:0">H</span><span data-r="6" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="6" style="opacity:0">a</span><span data-r="7" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="7" style="opacity:0">a</span><span data-r="8" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="8" style="opacity:0">n</span><span data-r="9" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="9" style="opacity:0">&nbsp;</span><span data-r="10" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="10" style="opacity:0">g</span><span data-r="11" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="11" style="opacity:0">e</span><span data-r="12" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="12" style="opacity:0">n</span><span data-r="13" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="13" style="opacity:0">t</span><span data-r="14" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="14" style="opacity:0">s</span><span data-r="15" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="15" style="opacity:0">&nbsp;</span><span data-r="16" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="16" style="opacity:0">s</span><span data-r="17" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="17" style="opacity:0">i</span><span data-r="18" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="18" style="opacity:0">z</span><span data-r="19" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="19" style="opacity:0">e</span><span data-r="20" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="20" style="opacity:0">&nbsp;</span><span data-r="21" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="21" style="opacity:0">4</span><span data-r="22" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="22" style="opacity:0">2</span><span data-r="23" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="23" style="opacity:0">&nbsp;</span><span data-r="24" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="24" style="opacity:0">r</span><span data-r="25" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="25" style="opacity:0">o</span><span data-r="26" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="26" style="opacity:0">u</span><span data-r="27" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="27" style="opacity:0">n</span><span data-r="28" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="28" style="opacity:0">d</span><span data-r="29" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="29" style="opacity:0">&nbsp;</span><span data-r="30" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="30" style="opacity:0">t</span><span data-r="31" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="31" style="opacity:0">o</span><span data-r="32" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span><span data-c="32" style="opacity:0">e</span><span data-r="33" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#00AEEF;transform:translateY(5px)"></span></span></div></span></div>
+        <div id="cp-chips" style="display:flex;flex-wrap:wrap;gap:12px;padding:8px 26px 26px">
+          <div id="cp-c0" style="position:relative;display:inline-flex">
+            <span id="cp-c0-off" class="chip" style="opacity:1">Brand · <b style="font-weight:600">COLE HAAN</b></span>
+            <span id="cp-c0-on" class="chip chip-on" style="position:absolute;left:0;top:0;right:0;bottom:0;opacity:0">Brand · <b style="font-weight:600">COLE HAAN</b></span>
+          </div>
+          <div id="cp-c1" style="position:relative;display:inline-flex">
+            <span id="cp-c1-off" class="chip" style="opacity:1">Category · <b style="font-weight:600">Gents</b></span>
+            <span id="cp-c1-on" class="chip chip-on" style="position:absolute;left:0;top:0;right:0;bottom:0;opacity:0">Category · <b style="font-weight:600">Gents</b></span>
+          </div>
+          <div id="cp-c2" style="position:relative;display:inline-flex">
+            <span id="cp-c2-off" class="chip" style="opacity:1">Size · <b style="font-weight:600">42</b></span>
+            <span id="cp-c2-on" class="chip chip-on" style="position:absolute;left:0;top:0;right:0;bottom:0;opacity:0">Size · <b style="font-weight:600">42</b></span>
+          </div>
+          <div id="cp-c3" style="position:relative;display:inline-flex">
+            <span id="cp-c3-off" class="chip" style="opacity:1">Toe shape · <b style="font-weight:600">Round</b></span>
+            <span id="cp-c3-on" class="chip chip-on" style="position:absolute;left:0;top:0;right:0;bottom:0;opacity:0">Toe shape · <b style="font-weight:600">Round</b></span>
+          </div>
+          <div id="cp-c4" style="position:relative;display:inline-flex">
+            <span id="cp-c4-off" class="chip" style="opacity:1">Geometry +</span>
+            <span id="cp-c4-on" class="chip chip-on" style="position:absolute;left:0;top:0;right:0;bottom:0;opacity:0">Geometry +</span>
+          </div>
+          <div id="cp-c5" style="position:relative;display:inline-flex">
+            <span id="cp-c5-off" class="chip" style="opacity:1">Match an STL ⬆</span>
+            <span id="cp-c5-on" class="chip chip-on" style="position:absolute;left:0;top:0;right:0;bottom:0;opacity:0">Match an STL ⬆</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:50%;bottom:52px;transform:translateX(-50%);
+           display:flex;align-items:center;gap:8px;padding:12px 16px;
+           background:#FFFFFF;border:1px solid rgba(16,24,40,0.12);box-shadow:inset 0 1px 0 #fff, inset 0 -1px 0 rgba(16,24,40,0.06)">
+        <div id="dk0" style="position:relative;width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:rgba(16,24,40,0.07);">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0B0D12" stroke-width="1.5" stroke-linecap="square"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 L21 21"/></svg>
+          <i style="position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);width:5px;height:5px;background:#00AEEF"></i>
+        </div>
+        <div id="dk1" style="position:relative;width:60px;height:60px;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#4B5563" stroke-width="1.5" stroke-linecap="square"><rect x="3" y="3" width="7.5" height="7.5"/><rect x="13.5" y="3" width="7.5" height="7.5"/><rect x="3" y="13.5" width="7.5" height="7.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5"/></svg>
+
+        </div>
+        <div id="dk2" style="position:relative;width:60px;height:60px;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#4B5563" stroke-width="1.5" stroke-linecap="square"><path d="M3 11 L11 3 L21 3 L21 13 L13 21 L3 11 Z"/><circle cx="16.5" cy="7.5" r="1.6"/></svg>
+
+        </div>
+        <div id="dk3" style="position:relative;width:60px;height:60px;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#4B5563" stroke-width="1.5" stroke-linecap="square"><rect x="3" y="3" width="18" height="18"/><path d="M8 16 L8 11 M12 16 L12 8 M16 16 L16 13"/></svg>
+
+        </div>
+      </div>
+      <div id="cur" class="cursor"><svg viewBox="0 0 24 24" width="54" height="54" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5.5 2.2 L5.5 19.4 L9.8 15.4 L12.6 21.6 L15.8 20.2 L13.0 14.1 L18.8 14.1 Z"
+    fill="#fff" stroke="#0B0D12" stroke-width="1.15" stroke-linejoin="round"/></svg></div>
+    </div></div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function(){
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#stg2", { y: 250, scale: 0.94 }, { y: 0, scale: 1, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#ask-grain", { x: 0, y: 0 },
+        { x: -132, y: -74, duration: 10.23, ease: "none" }, 0);
+      tl.fromTo("#eb", { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#h1", { y: 22 }, { y: 0, duration: 0.58, ease: "power3.out" }, 0.02);
+      tl.fromTo("#h2", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.54, ease: "power3.out" }, 0.24);
+      tl.fromTo("#cp", { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.62, ease: "power3.out" }, 0.36);
+
+      // the cursor arrives from off-frame and clicks INTO the field; the focus
+      // ring answers the click rather than appearing on its own
+      tl.set("#cur", { x: -160, y: 690 }, 0);
+      tl.to("#cur", { x: 700, y: 620, duration: 0.86, ease: "power2.inOut", overwrite: "auto" }, 1.050);
+      tl.to("#cur", { x: 742, y: 578, duration: 0.44, ease: "power2.inOut", overwrite: "auto" }, 1.910);
+
+      tl.to("#cur", { scale: 0.84, duration: 0.08, ease: "power2.in" }, 2.360);
+      tl.to("#cur", { scale: 1, duration: 0.20, ease: "power3.out" }, 2.440);
+      tl.fromTo("#cp-ring", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.26, ease: "power2.out" }, 2.46);
+      tl.to("#cur", { x: 1420, y: 900, duration: 0.80, ease: "power2.inOut" }, 2.62);
+      tl.to("#cur", { autoAlpha: 0, duration: 0.26 }, 3.42);
+
+      tl.set("#q [data-r='0']", { autoAlpha: 1 }, 2.620);
+      tl.set("#q [data-c='0']", { autoAlpha: 1 }, 2.620);
+      tl.set("#q [data-r='0']", { autoAlpha: 0 }, 2.620);
+      tl.set("#q [data-r='1']", { autoAlpha: 1 }, 2.620);
+      tl.set("#q [data-c='1']", { autoAlpha: 1 }, 2.679);
+      tl.set("#q [data-r='1']", { autoAlpha: 0 }, 2.679);
+      tl.set("#q [data-r='2']", { autoAlpha: 1 }, 2.679);
+      tl.set("#q [data-c='2']", { autoAlpha: 1 }, 2.738);
+      tl.set("#q [data-r='2']", { autoAlpha: 0 }, 2.738);
+      tl.set("#q [data-r='3']", { autoAlpha: 1 }, 2.738);
+      tl.set("#q [data-c='3']", { autoAlpha: 1 }, 2.796);
+      tl.set("#q [data-r='3']", { autoAlpha: 0 }, 2.796);
+      tl.set("#q [data-r='4']", { autoAlpha: 1 }, 2.796);
+      tl.set("#q [data-c='4']", { autoAlpha: 1 }, 2.855);
+      tl.set("#q [data-r='4']", { autoAlpha: 0 }, 2.855);
+      tl.set("#q [data-r='5']", { autoAlpha: 1 }, 2.855);
+      tl.set("#q [data-c='5']", { autoAlpha: 1 }, 2.914);
+      tl.set("#q [data-r='5']", { autoAlpha: 0 }, 2.914);
+      tl.set("#q [data-r='6']", { autoAlpha: 1 }, 2.914);
+      tl.set("#q [data-c='6']", { autoAlpha: 1 }, 2.973);
+      tl.set("#q [data-r='6']", { autoAlpha: 0 }, 2.973);
+      tl.set("#q [data-r='7']", { autoAlpha: 1 }, 2.973);
+      tl.set("#q [data-c='7']", { autoAlpha: 1 }, 3.032);
+      tl.set("#q [data-r='7']", { autoAlpha: 0 }, 3.032);
+      tl.set("#q [data-r='8']", { autoAlpha: 1 }, 3.032);
+      tl.set("#q [data-c='8']", { autoAlpha: 1 }, 3.091);
+      tl.set("#q [data-r='8']", { autoAlpha: 0 }, 3.091);
+      tl.set("#q [data-r='9']", { autoAlpha: 1 }, 3.091);
+      tl.set("#q [data-c='9']", { autoAlpha: 1 }, 3.149);
+      tl.set("#q [data-r='9']", { autoAlpha: 0 }, 3.149);
+      tl.set("#q [data-r='10']", { autoAlpha: 1 }, 3.149);
+      tl.set("#q [data-c='10']", { autoAlpha: 1 }, 3.208);
+      tl.set("#q [data-r='10']", { autoAlpha: 0 }, 3.208);
+      tl.set("#q [data-r='11']", { autoAlpha: 1 }, 3.208);
+      tl.set("#q [data-c='11']", { autoAlpha: 1 }, 3.267);
+      tl.set("#q [data-r='11']", { autoAlpha: 0 }, 3.267);
+      tl.set("#q [data-r='12']", { autoAlpha: 1 }, 3.267);
+      tl.set("#q [data-c='12']", { autoAlpha: 1 }, 3.326);
+      tl.set("#q [data-r='12']", { autoAlpha: 0 }, 3.326);
+      tl.set("#q [data-r='13']", { autoAlpha: 1 }, 3.326);
+      tl.set("#q [data-c='13']", { autoAlpha: 1 }, 3.385);
+      tl.set("#q [data-r='13']", { autoAlpha: 0 }, 3.385);
+      tl.set("#q [data-r='14']", { autoAlpha: 1 }, 3.385);
+      tl.set("#q [data-c='14']", { autoAlpha: 1 }, 3.444);
+      tl.set("#q [data-r='14']", { autoAlpha: 0 }, 3.444);
+      tl.set("#q [data-r='15']", { autoAlpha: 1 }, 3.444);
+      tl.set("#q [data-c='15']", { autoAlpha: 1 }, 3.502);
+      tl.set("#q [data-r='15']", { autoAlpha: 0 }, 3.502);
+      tl.set("#q [data-r='16']", { autoAlpha: 1 }, 3.502);
+      tl.set("#q [data-c='16']", { autoAlpha: 1 }, 3.561);
+      tl.set("#q [data-r='16']", { autoAlpha: 0 }, 3.561);
+      tl.set("#q [data-r='17']", { autoAlpha: 1 }, 3.561);
+      tl.set("#q [data-c='17']", { autoAlpha: 1 }, 3.620);
+      tl.set("#q [data-r='17']", { autoAlpha: 0 }, 3.620);
+      tl.set("#q [data-r='18']", { autoAlpha: 1 }, 3.620);
+      tl.set("#q [data-c='18']", { autoAlpha: 1 }, 3.679);
+      tl.set("#q [data-r='18']", { autoAlpha: 0 }, 3.679);
+      tl.set("#q [data-r='19']", { autoAlpha: 1 }, 3.679);
+      tl.set("#q [data-c='19']", { autoAlpha: 1 }, 3.738);
+      tl.set("#q [data-r='19']", { autoAlpha: 0 }, 3.738);
+      tl.set("#q [data-r='20']", { autoAlpha: 1 }, 3.738);
+      tl.set("#q [data-c='20']", { autoAlpha: 1 }, 3.796);
+      tl.set("#q [data-r='20']", { autoAlpha: 0 }, 3.796);
+      tl.set("#q [data-r='21']", { autoAlpha: 1 }, 3.796);
+      tl.set("#q [data-c='21']", { autoAlpha: 1 }, 3.855);
+      tl.set("#q [data-r='21']", { autoAlpha: 0 }, 3.855);
+      tl.set("#q [data-r='22']", { autoAlpha: 1 }, 3.855);
+      tl.set("#q [data-c='22']", { autoAlpha: 1 }, 3.914);
+      tl.set("#q [data-r='22']", { autoAlpha: 0 }, 3.914);
+      tl.set("#q [data-r='23']", { autoAlpha: 1 }, 3.914);
+      tl.set("#q [data-c='23']", { autoAlpha: 1 }, 3.973);
+      tl.set("#q [data-r='23']", { autoAlpha: 0 }, 3.973);
+      tl.set("#q [data-r='24']", { autoAlpha: 1 }, 3.973);
+      tl.set("#q [data-c='24']", { autoAlpha: 1 }, 4.032);
+      tl.set("#q [data-r='24']", { autoAlpha: 0 }, 4.032);
+      tl.set("#q [data-r='25']", { autoAlpha: 1 }, 4.032);
+      tl.set("#q [data-c='25']", { autoAlpha: 1 }, 4.091);
+      tl.set("#q [data-r='25']", { autoAlpha: 0 }, 4.091);
+      tl.set("#q [data-r='26']", { autoAlpha: 1 }, 4.091);
+      tl.set("#q [data-c='26']", { autoAlpha: 1 }, 4.149);
+      tl.set("#q [data-r='26']", { autoAlpha: 0 }, 4.149);
+      tl.set("#q [data-r='27']", { autoAlpha: 1 }, 4.149);
+      tl.set("#q [data-c='27']", { autoAlpha: 1 }, 4.208);
+      tl.set("#q [data-r='27']", { autoAlpha: 0 }, 4.208);
+      tl.set("#q [data-r='28']", { autoAlpha: 1 }, 4.208);
+      tl.set("#q [data-c='28']", { autoAlpha: 1 }, 4.267);
+      tl.set("#q [data-r='28']", { autoAlpha: 0 }, 4.267);
+      tl.set("#q [data-r='29']", { autoAlpha: 1 }, 4.267);
+      tl.set("#q [data-c='29']", { autoAlpha: 1 }, 4.326);
+      tl.set("#q [data-r='29']", { autoAlpha: 0 }, 4.326);
+      tl.set("#q [data-r='30']", { autoAlpha: 1 }, 4.326);
+      tl.set("#q [data-c='30']", { autoAlpha: 1 }, 4.385);
+      tl.set("#q [data-r='30']", { autoAlpha: 0 }, 4.385);
+      tl.set("#q [data-r='31']", { autoAlpha: 1 }, 4.385);
+      tl.set("#q [data-c='31']", { autoAlpha: 1 }, 4.444);
+      tl.set("#q [data-r='31']", { autoAlpha: 0 }, 4.444);
+      tl.set("#q [data-r='32']", { autoAlpha: 1 }, 4.444);
+      tl.set("#q [data-c='32']", { autoAlpha: 1 }, 4.502);
+      tl.set("#q [data-r='32']", { autoAlpha: 0 }, 4.502);
+      tl.set("#q [data-r='33']", { autoAlpha: 1 }, 4.502);
+      tl.set("#q [data-r='33']", { autoAlpha: 0 }, 4.741);
+      tl.set("#q [data-r='33']", { autoAlpha: 1 }, 5.041);
+      tl.set("#q [data-r='33']", { autoAlpha: 0 }, 5.341);
+      tl.set("#q [data-r='33']", { autoAlpha: 1 }, 5.641);
+      tl.set("#q [data-r='33']", { autoAlpha: 0 }, 6.061);
+
+
+      // the chips Forma set for itself
+      tl.set("#cp-c0-off", { autoAlpha: 0 }, 4.850);
+      tl.set("#cp-c0-on", { autoAlpha: 1 }, 4.850);
+      tl.fromTo("#cp-c0", { scale: 0.955 }, { scale: 1, duration: 0.34, ease: "power3.out" }, 4.850);
+      tl.set("#cp-c1-off", { autoAlpha: 0 }, 5.620);
+      tl.set("#cp-c1-on", { autoAlpha: 1 }, 5.620);
+      tl.fromTo("#cp-c1", { scale: 0.955 }, { scale: 1, duration: 0.34, ease: "power3.out" }, 5.620);
+      tl.set("#cp-c2-off", { autoAlpha: 0 }, 6.350);
+      tl.set("#cp-c2-on", { autoAlpha: 1 }, 6.350);
+      tl.fromTo("#cp-c2", { scale: 0.955 }, { scale: 1, duration: 0.34, ease: "power3.out" }, 6.350);
+      tl.set("#cp-c3-off", { autoAlpha: 0 }, 7.250);
+      tl.set("#cp-c3-on", { autoAlpha: 1 }, 7.250);
+      tl.fromTo("#cp-c3", { scale: 0.955 }, { scale: 1, duration: 0.34, ease: "power3.out" }, 7.250);
+
+      tl.to("#stg2", { x: -236, duration: 0.34, ease: "power4.in" }, 9.887);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["03-ask"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,146 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --paper:#F4F1EA; --paper2:#E7E1D4; --sheet:#FBF9F4;
+  --ink:#14110E; --ink2:#5A5245; --navy:#16233B;
+  --yellow:#FFEB00; --pen:#DC3220; --pentype:#B32414; --rule:#B8B0A0;
+  background:var(--paper); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* the coloured field travels WITH the stage, so a navy or yellow frame reads as a
+   card sliding over the page rather than as the ground changing colour. */
+.field{position:absolute;inset:0}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:88%;letter-spacing:-.045em;line-height:.90;color:var(--ink)}
+.deck{font-weight:500;line-height:1.26;color:var(--ink2)}
+.quote{font-family:"Serif",Georgia,serif;line-height:1.16;color:var(--ink)}
+.ital{font-family:"Serif",Georgia,serif;font-style:italic}
+.mono{font-family:"JBMono",monospace;color:var(--ink)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink2);font-size:21px}
+.redtype{color:var(--pentype)}
+.onnavy{color:var(--sheet)}
+.onnavy .tag,.onnavy .deck{color:#A9B6C9}
+
+/* ---- PAPER: a sheet is defined by its shadow and its edge, never by a stripe ---- */
+.sheet{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.16), 0 10px 24px rgba(20,17,14,.12)}
+.card{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.14), 0 7px 18px rgba(20,17,14,.10)}
+.hair{position:absolute;background:var(--rule);height:1px}
+.rule2{position:absolute;background:var(--ink);height:3px}
+
+/* ---- THE MARKER: sits BEHIND its phrase, skewed, origin left ---- */
+.mark{position:absolute;background:var(--yellow);z-index:0;transform-origin:0% 50%}
+.marknavy{background:var(--yellow)}
+.phrase{position:relative;z-index:1}
+
+/* ---- THE PEN: strokes only. Never a glyph, never on navy. ---- */
+.pen{position:absolute;pointer-events:none;overflow:visible}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--pen);stroke-linecap:round;
+  stroke-linejoin:round}
+.penY path,.penY line,.penY polyline{stroke:var(--yellow)}
+.penD path,.penD line,.penD polyline{stroke:var(--pentype)}
+.penI path,.penI line,.penI polyline{stroke:var(--ink)}
+
+  </style>
+
+  <div id="root" data-composition-id="05-post" data-start="0" data-width="1920" data-height="1080">
+<div class="field" style="background:var(--paper)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:108px">05 · the workaround</div>
+      <div id="s-rule" class="rule2" style="left:118px;top:146px;width:104px;transform-origin:0% 50%;"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:114px;top:172px;width:1240px;font-size:88px">SO EVERYONE<br>USED POST.</div>
+      
+
+      
+      <div class="sheet" style="left:96px;top:452px;width:748px;height:352px;transform:rotate(-0.42deg)"></div>
+      <div style="position:absolute;left:96px;top:452px;width:748px;height:352px;overflow:hidden;transform:rotate(-0.42deg)">
+        <div class="tag" style="position:absolute;left:34px;top:26px;font-size:16px">THE REQUEST</div>
+        <div class="hair" style="left:34px;top:58px;width:680px"></div>
+        <div id="f5-q-0" class="mono" style="position:absolute;left:34px;top:86px;font-size:26px;font-weight:700;color:var(--ink);white-space:nowrap">POST /products HTTP/1.1</div><div id="f5-q-1" class="mono" style="position:absolute;left:34px;top:126px;font-size:22px;color:var(--ink2);white-space:nowrap">Host: api.shop.example</div><div id="f5-q-2" class="mono" style="position:absolute;left:34px;top:166px;font-size:22px;color:var(--ink2);white-space:nowrap">Content-Type: application/json</div><div id="f5-q-3" class="mono" style="position:absolute;left:34px;top:206px;font-size:22px;color:var(--ink2);white-space:nowrap"></div><div id="f5-q-4" class="mono" style="position:absolute;left:34px;top:246px;font-size:22px;color:var(--ink2);white-space:nowrap">{ "ids": [ … 400 ], "sort": "-rating,price" }</div>
+      </div>
+      
+      <div class="sheet" style="left:1076px;top:452px;width:748px;height:352px;transform:rotate(1.31deg)"></div>
+      <div style="position:absolute;left:1076px;top:452px;width:748px;height:352px;overflow:hidden;transform:rotate(1.31deg)">
+        <div class="tag" style="position:absolute;left:34px;top:26px;font-size:16px">THE RESPONSE</div>
+        <div class="hair" style="left:34px;top:58px;width:680px"></div>
+        <div id="f5-a-0" class="mono" style="position:absolute;left:34px;top:86px;font-size:26px;font-weight:700;color:var(--ink);white-space:nowrap">HTTP/1.1 200 OK</div><div id="f5-a-1" class="mono" style="position:absolute;left:34px;top:126px;font-size:22px;color:var(--ink2);white-space:nowrap">Content-Type: application/json</div><div id="f5-a-2" class="mono" style="position:absolute;left:34px;top:166px;font-size:22px;color:var(--ink2);white-space:nowrap">Cache-Control: no-store</div><div id="f5-a-3" class="mono" style="position:absolute;left:34px;top:206px;font-size:22px;color:var(--ink2);white-space:nowrap"></div><div id="f5-a-4" class="mono" style="position:absolute;left:34px;top:246px;font-size:22px;color:var(--ink2);white-space:nowrap">{ "results": [ … 48 ], "total": 400 }</div>
+      </div>
+
+      <div style="position:absolute;left:96px;top:848px;width:1160px">
+        <div id="f5-mk" class="mark" style="left:-8px;top:8px;width:356px;height:54px"></div>
+        <div class="phrase quote" style="position:relative;font-size:52px">And it works.</div>
+        <div id="f5-sub" class="deck" style="position:absolute;left:420px;top:14px;width:740px;font-size:29px;opacity:0">Forty-eight results, every time. Nobody had a better option.</div>
+      </div>
+
+      <svg id="f5-arw-svg" class="pen " style="left:0;top:0;width:1920px;height:1080px" viewBox="0 0 1920 1080">
+      <path id="f5-arw" d="M866,604 Q962.0,570.0 1058,604 M1036.1,605.7 L1058,604 L1042.1,588.8" stroke-width="6" style="stroke-dasharray:287;stroke-dashoffset:287"/>
+    </svg>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at FULL opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // SEAM CARRIER — the tag and the headline are at FULL opacity from frame zero and
+      // ride the cut in on the stage. They are never faded up: the gate measures MOTION,
+      // so a frame whose content fades in at 0.1s passes while visibly entering blank.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.46, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 16 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      gsap.set("#f5-q-0", { autoAlpha: 0 });
+      tl.fromTo("#f5-q-0", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 0.40);
+      gsap.set("#f5-q-1", { autoAlpha: 0 });
+      tl.fromTo("#f5-q-1", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 0.56);
+      gsap.set("#f5-q-2", { autoAlpha: 0 });
+      tl.fromTo("#f5-q-2", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 0.72);
+      gsap.set("#f5-q-3", { autoAlpha: 0 });
+      tl.fromTo("#f5-q-3", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 0.88);
+      gsap.set("#f5-q-4", { autoAlpha: 0 });
+      tl.fromTo("#f5-q-4", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 1.04);
+
+      gsap.set("#f5-arw", { strokeDashoffset: 287 });
+      tl.to("#f5-arw", { strokeDashoffset: 0, duration: 0.4, ease: "steps(6)" }, 1.46);
+      gsap.set("#f5-a-0", { autoAlpha: 0 });
+      tl.fromTo("#f5-a-0", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 1.94);
+      gsap.set("#f5-a-1", { autoAlpha: 0 });
+      tl.fromTo("#f5-a-1", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 2.10);
+      gsap.set("#f5-a-2", { autoAlpha: 0 });
+      tl.fromTo("#f5-a-2", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 2.26);
+      gsap.set("#f5-a-3", { autoAlpha: 0 });
+      tl.fromTo("#f5-a-3", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 2.42);
+      gsap.set("#f5-a-4", { autoAlpha: 0 });
+      tl.fromTo("#f5-a-4", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.18, ease: "steps(3)" }, 2.58);
+
+      gsap.set("#f5-mk", { scaleX: 0, skewX: -1.2 });
+      tl.fromTo("#f5-mk", { scaleX: 0, skewX: -1.2 }, { scaleX: 1, skewX: -1.2, duration: 0.4, ease: "steps(6)" }, 3.10);
+      tl.fromTo("#f5-sub", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, 3.70);
+      // the request runs again, and again, because that is the point of this beat: the
+      // workaround is not broken. Two more round trips, on twos.
+      tl.fromTo("#f5-arw", { autoAlpha: 1 }, { autoAlpha: 0.28, duration: 0.24, ease: "steps(3)", yoyo: true, repeat: 1 }, 4.70);
+      tl.fromTo("#f5-arw", { autoAlpha: 1 }, { autoAlpha: 0.28, duration: 0.24, ease: "steps(3)", yoyo: true, repeat: 1 }, 6.00);
+      tl.fromTo(["#f5-a-0","#f5-a-1","#f5-a-2","#f5-a-4"], { autoAlpha: 1 }, { autoAlpha: 0.35, duration: 0.20, ease: "steps(3)", yoyo: true, repeat: 1, stagger: 0.05 }, 5.00);
+      tl.fromTo(["#f5-a-0","#f5-a-1","#f5-a-2","#f5-a-4"], { autoAlpha: 1 }, { autoAlpha: 0.35, duration: 0.20, ease: "steps(3)", yoyo: true, repeat: 1, stagger: 0.05 }, 6.30);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 7.49);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["05-post"] = tl;
+    })();
+  </script>
+</template>

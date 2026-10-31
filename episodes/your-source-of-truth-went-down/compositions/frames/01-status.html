@@ -1,0 +1,200 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Bricolage"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Jakarta"; src: url("assets/fonts/Jakarta-var.woff2") format("woff2"); font-weight: 200 800; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --void: #16102B; --void-2: #241748;
+      --ink: #FFFFFF; --ink-soft: #C9BEE8; --ink-mute: #9E8FC4;
+      --coral: #FF7A6B; --amber: #FFC24B; --mint: #5FE0B0; --lilac: #B48BFF; --sky: #6FC7FF;
+      --clay-ink: #16102B;
+      --coral-lit: #FFB2A6; --lilac-lit: #D2B8FF;
+      background: var(--void);
+      font-family: "Jakarta", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #f1-stage { position: absolute; inset: 0; }
+
+    /* --- clay: the furniture. Static box-shadows (not animatable); objects are moved
+       and scaled only. Two insets are the whole illusion, the drop shadow is the mass. --- */
+    .clay { position: absolute; }
+    #f1-clay-a { left: -220px; top: 430px; width: 760px; height: 760px; border-radius: 300px;
+      background: var(--amber); transform: rotate(-12deg);
+      box-shadow: inset 16px 18px 34px rgba(255,255,255,0.55), inset -18px -20px 40px rgba(0,0,0,0.22), 0 34px 78px rgba(0,0,0,0.44); }
+    #f1-clay-b { left: 1560px; top: -260px; width: 620px; height: 620px; border-radius: 260px;
+      background: var(--lilac); transform: rotate(18deg);
+      box-shadow: inset 14px 16px 30px rgba(255,255,255,0.52), inset -16px -18px 36px rgba(0,0,0,0.22), 0 30px 70px rgba(0,0,0,0.42); }
+    #f1-clay-c { left: 1470px; top: 900px; width: 480px; height: 480px; border-radius: 200px;
+      background: var(--sky);
+      box-shadow: inset 12px 14px 26px rgba(255,255,255,0.50), inset -14px -16px 32px rgba(0,0,0,0.20), 0 26px 60px rgba(0,0,0,0.40); }
+    #f1-clay-d { left: 700px; top: -180px; width: 380px; height: 380px; border-radius: 160px;
+      background: var(--mint); transform: rotate(-8deg);
+      box-shadow: inset 10px 12px 22px rgba(255,255,255,0.50), inset -12px -14px 28px rgba(0,0,0,0.20), 0 22px 52px rgba(0,0,0,0.38); }
+
+    /* --- glass: the type surface. 0.76 is the floor that bounds the composite when the
+       backdrop is at its brightest (worst case, over white: ink 8.61:1, soft 4.93:1). --- */
+    .glass {
+      position: absolute;
+      background: rgba(22,16,43,0.76);
+      -webkit-backdrop-filter: blur(30px) saturate(150%);
+      backdrop-filter: blur(30px) saturate(150%);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 30px;
+      box-shadow: 0 22px 58px rgba(0,0,0,0.40);
+    }
+
+    #f1-board { left: 132px; top: 176px; width: 968px; height: 740px; }
+    #f1-bhead { position: absolute; left: 44px; top: 40px; right: 44px; height: 74px;
+      display: flex; align-items: center; gap: 22px; }
+    #f1-gplate { background: #FFFFFF; border-radius: 12px; padding: 9px 16px; display: flex; align-items: center; }
+    #f1-glogo { height: 32px; width: auto; display: block; }
+    #f1-btitle { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 25px;
+      letter-spacing: 0.16em; color: var(--ink-soft); }
+    #f1-clock { margin-left: auto; font-family: "JetBrains Mono", monospace; font-weight: 700;
+      font-size: 27px; color: var(--ink); font-variant-numeric: tabular-nums; }
+    #f1-rule { position: absolute; left: 44px; right: 44px; top: 132px; height: 1px;
+      background: rgba(255,255,255,0.18); }
+
+    .f1-row { position: absolute; left: 44px; right: 44px; height: 78px;
+      display: flex; align-items: center; }
+    .f1-dot { width: 20px; height: 20px; border-radius: 10px; background: var(--mint); flex: none;
+      box-shadow: inset 3px 3px 6px rgba(255,255,255,0.55), inset -3px -3px 7px rgba(0,0,0,0.24); }
+    .f1-svc { font-weight: 700; font-size: 35px; color: var(--ink); margin-left: 26px; letter-spacing: -0.005em; }
+    .f1-state { margin-left: auto; position: relative; height: 32px; width: 300px; }
+    .f1-state span { position: absolute; right: 0; top: 0; font-family: "JetBrains Mono", monospace;
+      font-weight: 700; font-size: 24px; letter-spacing: 0.10em; white-space: nowrap; }
+    .f1-s-ok  { color: var(--mint); }
+    .f1-s-deg { color: var(--amber); }
+    .f1-s-out { color: var(--coral-lit); }
+
+    #f1-fig { left: 1188px; top: 262px; width: 604px; height: 508px; }
+    #f1-num { position: absolute; left: 46px; top: 52px; font-family: "Bricolage", sans-serif;
+      font-weight: 800; font-size: 212px; line-height: 1.0; letter-spacing: -0.045em;
+      color: var(--ink); font-variant-numeric: tabular-nums; }
+    #f1-cap { position: absolute; left: 48px; right: 46px; top: 296px; font-weight: 700;
+      font-size: 37px; line-height: 1.24; color: var(--ink); letter-spacing: -0.01em; }
+    #f1-src { position: absolute; left: 48px; top: 412px; font-family: "JetBrains Mono", monospace;
+      font-weight: 400; font-size: 21px; letter-spacing: 0.08em; color: var(--ink-soft); }
+
+    /* the one clay chip on this frame — a short dark label on clay, which is the only
+       type permitted off glass in this register */
+    #f1-chip { position: absolute; left: 1188px; top: 812px; padding: 20px 34px; border-radius: 34px;
+      background: var(--coral); font-family: "JetBrains Mono", monospace; font-weight: 700;
+      font-size: 30px; letter-spacing: 0.04em; color: var(--clay-ink);
+      box-shadow: inset 8px 9px 16px rgba(255,255,255,0.50), inset -9px -10px 20px rgba(0,0,0,0.20), 0 18px 40px rgba(0,0,0,0.40); }
+    #f1-chipsub { position: absolute; left: 1188px; top: 908px; width: 604px; padding: 20px 26px;
+      font-family: "JetBrains Mono", monospace; font-weight: 400; font-size: 21px;
+      letter-spacing: 0.05em; color: var(--ink-soft); border-radius: 22px; box-sizing: border-box; }
+  </style>
+
+  <div id="root" data-composition-id="01-status" data-width="1920" data-height="1080">
+    <div id="f1-clip" class="clip" data-start="0" data-duration="10.0" data-track-index="0" data-layout-allow-overflow>
+      <div id="f1-stage">
+        <div id="f1-clay-a" class="clay"></div>
+        <div id="f1-clay-b" class="clay"></div>
+        <div id="f1-clay-c" class="clay"></div>
+        <div id="f1-clay-d" class="clay"></div>
+
+        <div id="f1-board" class="glass">
+          <div id="f1-bhead">
+            <div id="f1-gplate"><img id="f1-glogo" src="public/img/logo-github-trim.png" alt="GitHub"></div>
+            <div id="f1-btitle">STATUS</div>
+            <div id="f1-clock">13:40 UTC</div>
+          </div>
+          <div id="f1-rule"></div>
+        </div>
+
+        <div id="f1-fig" class="glass">
+          <div id="f1-num">0</div>
+          <div id="f1-cap">GitHub outages in twelve months</div>
+          <div id="f1-src">SOURCE: LEADDEV</div>
+        </div>
+
+        <div id="f1-chip">20% ERROR RATE</div>
+        <div id="f1-chipsub" class="glass">50% ON RAW + ARCHIVE DOWNLOADS</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var board = document.querySelector("#f1-board");
+      var SERVICES = ["API", "Actions", "Pull Requests", "Pages", "Webhooks", "Copilot"];
+      var rows = [], dots = [], states = [];
+      SERVICES.forEach(function (name, i) {
+        var r = document.createElement("div");
+        r.className = "f1-row"; r.style.top = (166 + i * 92) + "px";
+        r.innerHTML = '<div class="f1-dot"></div><div class="f1-svc">' + name +
+                      '</div><div class="f1-state">' +
+                      '<span class="f1-s-ok">OPERATIONAL</span>' +
+                      '<span class="f1-s-deg">DEGRADED</span>' +
+                      '<span class="f1-s-out">MAJOR OUTAGE</span></div>';
+        board.appendChild(r);
+        rows.push(r); dots.push(r.querySelector(".f1-dot"));
+        states.push({ ok: r.querySelector(".f1-s-ok"), deg: r.querySelector(".f1-s-deg"),
+                      out: r.querySelector(".f1-s-out") });
+      });
+
+      var tl = gsap.timeline({ paused: true });
+
+      // Scene 1 (0-1.2s): the clay settles. It has mass, so it overshoots and comes back.
+      tl.fromTo("#f1-clay-a", { scale: 0.86, y: 70 }, { scale: 1, y: 0, duration: 1.05, ease: "back.out(1.3)" }, 0);
+      tl.fromTo("#f1-clay-b", { scale: 0.86, y: -60 }, { scale: 1, y: 0, duration: 1.05, ease: "back.out(1.3)" }, 0.10);
+      tl.fromTo("#f1-clay-c", { scale: 0.84, y: 80 }, { scale: 1, y: 0, duration: 1.0, ease: "back.out(1.3)" }, 0.20);
+      tl.fromTo("#f1-clay-d", { scale: 0.84, y: -70 }, { scale: 1, y: 0, duration: 1.0, ease: "back.out(1.3)" }, 0.28);
+
+      // Scene 2 (0.5-3.0s): the board arrives. Glass slides and fades; it never scales,
+      // because a scaling frosted panel reveals that the blur is not attached to it.
+      tl.fromTo("#f1-board", { autoAlpha: 0, x: -64 }, { autoAlpha: 1, x: 0, duration: 0.66, ease: "power3.out" }, 0.50);
+      tl.fromTo("#f1-gplate",  { autoAlpha: 0, x: -22 }, { autoAlpha: 1, x: 0, duration: 0.44, ease: "power2.out" }, 0.96);
+      tl.fromTo("#f1-btitle", { autoAlpha: 0, x: -22 }, { autoAlpha: 1, x: 0, duration: 0.44, ease: "power2.out" }, 1.06);
+      tl.fromTo("#f1-clock",  { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.40, ease: "power2.out" }, 1.20);
+      tl.fromTo("#f1-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.60, ease: "power3.out" }, 1.10);
+      gsap.set("#f1-rule", { transformOrigin: "0% 50%" });
+      tl.fromTo(rows, { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.46, ease: "power2.out", stagger: 0.13 }, 1.42);
+
+      // Scene 3 (3.0-5.4s): the running system — the board degrades in front of you,
+      // service by service, which is what the line is describing while it plays.
+      states.forEach(function (s) { gsap.set([s.deg, s.out], { autoAlpha: 0 }); });
+      var DEGRADE = [
+        [3.00, "#FFC24B", "deg"],
+        [3.26, "#FFC24B", "deg"],
+        [3.54, "#FF7A6B", "out"],
+        [3.84, "#FFC24B", "deg"],
+        [4.10, "#FF7A6B", "out"],
+        [4.42, "#FF7A6B", "out"]
+      ];
+      DEGRADE.forEach(function (d, i) {
+        tl.to(dots[i], { backgroundColor: d[1], duration: 0.30, ease: "power2.out" }, d[0]);
+        tl.set(states[i].ok,    { autoAlpha: 0 }, d[0] + 0.15);
+        tl.set(states[i][d[2]], { autoAlpha: 1 }, d[0] + 0.15);
+      });
+
+      // Scene 4 (4.6-8.6s): the figure. The count runs for 3.2s so the beat keeps
+      // delivering across its length instead of resolving and then waiting.
+      tl.fromTo("#f1-fig", { autoAlpha: 0, x: 64 }, { autoAlpha: 1, x: 0, duration: 0.66, ease: "power3.out" }, 4.60);
+      tl.fromTo("#f1-cap", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.48, ease: "power2.out" }, 5.02);
+      tl.fromTo("#f1-src", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.44, ease: "power2.out" }, 5.30);
+      var c = { v: 0 }, numEl = document.querySelector("#f1-num");
+      tl.to(c, { v: 257, duration: 3.20, ease: "power2.out",
+                 onUpdate: function () { numEl.textContent = Math.round(c.v); } }, 5.10);
+
+      tl.fromTo("#f1-chip", { autoAlpha: 0, scale: 0.80 }, { autoAlpha: 1, scale: 1, duration: 0.52, ease: "back.out(1.6)" }, 6.30);
+      tl.fromTo("#f1-chipsub", { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: 0.44, ease: "power2.out" }, 6.72);
+
+      // Scene 5 (8.6-9.66s): still. Scheduled stillness before the title.
+
+      // ---- SEAM 1 -> 2: cut-the-curve LEFT (the current). power4.in ends at peak
+      // velocity, so the cut lands mid-motion. Hard-killed exactly at 10.0.
+      tl.to("#f1-stage", { x: -238, duration: 0.34, ease: "power4.in" }, 9.66);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["01-status"] = tl;
+    })();
+  </script>
+</template>

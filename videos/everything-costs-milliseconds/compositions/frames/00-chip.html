@@ -1,0 +1,133 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+#root{background:transparent}
+  </style>
+
+  <div id="root" data-composition-id="00-chip" data-start="0" data-width="1920" data-height="1080">
+
+    <div id="chip" style="position:absolute;left:1484px;top:100px;width:342px;height:152px;
+      background:rgba(11,16,15,.82);border:1px solid rgba(176,228,204,.16);border-radius:12px;
+      box-shadow:0 14px 34px rgba(0,0,0,.55)">
+      <div class="mono" style="position:absolute;left:22px;top:22px;font-size:20px;font-weight:700;color:var(--mint)">nav 8842</div>
+      <div style="position:absolute;left:22px;top:50px;width:150px;height:22px">
+        <div class="cstate mono" id="cs0" style="position:absolute;left:0;top:0;width:170px;
+          font-size:15px;line-height:1.4;color:var(--emerald-lit);white-space:nowrap">p75 baseline</div><div class="cstate mono" id="cs1" style="position:absolute;left:0;top:0;width:170px;
+          font-size:15px;line-height:1.4;color:var(--emerald-lit);white-space:nowrap">4 chained requests</div><div class="cstate mono" id="cs2" style="position:absolute;left:0;top:0;width:170px;
+          font-size:15px;line-height:1.4;color:var(--brass);white-space:nowrap">780 KB parsed</div><div class="cstate mono" id="cs3" style="position:absolute;left:0;top:0;width:170px;
+          font-size:15px;line-height:1.4;color:var(--emerald-lit);white-space:nowrap">streamed</div><div class="cstate mono" id="cs4" style="position:absolute;left:0;top:0;width:170px;
+          font-size:15px;line-height:1.4;color:var(--emerald-lit);white-space:nowrap">yielded</div><div class="cstate mono" id="cs5" style="position:absolute;left:0;top:0;width:170px;
+          font-size:15px;line-height:1.4;color:var(--emerald-lit);white-space:nowrap">cached</div><div class="cstate mono" id="cs6" style="position:absolute;left:0;top:0;width:170px;
+          font-size:15px;line-height:1.4;color:var(--emerald-lit);white-space:nowrap">held at budget</div>
+      </div>
+      <div class="mono" style="position:absolute;left:22px;top:82px;font-size:13px;letter-spacing:.14em;opacity:.4;color:var(--mint)">TIME TO INTERACTIVE</div>
+
+      <div style="position:absolute;left:222px;top:0px;width:92px;height:92px;border-radius:50%;
+        background-image:url('assets/plates/brass.jpg');background-size:cover;
+        box-shadow:inset 1px 1px 3px rgba(255,236,196,.5),inset -2px -2px 4px rgba(0,0,0,.6),0 5px 12px rgba(0,0,0,.5)"></div>
+      <div style="position:absolute;left:228px;top:6px;width:80px;height:80px;border-radius:50%;
+        background:radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 52%, #091413 100%)"></div>
+      <div id="c-needle" style="position:absolute;left:266px;top:12px;width:4px;height:34px;
+        transform-origin:50% 100%;border-radius:2px;background:var(--mint)"></div>
+      <div id="c-needlehot" style="position:absolute;left:266px;top:12px;width:4px;height:34px;
+        transform-origin:50% 100%;border-radius:2px;background:var(--brass)"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // The chip enters once, with the first station, and is never interrupted again.
+      gsap.set("#chip", { autoAlpha: 0 });
+      tl.to("#chip", { autoAlpha: 1, duration: 0.60, ease: "power3.out" }, 14.60);
+      var K = [{"t":15,"v":4.2,"s":"p75 baseline"},{"t":61.42857142857143,"v":4.2,"s":"4 chained requests"},{"t":93.57142857142858,"v":5.6,"s":"780 KB parsed","hot":true},{"t":103.57142857142858,"v":3.9,"s":"streamed"},{"t":124.2857142857143,"v":2.8,"s":"yielded"},{"t":146.42857142857144,"v":1.6,"s":"cached"},{"t":167.8571428571429,"v":1.42,"s":"held at budget"}];
+      // stack one span per state and toggle with zero-duration sets: a tl.call is not
+      // reliably seekable, and a tween on text content is a no-op.
+      for (var i = 0; i < K.length; i++) gsap.set("#cs" + i, { autoAlpha: 0 });
+      gsap.set("#c-needle", { rotation: -120.00 });
+      gsap.set("#c-needlehot", { rotation: -120.00, autoAlpha: 0 });
+      for (var j = 0; j < K.length; j++) {
+        (function (k, idx) {
+          tl.set("#cs" + idx, { autoAlpha: 1 }, k.t);
+          if (idx > 0) tl.set("#cs" + (idx - 1), { autoAlpha: 0 }, k.t);
+          // the needle swings with the same law as every other instrument in the film.
+          tl.to("#c-needle",    { rotation: -120 + (k.v / 6) * 240, duration: 0.78, ease: "power3.out" }, k.t);
+          tl.to("#c-needlehot", { rotation: -120 + (k.v / 6) * 240, duration: 0.78, ease: "power3.out" }, k.t);
+          // brass only while the value is over budget — the same accent rule as the rest.
+          tl.set("#c-needle",    { autoAlpha: k.hot ? 0 : 1 }, k.t);
+          tl.set("#c-needlehot", { autoAlpha: k.hot ? 1 : 0 }, k.t);
+        })(K[j], j);
+      }
+      window.__timelines = window.__timelines || {};
+      window.__timelines["00-chip"] = tl;
+    })();
+  </script>
+</template>

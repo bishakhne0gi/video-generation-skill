@@ -1,0 +1,254 @@
+<template>
+  <style>
+@font-face{font-family:"Fraktur";src:url("assets/fonts/Fraktur-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Anton";src:url("assets/fonts/Anton-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Oswald";src:url("assets/fonts/Oswald-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-900.woff2") format("woff2");font-weight:900;font-style:normal;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-700i.woff2") format("woff2");font-weight:700;font-style:italic;font-display:block}
+@font-face{font-family:"Bodoni";src:url("assets/fonts/Bodoni-900.woff2") format("woff2");font-weight:900;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400i.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --news:#E3DDCE; --news2:#D3CBB8; --scrap:#F2EDE1; --plate:#141210;
+  --ink:#171310; --ink2:#4E4638; --stop:#C1272D; --stopt:#A81E24;
+  background:var(--news); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the .clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* The field OVER-SCANS. A frame whose exit shrinks (the reserved Z-back) would
+   otherwise show the stage edge for the length of the cut. -18% covers the largest
+   travel in a 1920-wide frame and costs nothing on the frames that never shrink. */
+.field{position:absolute;inset:-18%}
+
+/* ---- THE PAGE: newsprint is a HALFTONE, not a flat fill --------------------
+   A 4px dot screen in press black at low alpha. Static, always: a halftone that
+   moves is a moire and it will wreck the encode. */
+.screen{position:absolute;inset:-18%;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px, rgba(23,19,16,.115) 0.85px, transparent 0.9px);
+  background-size:4px 4px}
+/* the press never lays ink perfectly evenly */
+.grain{position:absolute;inset:-18%;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle at 2px 3px, rgba(23,19,16,.08) 1px, transparent 1.1px);
+  background-size:11px 9px}
+
+/* ---- TYPE: eight families, one job each ---------------------------------- */
+.mast{font-family:"Fraktur",serif;font-weight:400;line-height:.95;color:var(--ink)}
+.head{font-family:"Anton",sans-serif;font-weight:400;line-height:.88;
+  letter-spacing:-.005em;text-transform:uppercase;color:var(--ink)}
+.head2{font-family:"Oswald",sans-serif;font-weight:700;line-height:.94;
+  letter-spacing:.005em;text-transform:uppercase;color:var(--ink)}
+.quote{font-family:"Playfair",Georgia,serif;font-weight:900;line-height:1.10;color:var(--ink)}
+.qital{font-family:"Playfair",Georgia,serif;font-weight:700;font-style:italic;line-height:1.14}
+/* Bodoni Moda is loaded at optical size 96 — a DISPLAY cut. Below about 80px its
+   hairline stems vanish in the render and N becomes a bare diagonal, 1 a bare stem.
+   .fig is for BIG figures only; anything smaller uses .head2 (Oswald). Verified by
+   measuring the render, not by looking at the font in a browser. */
+.fig{font-family:"Bodoni",serif;font-weight:900;line-height:.86;color:var(--ink)}
+.body{font-family:"PTSerif",Georgia,serif;font-weight:400;line-height:1.30;color:var(--ink)}
+.bodyb{font-family:"PTSerif",Georgia,serif;font-weight:700;line-height:1.28}
+.bodyi{font-family:"PTSerif",Georgia,serif;font-style:italic;line-height:1.30}
+.mono{font-family:"Courier",monospace;font-weight:400;color:var(--ink)}
+.monob{font-family:"Courier",monospace;font-weight:700}
+.slug{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.20em;
+  text-transform:uppercase;font-size:20px;color:var(--ink2)}
+.red{color:var(--stopt)}      /* red as a LETTER — the only red allowed to be type */
+.faint{color:var(--ink2)}
+.rev{color:var(--scrap)}      /* reversed out of the black plate */
+.rev .faint{color:#A79E8D}
+.rev .slug{color:#A79E8D}
+
+/* ---- RULES: press furniture. Never a glyph. ------------------------------ */
+.rule{position:absolute;background:var(--ink);height:3px}
+.hair{position:absolute;background:var(--ink2);height:1px;opacity:.55}
+.rrule{position:absolute;background:var(--stop);height:5px}
+.revrule{position:absolute;background:var(--scrap);height:3px}
+
+/* ---- A CUTTING ----------------------------------------------------------
+   Four layers, and all four are required. The drop-shadow lives on a SIBLING,
+   not in box-shadow: box-shadow follows the border box, so on a clip-path shape
+   it draws a rectangle behind a torn edge — the single loudest tell in the register. */
+.cutw{position:absolute}                                   /* the slap wrapper */
+.cutsh{position:absolute;inset:0;background:rgba(23,19,16,.34);filter:blur(7px)}
+.cutfib{position:absolute;inset:0;background:#FFFCF4}      /* the torn fibre lip */
+.cutface{position:absolute;inset:0;background:var(--scrap);overflow:hidden}
+.cutbody{position:absolute;inset:0}
+
+/* ---- MISREGISTRATION -----------------------------------------------------
+   The one "effect" in the film, and it is a real press artifact: the spot plate lands
+   a hair off the black one. Carried as a TEXT-SHADOW on the headline itself, never as
+   a duplicated element — a second copy of the words in the same place is two text
+   blocks the layout gate is right to reject, and it doubles what a contrast checker
+   has to reason about. One impression, one fringe. */
+
+/* ---- THE STAMP ---------------------------------------------------------- */
+/* on the black plate the stamp turns CREAM: red type on plate measures 3.20:1 and
+   this register does not put red type on black. */
+.stampw{border-color:var(--scrap)!important;color:var(--scrap)!important}
+.stamp{position:absolute;border:4px solid var(--stop);color:var(--stopt);
+  font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:.10em;
+  text-transform:uppercase;opacity:.88;display:flex;align-items:center;
+  justify-content:center;white-space:nowrap}
+
+/* ---- THE PEN: red strokes drawn on the page. Never a glyph. -------------- */
+/* z-index 5 is load-bearing: a cutting is z-index 2, so a pen with auto z-index
+   draws UNDERNEATH the very thing it is marking and is invisible in the render. */
+.pen{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;overflow:visible;z-index:5}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--stop);stroke-linecap:round;
+  stroke-linejoin:round}
+.penk path,.penk line,.penk polyline{stroke:var(--ink)}
+.penw path,.penw line,.penw polyline{stroke:var(--scrap)}
+
+  </style>
+
+  <div id="root" data-composition-id="12-deadline" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="field" data-layout-allow-overflow style="background:var(--news)"></div><div class="screen" data-layout-allow-overflow ></div><div class="grain" data-layout-allow-overflow></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-kick" class="slug" style="position:absolute;left:120px;top:110px;color:var(--stopt)">2015 &middot; THE REVERSAL</div>
+      <div id="s-rule" class="rrule" style="left:120px;top:146px;width:132px;transform-origin:0% 50%"></div>
+      <div id="s-head" class="head" style="position:absolute;left:120px;top:186px;width:1300px;font-size:84px;z-index:1;text-shadow:3px 2px 0 rgba(193,39,45,.42)">THE ONE RULE<br>THEY OVERTURNED</div>
+      <div id="s-deck" class="body" style="position:absolute;left:122px;top:371.20000000000005px;width:1320px;font-size:31px">Nineteen eighty-four refused a deadline on principle. Every gRPC request carries one in its headers.</div>
+
+      
+      <div id="f12-old" class="cutw" style="left:150px;top:470px;width:748px;height:268px;z-index:2;transform:rotate(-1.4deg)">
+        <div id="f12-old-sh"  class="cutsh"  style="clip-path:polygon(0.0px -0.4px,25.8px -7.6px,51.6px 6.4px,77.4px 0.6px,103.2px 1.1px,129.0px 4.9px,154.8px 4.5px,180.6px 1.8px,206.3px 5.8px,232.1px 1.2px,257.9px -4.4px,283.7px 0.2px,309.5px -4.3px,335.3px -4.0px,361.1px 4.2px,386.9px -0.7px,412.7px -0.3px,438.5px 0.5px,464.3px -4.8px,490.1px 4.9px,515.9px 6.8px,541.7px -8.2px,567.4px -4.4px,593.2px -2.7px,619.0px -4.5px,644.8px -0.9px,670.6px 2.3px,696.4px 3.9px,722.2px 5.1px,748.6px 0.0px,748.3px 26.8px,746.6px 53.6px,756.4px 80.4px,754.2px 107.2px,743.5px 134.0px,742.9px 160.8px,753.0px 187.6px,738.9px 214.4px,753.4px 241.2px,748.0px 268.5px,722.2px 273.1px,696.4px 265.5px,670.6px 268.2px,644.8px 269.2px,619.0px 261.0px,593.2px 265.3px,567.4px 265.4px,541.7px 263.7px,515.9px 269.0px,490.1px 272.6px,464.3px 266.9px,438.5px 272.9px,412.7px 269.1px,386.9px 271.2px,361.1px 271.1px,335.3px 273.0px,309.5px 266.0px,283.7px 271.3px,257.9px 263.8px,232.1px 272.1px,206.3px 266.5px,180.6px 261.6px,154.8px 267.3px,129.0px 273.7px,103.2px 264.9px,77.4px 271.8px,51.6px 263.1px,25.8px 267.6px,-0.9px 268.0px,-2.9px 241.2px,0.5px 214.4px,-8.3px 187.6px,-4.0px 160.8px,-2.8px 134.0px,-5.3px 107.2px,-0.1px 80.4px,3.2px 53.6px,-1.2px 26.8px)"></div>
+        <div id="f12-old-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px 6.0px,26.0px 4.6px,51.9px 1.7px,77.9px 1.3px,103.9px 4.0px,129.8px -2.4px,155.8px -3.0px,181.8px 1.2px,207.7px -3.5px,233.7px -8.8px,259.7px 2.6px,285.6px -4.3px,311.6px -3.1px,337.6px 3.9px,363.5px -3.3px,389.5px 1.9px,415.4px 2.2px,441.4px 4.3px,467.4px -3.5px,493.3px -8.4px,519.3px -4.5px,545.3px 2.8px,571.2px 2.0px,597.2px 4.8px,623.2px 6.3px,649.1px 0.5px,675.1px -0.8px,701.1px 5.6px,727.0px -5.0px,748.1px 0.0px,753.9px 24.8px,747.0px 49.6px,752.9px 74.5px,751.3px 99.3px,754.0px 124.1px,749.6px 148.9px,751.8px 173.7px,761.3px 198.5px,753.9px 223.4px,750.4px 248.2px,753.0px 267.2px,727.0px 276.9px,701.1px 274.4px,675.1px 271.5px,649.1px 275.1px,623.2px 276.6px,597.2px 267.8px,571.2px 276.2px,545.3px 267.8px,519.3px 266.7px,493.3px 265.7px,467.4px 270.0px,441.4px 267.1px,415.4px 277.1px,389.5px 273.7px,363.5px 265.6px,337.6px 270.4px,311.6px 270.3px,285.6px 281.1px,259.7px 276.1px,233.7px 272.8px,207.7px 265.4px,181.8px 275.8px,155.8px 271.9px,129.8px 266.2px,103.9px 275.5px,77.9px 282.1px,51.9px 269.7px,26.0px 267.5px,6.7px 273.0px,-3.7px 248.2px,3.3px 223.4px,0.7px 198.5px,-4.3px 173.7px,0.7px 148.9px,1.1px 124.1px,0.2px 99.3px,3.3px 74.5px,-4.1px 49.6px,-2.3px 24.8px)"></div>
+        <div id="f12-old-fc"  class="cutface" style="background:var(--news2);clip-path:polygon(0.0px -0.4px,25.8px -7.6px,51.6px 6.4px,77.4px 0.6px,103.2px 1.1px,129.0px 4.9px,154.8px 4.5px,180.6px 1.8px,206.3px 5.8px,232.1px 1.2px,257.9px -4.4px,283.7px 0.2px,309.5px -4.3px,335.3px -4.0px,361.1px 4.2px,386.9px -0.7px,412.7px -0.3px,438.5px 0.5px,464.3px -4.8px,490.1px 4.9px,515.9px 6.8px,541.7px -8.2px,567.4px -4.4px,593.2px -2.7px,619.0px -4.5px,644.8px -0.9px,670.6px 2.3px,696.4px 3.9px,722.2px 5.1px,748.6px 0.0px,748.3px 26.8px,746.6px 53.6px,756.4px 80.4px,754.2px 107.2px,743.5px 134.0px,742.9px 160.8px,753.0px 187.6px,738.9px 214.4px,753.4px 241.2px,748.0px 268.5px,722.2px 273.1px,696.4px 265.5px,670.6px 268.2px,644.8px 269.2px,619.0px 261.0px,593.2px 265.3px,567.4px 265.4px,541.7px 263.7px,515.9px 269.0px,490.1px 272.6px,464.3px 266.9px,438.5px 272.9px,412.7px 269.1px,386.9px 271.2px,361.1px 271.1px,335.3px 273.0px,309.5px 266.0px,283.7px 271.3px,257.9px 263.8px,232.1px 272.1px,206.3px 266.5px,180.6px 261.6px,154.8px 267.3px,129.0px 273.7px,103.2px 264.9px,77.4px 271.8px,51.6px 263.1px,25.8px 267.6px,-0.9px 268.0px,-2.9px 241.2px,0.5px 214.4px,-8.3px 187.6px,-4.0px 160.8px,-2.8px 134.0px,-5.3px 107.2px,-0.1px 80.4px,3.2px 53.6px,-1.2px 26.8px)">
+          <div class="cutbody" style="padding:0px">
+          <div class="slug" style="position:absolute;left:32px;top:24px;font-size:14px">FILED 1984 &middot; BIRRELL &amp; NELSON</div>
+          <div class="hair" style="left:32px;top:50px;width:684px"></div>
+          <div class="quote" style="position:absolute;left:32px;top:76px;width:684px;font-size:38px">local procedure calls have no time-out mechanism</div></div>
+        </div>
+      </div>
+
+      <svg id="f12-strike-svg" class="pen " viewBox="0 0 1920 1080"><path id="f12-strike" d="M186,571.9 Q531.0,570.5 876,569.9" stroke-width="7"/></svg>
+      <svg id="f12-strike2-svg" class="pen " viewBox="0 0 1920 1080"><path id="f12-strike2" d="M186,611.2 Q304.0,616.3 422,612.9" stroke-width="7"/></svg>
+      <svg id="f12-arr-svg" class="pen " viewBox="0 0 1920 1080"><path id="f12-arr" d="M922,604 Q982.0,582.0 1042,604 M1020.1,605.5 L1042,604 L1026.2,588.7" stroke-width="6"/></svg>
+
+      
+      <div id="f12-new" class="cutw" style="left:1062px;top:470px;width:708px;height:268px;z-index:2;transform:rotate(1.1deg)">
+        <div id="f12-new-sh"  class="cutsh"  style="clip-path:polygon(0.0px -0.5px,70.8px -1.3px,141.6px -0.7px,212.4px 2.3px,283.2px -0.6px,354.0px -0.1px,424.8px -0.5px,495.6px 2.3px,566.4px 0.6px,637.2px 1.8px,708.1px 0.0px,707.5px 67.0px,705.7px 134.0px,709.3px 201.0px,708.0px 267.7px,637.2px 269.1px,566.4px 267.1px,495.6px 267.0px,424.8px 270.2px,354.0px 268.8px,283.2px 270.2px,212.4px 265.8px,141.6px 266.8px,70.8px 269.4px,0.4px 268.0px,-2.1px 201.0px,2.0px 134.0px,-2.4px 67.0px)"></div>
+        <div id="f12-new-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px -0.1px,71.3px -0.5px,142.6px 2.3px,213.9px 0.6px,285.2px 1.8px,356.5px -0.1px,427.8px 0.5px,499.1px 2.3px,570.4px -1.3px,641.7px 0.3px,714.1px 0.0px,712.1px 68.3px,712.0px 136.5px,715.2px 204.8px,713.0px 273.8px,641.7px 275.2px,570.4px 270.8px,499.1px 271.8px,427.8px 274.4px,356.5px 272.6px,285.2px 275.1px,213.9px 271.0px,142.6px 275.4px,71.3px 272.8px,0.1px 273.0px,-2.2px 204.8px,2.1px 136.5px,1.5px 68.3px)"></div>
+        <div id="f12-new-fc"  class="cutface" style="background:var(--scrap);clip-path:polygon(0.0px -0.5px,70.8px -1.3px,141.6px -0.7px,212.4px 2.3px,283.2px -0.6px,354.0px -0.1px,424.8px -0.5px,495.6px 2.3px,566.4px 0.6px,637.2px 1.8px,708.1px 0.0px,707.5px 67.0px,705.7px 134.0px,709.3px 201.0px,708.0px 267.7px,637.2px 269.1px,566.4px 267.1px,495.6px 267.0px,424.8px 270.2px,354.0px 268.8px,283.2px 270.2px,212.4px 265.8px,141.6px 266.8px,70.8px 269.4px,0.4px 268.0px,-2.1px 201.0px,2.0px 134.0px,-2.4px 67.0px)">
+          <div class="cutbody" style="padding:0px">
+          <div class="slug" style="position:absolute;left:32px;top:24px;font-size:14px">2015 &middot; REQUEST-HEADERS &middot; EVERY CALL</div>
+          <div class="hair" style="left:32px;top:50px;width:644px"></div>
+          <div class="mono" style="position:absolute;left:32px;top:84px;font-size:44px;font-weight:700">grpc-timeout<span class="red">:</span> 1500m</div>
+          <div class="body faint" style="position:absolute;left:32px;top:158px;width:644px;font-size:21px;font-style:italic">If Timeout is omitted a server should assume an infinite timeout.</div></div>
+        </div>
+      </div>
+
+      <div id="f12-st" class="stamp" style="left:560px;top:682px;width:300px;height:66px;font-size:27px;transform:rotate(-4.68deg);z-index:6">OVERTURNED</div>
+
+      <!-- THE RUNNING SYSTEM: the deadline the header just declared, actually running -->
+      <div id="f12-cl" class="slug" style="position:absolute;left:150px;top:800px;font-size:16px">THE DEADLINE, RUNNING</div>
+      <div id="f12-cr" class="hair" style="left:150px;top:826px;width:748px"></div>
+      <div id="f12-cd" style="position:relative;left:150px;top:846px;font-size:96px;height:118px"><span id="f12-cd-0" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">1500 <span style="font-size:44px">ms left</span></span><span id="f12-cd-1" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">1210 <span style="font-size:44px">ms left</span></span><span id="f12-cd-2" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">940 <span style="font-size:44px">ms left</span></span><span id="f12-cd-3" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">700 <span style="font-size:44px">ms left</span></span><span id="f12-cd-4" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">480 <span style="font-size:44px">ms left</span></span><span id="f12-cd-5" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">300 <span style="font-size:44px">ms left</span></span><span id="f12-cd-6" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">160 <span style="font-size:44px">ms left</span></span><span id="f12-cd-7" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">60 <span style="font-size:44px">ms left</span></span><span id="f12-cd-8" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">10 <span style="font-size:44px">ms left</span></span><span id="f12-cd-9" class="fig" style="position:absolute;left:0;top:0;white-space:nowrap">0 <span style="font-size:44px">ms left</span></span></div>
+      <div id="f12-x" class="head2" style="position:absolute;left:150px;top:846px;font-size:52px;color:var(--stopt)">DEADLINE_EXCEEDED &middot; 4</div>
+      <div id="f12-xs" class="body faint" style="position:absolute;left:150px;top:912px;font-size:22px;font-style:italic">the call is over, whatever the server is still doing</div>
+
+      <div id="f12-ul" class="slug" style="position:absolute;left:1062px;top:800px;font-size:16px">TIMEOUTUNIT &middot; ABNF, VERBATIM</div>
+      <div id="f12-ur" class="hair" style="left:1062px;top:826px;width:708px"></div>
+      <div id="f12-un" class="mono" style="position:absolute;left:1062px;top:842px;width:708px;font-size:22px;line-height:34px;display:grid;grid-template-columns:1fr 1fr;gap:2px 30px"><div><span class="red" style="font-weight:700">H</span>&nbsp;&nbsp;Hour</div><div><span class="red" style="font-weight:700">M</span>&nbsp;&nbsp;Minute</div><div><span class="red" style="font-weight:700">S</span>&nbsp;&nbsp;Second</div><div><span class="red" style="font-weight:700">m</span>&nbsp;&nbsp;Millisecond</div><div><span class="red" style="font-weight:700">u</span>&nbsp;&nbsp;Microsecond</div><div><span class="red" style="font-weight:700">n</span>&nbsp;&nbsp;Nanosecond</div></div>
+      <div id="f12-cx" class="bodyi" style="position:absolute;left:1062px;top:952px;width:708px;font-size:20px;color:var(--ink2)">
+        &ldquo;cancellation allows servers to reclaim resources when clients are well-behaved.&rdquo; &mdash; gRPC design principles</div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at FULL opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+
+      // SEAM CARRIER — the kicker and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.42, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-head", { y: 15 }, { y: 0, duration: 0.50, ease: "power3.out" }, 0);
+      tl.fromTo("#s-deck", { autoAlpha: 0, y: 17 }, { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 0.30);
+      gsap.set("#f12-old", { autoAlpha: 0 });
+      tl.set("#f12-old", { autoAlpha: 1 }, 0.90);
+      gsap.set("#f12-old", { rotation: -9.92, scale: 1.13, y: -34 });
+      tl.fromTo("#f12-old", { rotation: -9.92, scale: 1.13, y: -34 }, { rotation: -1.4, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 0.90);
+      gsap.set("#f12-old-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f12-old-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 0.933);
+      gsap.set("#f12-new", { autoAlpha: 0 });
+      tl.set("#f12-new", { autoAlpha: 1 }, 2.60);
+      gsap.set("#f12-new", { rotation: 11.92, scale: 1.13, y: -34 });
+      tl.fromTo("#f12-new", { rotation: 11.92, scale: 1.13, y: -34 }, { rotation: 1.1, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 2.60);
+      gsap.set("#f12-new-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f12-new-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 2.633);
+      var pen_f12arr_d = anime.svg.createDrawable("#f12-arr");
+      var pen_f12arr = anime.animate(pen_f12arr_d, { draw: ["0 0", "0 1"], duration: 440, ease: anime.steps(7), autoplay: false });
+      var P_pen_f12arr = { p: 0 };
+      tl.to(P_pen_f12arr, { p: 1, duration: 0.44, ease: "none", onUpdate: function () { pen_f12arr.seek(P_pen_f12arr.p * pen_f12arr.duration); } }, 3.30);
+      var pen_f12strike_d = anime.svg.createDrawable("#f12-strike");
+      var pen_f12strike = anime.animate(pen_f12strike_d, { draw: ["0 0", "0 1"], duration: 400, ease: anime.steps(6), autoplay: false });
+      var P_pen_f12strike = { p: 0 };
+      tl.to(P_pen_f12strike, { p: 1, duration: 0.40, ease: "none", onUpdate: function () { pen_f12strike.seek(P_pen_f12strike.p * pen_f12strike.duration); } }, 3.90);
+      var pen_f12strike2_d = anime.svg.createDrawable("#f12-strike2");
+      var pen_f12strike2 = anime.animate(pen_f12strike2_d, { draw: ["0 0", "0 1"], duration: 220, ease: anime.steps(3), autoplay: false });
+      var P_pen_f12strike2 = { p: 0 };
+      tl.to(P_pen_f12strike2, { p: 1, duration: 0.22, ease: "none", onUpdate: function () { pen_f12strike2.seek(P_pen_f12strike2.p * pen_f12strike2.duration); } }, 4.10);
+      gsap.set("#f12-st", { rotation: -4.68, scale: 1.30, autoAlpha: 0 });
+      tl.fromTo("#f12-st", { rotation: -4.68, scale: 1.30, autoAlpha: 0 }, { rotation: -4.68, scale: 1, autoAlpha: 0.88, duration: 0.10, ease: "steps(2)" }, 4.36);
+
+      gsap.set("#f12-ul", { autoAlpha: 0 }); gsap.set("#f12-un", { autoAlpha: 0 });
+      gsap.set("#f12-ur", { scaleX: 0, transformOrigin: "0% 50%" });
+      tl.to("#f12-ul", { autoAlpha: 1, duration: 0.26 }, 5.10);
+      tl.to("#f12-ur", { scaleX: 1, duration: 0.40, ease: "power3.out" }, 5.18);
+      tl.to("#f12-un", { autoAlpha: 1, duration: 0.34 }, 5.34);
+      gsap.set("#f12-cx", { autoAlpha: 0 });
+      tl.to("#f12-cx", { autoAlpha: 1, duration: 0.32 }, 10.20);
+
+      // and then the deadline runs down, on screen, to the status code it produces
+      gsap.set("#f12-cl", { autoAlpha: 0 });
+      gsap.set("#f12-cr", { scaleX: 0, transformOrigin: "0% 50%" });
+      tl.to("#f12-cl", { autoAlpha: 1, duration: 0.26 }, 6.20);
+      tl.to("#f12-cr", { scaleX: 1, duration: 0.40, ease: "power3.out" }, 6.28);
+      gsap.set("#f12-cd", { autoAlpha: 0 });
+      tl.to("#f12-cd", { autoAlpha: 1, duration: 0.20 }, 6.44);
+      for (var _rf12cd = 1; _rf12cd < 10; _rf12cd++) gsap.set("#f12-cd-" + _rf12cd, { autoAlpha: 0 });
+      tl.set("#f12-cd-1", { autoAlpha: 1 }, 6.66);
+      tl.set("#f12-cd-0", { autoAlpha: 0 }, 6.66);
+      tl.set("#f12-cd-2", { autoAlpha: 1 }, 6.96);
+      tl.set("#f12-cd-1", { autoAlpha: 0 }, 6.96);
+      tl.set("#f12-cd-3", { autoAlpha: 1 }, 7.26);
+      tl.set("#f12-cd-2", { autoAlpha: 0 }, 7.26);
+      tl.set("#f12-cd-4", { autoAlpha: 1 }, 7.56);
+      tl.set("#f12-cd-3", { autoAlpha: 0 }, 7.56);
+      tl.set("#f12-cd-5", { autoAlpha: 1 }, 7.86);
+      tl.set("#f12-cd-4", { autoAlpha: 0 }, 7.86);
+      tl.set("#f12-cd-6", { autoAlpha: 1 }, 8.16);
+      tl.set("#f12-cd-5", { autoAlpha: 0 }, 8.16);
+      tl.set("#f12-cd-7", { autoAlpha: 1 }, 8.46);
+      tl.set("#f12-cd-6", { autoAlpha: 0 }, 8.46);
+      tl.set("#f12-cd-8", { autoAlpha: 1 }, 8.76);
+      tl.set("#f12-cd-7", { autoAlpha: 0 }, 8.76);
+      tl.set("#f12-cd-9", { autoAlpha: 1 }, 9.06);
+      tl.set("#f12-cd-8", { autoAlpha: 0 }, 9.06);
+      gsap.set("#f12-x", { autoAlpha: 0, scale: 1.24 });
+      tl.set("#f12-cd", { autoAlpha: 0 }, 9.42);
+      tl.fromTo("#f12-x", { autoAlpha: 0, scale: 1.24 }, { autoAlpha: 1, scale: 1, duration: 0.12, ease: "steps(2)" }, 9.42);
+      gsap.set("#f12-xs", { autoAlpha: 0 });
+      tl.to("#f12-xs", { autoAlpha: 1, duration: 0.30 }, 9.70);
+      // SEAM EXIT — Z-BACK. Recedes 1.0 -> 0.60. The field over-scans, or this
+      // shows the stage edge for the length of the cut.
+      tl.to("#stage", { scale: 0.60, duration: 0.52, ease: "power4.in" }, 11.36);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["12-deadline"] = tl;
+    })();
+  </script>
+</template>

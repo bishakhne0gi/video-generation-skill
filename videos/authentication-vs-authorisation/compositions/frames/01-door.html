@@ -1,0 +1,202 @@
+<template>
+  <style>
+    /* ---- the three families, vendored (assets/fonts) ---- */
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-600.woff2") format("woff2"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden;
+      container-type: size;
+      /* Replicate tokens (frame.md is the source of truth) */
+      --canvas: #f9f7f3; --bone: #f3f0e8; --card: #ffffff;
+      --dark: #202020; --deep: #000000;
+      --hair: rgba(32,32,32,0.12); --hair-strong: #202020;
+      --primary: #ea2804; --glow: #ff6a3d;
+      --ink: #202020; --body: #3a3a3a; --charcoal: #575757; --mute: #646464;
+      --on-dark: #fcfcfc;
+    }
+
+    /* the full-bleed ground rides a .clip layer, never #root */
+    #f1-ground { position: absolute; inset: 0; background: var(--canvas); }
+
+    #f1-stage { position: absolute; inset: 0; }
+
+    /* ---------- the photograph (the pull-back subject) ---------- */
+    #f1-photowrap { position: absolute; inset: 0; overflow: hidden; }
+    /* transform-origin sits on the door reader, so the pull-back reveals outward from it */
+    #f1-photo { position: absolute; inset: 0; transform-origin: 18.5% 43.5%; }
+    /* A focus pull, built as two stacked plates cross-fading on OPACITY — `filter` is not
+       on the animatable allowlist, so an animated blur() is not seek-safe. The soft plate
+       also does real work: at the macro end we are upsampling the source ~1.5x, and a
+       shallow depth of field is the honest way to render that rather than a soft image. */
+    .f1-plate-img {
+      position: absolute; inset: -4%;
+      background: url("public/img/corridor.jpg") center/cover no-repeat;
+    }
+    #f1-photo-soft { filter: blur(9px) saturate(1.06); }
+    /* the invented reader — it must change state on cue, which a photograph cannot */
+    #f1-reader {
+      position: absolute; left: 300px; top: 408px; width: 64px; height: 100px;
+      border-radius: 8px; background: #1b1a18;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+    }
+    #f1-reader-slot {
+      position: absolute; left: 12px; top: 66px; width: 40px; height: 4px;
+      border-radius: 9999px; background: rgba(252,252,252,0.34);
+    }
+    #f1-led {
+      position: absolute; left: 26px; top: 20px; width: 12px; height: 12px;
+      border-radius: 9999px; background: #d99a2b;
+    }
+    #f1-ledglow {
+      position: absolute; left: 14px; top: 8px; width: 36px; height: 36px;
+      border-radius: 9999px; background: radial-gradient(circle, rgba(217,154,43,0.55) 0%, rgba(217,154,43,0) 70%);
+    }
+
+    /* ---------- annotation tags on the photograph (dark pills = legible by construction) ---------- */
+    .f1-tag {
+      position: absolute; display: flex; align-items: center; gap: 10px;
+      padding: 9px 20px; border-radius: 9999px; background: var(--dark);
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--on-dark);
+      white-space: nowrap;
+    }
+    .f1-tag b { font-weight: 700; color: var(--glow); }
+    .f1-lead { position: absolute; background: var(--dark); }
+
+    /* ---------- the cream plate (colour-blocking, not a scrim) ---------- */
+    #f1-plate {
+      position: absolute; left: 1100px; top: 0; width: 820px; height: 1080px;
+      background: var(--canvas); border-left: 1px solid var(--hair);
+    }
+    #f1-kicker {
+      position: absolute; left: 1180px; top: 148px;
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--charcoal);
+    }
+    #f1-rule { position: absolute; left: 1180px; top: 196px; width: 68px; height: 2px; background: var(--primary); transform-origin: left center; }
+    #f1-head {
+      position: absolute; left: 1180px; top: 372px; width: 640px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+      font-size: 100px; line-height: 1.0; letter-spacing: -0.025em; color: var(--ink);
+    }
+    #f1-head span { display: block; }
+    #f1-head .hot { color: var(--primary); }
+    #f1-sub {
+      position: absolute; left: 1180px; top: 664px; width: 620px;
+      font-family: "Inter", sans-serif; font-weight: 400; font-size: 28px;
+      line-height: 1.5; color: var(--body);
+    }
+    #f1-sub em { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-style: normal; color: var(--ink); }
+
+    /* ---------- the continuity object: the HTTP status, pinned ---------- */
+    #f1-chip {
+      position: absolute; right: 80px; top: 72px; display: flex; align-items: center; gap: 12px;
+      padding: 10px 22px; border-radius: 9999px;
+      background: var(--card); border: 1px solid var(--hair);
+      font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 500; color: var(--charcoal);
+    }
+    #f1-chip i { width: 9px; height: 9px; border-radius: 9999px; background: #bbbbbb; display: block; }
+    #f1-chip u { text-decoration: none; font-size: 15px; font-weight: 700; letter-spacing: 0.14em; color: var(--mute); }
+    #f1-chip b { font-weight: 500; color: var(--mute); }
+
+    /* ---------- grain (catalog: grain-overlay), re-seeded per frame ---------- */
+    #f1-grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.05; mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    }
+    #f1-vig { position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 78% 72% at 42% 46%, rgba(32,32,32,0) 55%, rgba(32,32,32,0.16) 100%); }
+  </style>
+
+  <div id="root" data-composition-id="01-door" data-width="1920" data-height="1080">
+    <div id="f1-ground" class="clip" data-start="0" data-duration="8.2" data-track-index="0"></div>
+
+    <div id="f1-stage">
+      <div id="f1-photowrap">
+        <div id="f1-photo" data-layout-allow-overflow>
+          <div class="f1-plate-img" id="f1-photo-sharp"></div>
+          <div class="f1-plate-img" id="f1-photo-soft"></div>
+          <div id="f1-reader">
+            <div id="f1-ledglow"></div>
+            <div id="f1-led"></div>
+            <div id="f1-reader-slot"></div>
+          </div>
+        </div>
+        <div id="f1-vig"></div>
+      </div>
+
+      <div class="f1-lead" id="f1-lead1" style="left: 372px; top: 462px; width: 108px; height: 1px;"></div>
+      <div class="f1-tag" id="f1-tag1" style="left: 480px; top: 442px;">The card<b>&rarr;</b>who you are</div>
+
+      <div class="f1-lead" id="f1-lead2" style="left: 700px; top: 520px; width: 1px; height: 176px;"></div>
+      <div class="f1-tag" id="f1-tag2" style="left: 560px; top: 700px;">The door<b>&rarr;</b>what you may open</div>
+
+      <div id="f1-plate">
+        <div id="f1-chip"><i></i><u>HTTP</u><b>&mdash;&mdash;</b></div>
+      </div>
+      <div id="f1-kicker">01 / The door</div>
+      <div id="f1-rule"></div>
+      <div id="f1-head"><span>Two checks,</span><span class="hot">not one.</span></div>
+      <div id="f1-sub">A hotel gives you <em>both</em>, in two different places, and only one of them is at the front desk.</div>
+
+      <div id="f1-grain"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // ---- Scene 1 (0.0–1.9s) macro on the reader; the pull-back has already begun.
+      // ONE unbroken decelerating curve for the whole reveal — the blueprint's signature
+      // move. Never restarted, never eased in two pieces.
+      tl.fromTo("#f1-photo", { scale: 2.9 }, { scale: 1.0, duration: 4.4, ease: "power2.out" }, 0);
+      // the focus resolves as the camera pulls back — soft plate out, sharp plate in
+      tl.fromTo("#f1-photo-soft", { autoAlpha: 1 }, { autoAlpha: 0, duration: 2.1, ease: "power1.inOut" }, 1.5);
+      // the LED settles amber -> green as the VO reaches "keycard"
+      tl.to("#f1-led",     { backgroundColor: "#2b9a66", duration: 0.5, ease: "power2.out" }, 1.35);
+      tl.to("#f1-ledglow", { opacity: 0.75, duration: 0.5, ease: "power2.out" }, 1.35);
+
+      // ---- Scene 2 (1.9–4.4s) the corridor resolves around it. Nothing is ADDED here;
+      // the frame is revealing, which is this shape's entire engine.
+
+      // ---- Scene 3 (4.4–6.6s) the camera locks; the layout resolves and the tags land.
+      // The cream plate wipes in from the right — colour-blocking, so the type sits on
+      // cream rather than on a scrim over the photograph.
+      tl.fromTo("#f1-plate", { x: 830 }, { x: 0, duration: 0.62, ease: "power3.out" }, 4.28);
+      tl.fromTo("#f1-kicker", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.42, ease: "power3.out" }, 4.62);
+      tl.fromTo("#f1-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.46, ease: "power3.out" }, 4.74);
+      tl.fromTo("#f1-chip", { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 0.38, ease: "back.out(1.5)" }, 4.86);
+
+      // tag 1 on "proves who you are" — the lead line draws first, the pill follows it
+      tl.fromTo("#f1-lead1", { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.3, ease: "power2.out" }, 4.52);
+      tl.fromTo("#f1-tag1", { autoAlpha: 0, x: -18 }, { autoAlpha: 1, x: 0, duration: 0.4, ease: "power3.out" }, 4.7);
+
+      // ---- Scene 4 (6.6–8.2s) tag 2 on "which doors open", then the display payoff.
+      tl.fromTo("#f1-lead2", { scaleY: 0, transformOrigin: "top center" }, { scaleY: 1, duration: 0.32, ease: "power2.out" }, 5.62);
+      tl.fromTo("#f1-tag2", { autoAlpha: 0, y: -16 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out" }, 5.8);
+
+      // the hero line lands last, one clause per beat (staged, never as a block)
+      tl.fromTo("#f1-head span:nth-child(1)", { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 6.28);
+      tl.fromTo("#f1-head span:nth-child(2)", { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 6.52);
+      tl.fromTo("#f1-sub", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 6.94);
+
+      // then STILL. No continuing push, no drift — the LED holds green and that is all.
+
+      // ---- SEAM 1 -> 2 : cut-the-curve LEFT (the current). This frame owns the EXIT half;
+      // frame 02 enters from the right at matched velocity. Exit power4.in so the cut lands
+      // while the stage is still accelerating away.
+      tl.to("#f1-stage", { x: -232, duration: 0.34, ease: "power4.in" }, 7.86);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["01-door"] = tl;
+    })();
+  </script>
+</template>

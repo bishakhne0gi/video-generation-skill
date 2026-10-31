@@ -1,0 +1,99 @@
+{
+  "_": "EP 11 — PagedAttention / vLLM. THE TRAVELLED-CANVAS EPISODE: there is one world (a memory map) and the camera lives inside it for the whole film. Beats are camera positions with annotation layers, not screens that replace each other — which is why nearly every `enter` is a cut. The two accents (flash on the title, dip-black into the honest limitation) are the only two moments continuity deliberately breaks. Every figure is sourced in references/ep11-facts.md; nothing here is remembered or rounded for effect. Display + technical face is Geist / Geist Mono, chosen against IBM Plex, Space Grotesk and Poppins on a rendered specimen — the metrics-matched pair matters because almost every beat sets a headline directly against a number.",
+  "series": "Ship It",
+  "episode": "EP 11",
+  "title": "Your chatbot doesn't stutter because of a trick from 1962.",
+  "titleAccent": "1962",
+  "subtitle": "Eight hundred kilobytes a token, most of it thrown away, and an operating-system idea older than the GPU",
+  "hook": "“A GPU runs out of memory long before it runs out of maths.”",
+  "cta": "Read the PagedAttention paper · SOSP 2023",
+  "next": "Next: the regular expression that broke the internet",
+  "theme": "white-light",
+  "fps": 30,
+
+  "_voice": "Series voice, unchanged from EP10: eleven_multilingual_v2, which CANNOT perform audio tags, so 'directive and unmodulated' is structural rather than a setting that drifts. House settings — stability 0.72, style 0.05. The authority is in the writing: imperatives, second person, front-loaded subjects, and a full stop where a weaker script would use a comma.",
+  "voice": "MjAff57sfV5MRLNOeIpA",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1111,
+
+  "_music": "84 bpm, DECLARED not detected — we generate the bed ourselves, so the grid is exact by construction (the synth pads detect at only 0.6 confidence, correctly). `volume` is the ducked level under narration; `open` is where the bed sits when nobody is speaking. Beats 2 and 11 carry no VO on purpose: those are where the score gets to be music.",
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.15,
+    "open": 0.34,
+    "startAt": 14,
+    "mood": "calm-focus",
+    "bpm": 84
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+
+  "_vo": "12 spoken lines across 14 beats. Beat 2 (title) and beat 11 (the re-pack) are SILENT by design — the signature move earns a held silence with one thunk under it, and the bed lifts a full 7dB in both. Every figure is spelled as words, never digits. Eight of twelve lines are directive (second person or an instruction verb up front).",
+  "vo": [
+    { "scene": 1, "text": "Watch a graphics card serve a language model.\nIt is not thinking. Most of the time… it is waiting." },
+    { "scene": 2, "text": "Here is what nobody tells you.\nA GPU runs out of MEMORY… long before it runs out of maths." },
+    { "scene": 3, "text": "Every token you generate leaves keys and values behind. On a thirteen billion parameter model… eight hundred kilobytes each." },
+    { "scene": 4, "text": "Chapter one. The cache." },
+    { "scene": 5, "text": "Look at the card.\nTwenty six gigabytes… is the model itself.\nThirty percent is all the cache gets." },
+    { "scene": 6, "text": "Now watch that disappear. Reserved space. Rounding up to the longest answer. Gaps. Only a third holds real tokens." },
+    { "scene": 7, "text": "Chapter two. The trick." },
+    { "scene": 8, "text": "This is paging.\nCut the cache into fixed blocks.\nKeep a table that says where each block really lives." },
+    { "scene": 9, "text": "Two answers to one prompt share their blocks until they differ. Copy on write. Fifty five percent saved." },
+    { "scene": 10, "text": "Count the result.\nTwo to four times the throughput of the best serving systems… Half the graphics cards." },
+    { "scene": 11, "text": "Do not oversell this. Paging buys you memory, not intelligence. The model is no smarter… only cheaper to serve." },
+    { "scene": 12, "text": "Memory was the bottleneck. Nineteen sixty two already had the answer. Next: the regular expression that broke the internet." }
+  ],
+
+  "_shots": "Five jobs. A travelled-canvas episode carries itself on the world, so this is well under the usual ten to twenty: one cold open, TWO theme elements (the surfaces the graphics sit on, one per value act), one saturated payoff, one close. A sixth job — the morph bridge into the world — is generated later from rendered Remotion stills, once there are frames to bridge between.",
+  "shots": [
+    {
+      "id": "ep11_open",
+      "prompt": "Cinematic extreme macro gliding slowly across the surface of a computer accelerator card, dense black heatsink fins and gold contact pins, cool white key light with one soft blue rim, shallow depth of field, slow dolly right, volumetric haze, photoreal, 24fps film look",
+      "duration": 5,
+      "mode": "pro",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep11_tex_paper",
+      "_": "THEME ELEMENT, acts 1 and 3 (the pale field). Material, not scene: locked off, nothing resolves, no subject. Runs under the graphics via Ambient at 0.05-0.12 on this light theme.",
+      "prompt": "Extreme macro of pale off-white paper fibre under raking light, slow continuous drift, a soft shadow travelling slowly across a near-white field, locked-off camera, no subject, abstract material study, photoreal, shallow depth of field",
+      "duration": 10,
+      "mode": "std",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep11_tex_dark",
+      "_": "THEME ELEMENT, act 2 (the waste). The value arc goes near-black there, so the surface has to change with it.",
+      "prompt": "Fine dust drifting slowly through a single shaft of pale light in a dark room, slow continuous motion, near-black field, faint cool highlights, locked-off camera, no subject, abstract material study, photoreal",
+      "duration": 10,
+      "mode": "std",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep11_payoff",
+      "_": "The one saturated full-bleed. Arrives by ScaleFrom, pushed into from a node, with the graph labels still overlaid.",
+      "prompt": "Wide cinematic shot down an illuminated data centre aisle, rows of servers glowing cool blue and white, volumetric haze, slow dolly forward, anamorphic lens flare, photoreal, 24fps film look",
+      "duration": 5,
+      "mode": "pro",
+      "aspect": "16:9"
+    },
+    {
+      "id": "ep11_close",
+      "_": "The end card's surface. Quiet, warm, almost no motion — the film has stopped arguing.",
+      "prompt": "Soft dawn light falling through a window onto an empty desk with a dark switched-off monitor, dust in the air, warm low-contrast light, static locked-off camera, photoreal, shallow depth of field",
+      "duration": 5,
+      "mode": "std",
+      "aspect": "16:9"
+    }
+  ]
+}

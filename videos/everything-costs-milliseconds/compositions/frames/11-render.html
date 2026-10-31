@@ -1,0 +1,162 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="11-render" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/inspection.jpg');opacity:0.26"></div>
+  <div class="scrim" style="background:radial-gradient(80% 92% at 52% 34%, rgba(9,20,19,.24) 0%, rgba(9,20,19,.80) 60%, rgba(9,20,19,.94) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:112px">09 · RENDERING STRATEGY</div>
+      <div id="s-rule" class="rule" style="left:118px;top:150px;width:96px;transform-origin:0% 50%"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:118px;top:176px;width:1180px;font-size:82px">Where the HTML<br>comes from.</div>
+      <div id="s-lead" class="lead" style="position:absolute;left:120px;top:372px;width:840px;font-size:31px">Every strategy trades server time against client time. Client rendering is the only one that makes the user pay for your framework before they see a word.</div>
+
+      <div id="r-panel" class="panel" style="left:118px;top:530px;width:1684px;height:412px"></div>
+      <div id="r-head" style="position:absolute;left:158px;top:556px;width:1604px;height:30px">
+        <span class="mono" style="position:absolute;left:0;top:0;font-size:15px;letter-spacing:.16em;opacity:.55">STRATEGY</span>
+        <span class="mono" style="position:absolute;left:392px;top:0;font-size:15px;letter-spacing:.16em;opacity:.55">TTFB &rarr; PAINT &rarr; INTERACTIVE</span>
+        <span class="mono" style="position:absolute;right:0;top:0;font-size:15px;letter-spacing:.16em;opacity:.55">TIME TO INTERACTIVE</span></div>
+      <div id="r-rows" style="position:absolute;left:158px;top:600px;width:1604px;height:324px"></div>
+      <div id="r-sweep" style="position:absolute;left:118px;top:530px;width:370px;height:412px;
+    background:linear-gradient(90deg,rgba(176,228,204,0),rgba(176,228,204,.16),rgba(176,228,204,0));pointer-events:none"></div>
+      <div id="r-pick" style="position:absolute;left:158px;top:962px;width:1500px">
+        <div class="mono" style="font-size:19px;color:var(--emerald-lit)">
+          you are almost never choosing one &mdash;
+          <span style="color:var(--mint);font-weight:700">static for the marketing page, streaming for the product page, islands for the widgets</span></div></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — ACT BREAK lift. Rises from below through a softer scale curve
+      // than the travel, so the pull-back reads as the camera stepping up and over.
+      tl.fromTo("#stage", { y: 372, scale: 0.84 }, { y: 0, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#stage", { scale: 0.84 }, { scale: 1, duration: 0.78, ease: "power2.out" }, 0);
+      // SEAM CARRIER — the box tag and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up: the seam gate measures
+      // MOTION, so a station whose content fades in at 0.1s passes the gate while visibly
+      // entering on an empty frame. Only the rule and the lead line are staged.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30000000000000004);
+      tl.fromTo("#r-panel", { autoAlpha: 0, scale: 0.98 }, { autoAlpha: 1, scale: 1, duration: 0.56, ease: "power3.out" }, 0.10);
+      tl.fromTo("#r-head",  { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.40 }, 0.30);
+      var R = [{"n":"Static (SSG)","ttfb":0.04,"paint":0.32,"inter":0.48,"note":"prebuilt, cached at the edge"},{"n":"Streaming SSR","ttfb":0.18,"paint":0.54,"inter":1.36,"note":"shell first, data flushed after"},{"n":"Islands","ttfb":0.16,"paint":0.5,"inter":0.74,"note":"only the interactive parts hydrate"},{"n":"Client rendering","ttfb":0.06,"paint":1.92,"inter":2.84,"note":"framework first, content later","hot":true}], wrap = document.querySelector("#r-rows"), S = 300;
+      for (var i = 0; i < R.length; i++) {
+        var r = R[i], col = r.hot ? "var(--brass)" : "var(--emerald-lit)";
+        var row = document.createElement("div");
+        row.style.cssText = "position:absolute;left:0;top:" + (i*80) + "px;width:1604px;height:68px";
+        row.innerHTML =
+          '<span style="position:absolute;left:0;top:2px;font-family:Archivo,sans-serif;font-weight:500;font-size:26px;color:' +
+            (r.hot ? "var(--brass)" : "var(--mint)") + '">' + r.n + '</span>' +
+          '<span style="position:absolute;left:0;top:36px;font-family:JBMono,monospace;font-size:15px;color:var(--mint);opacity:.42">' + r.note + '</span>' +
+          '<div class="seg s1" style="position:absolute;left:392px;top:14px;height:22px;border-radius:4px;transform-origin:0% 50%;' +
+            'width:' + Math.max(r.ttfb*S, 8) + 'px;background:rgba(64,138,113,.55)"></div>' +
+          '<div class="seg s2" style="position:absolute;left:' + (396 + r.ttfb*S) + 'px;top:14px;height:22px;border-radius:4px;' +
+            'transform-origin:0% 50%;width:' + ((r.paint-r.ttfb)*S) + 'px;background:rgba(64,138,113,.85)"></div>' +
+          '<div class="seg s3" style="position:absolute;left:' + (400 + r.paint*S) + 'px;top:14px;height:22px;border-radius:4px;' +
+            'transform-origin:0% 50%;width:' + ((r.inter-r.paint)*S) + 'px;background:' +
+            (r.hot ? "rgba(232,161,60,.85)" : "rgba(176,228,204,.42)") + '"></div>' +
+          '<span style="position:absolute;right:0;top:8px;font-family:JBMono,monospace;font-size:30px;font-weight:700;color:' +
+            col + '">' + r.inter.toFixed(2) + 's</span>';
+        wrap.appendChild(row);
+        tl.fromTo(row, { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: 0.44, ease: "power3.out" }, 0.80 + i*0.62);
+        var segs = row.querySelectorAll(".seg");
+        for (var s = 0; s < segs.length; s++)
+          tl.fromTo(segs[s], { scaleX: 0 }, { scaleX: 1, duration: 0.36, ease: "power2.out" }, 0.92 + i*0.62 + s*0.16);
+      }
+      // the legend arrives last, once the shapes have already made the point.
+      var leg = document.createElement("div");
+      leg.style.cssText = "position:absolute;left:392px;top:300px;font-family:JBMono,monospace;font-size:14px;letter-spacing:.12em;color:var(--mint);opacity:.5";
+      leg.innerHTML = "&#9632; server &nbsp;&#9632; paint &nbsp;&#9632; hydrate";
+      wrap.appendChild(leg);
+      tl.fromTo(leg, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.40 }, 3.90);
+      // the panel is read back row by row, the losing rows dim, and the two that survive
+      // stay lit. The beat resolves into an answer rather than stopping on a table.
+      tl.fromTo("#r-pick", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 6.60);
+      var rows2 = document.querySelectorAll("#r-rows > div");
+      tl.to(rows2[3], { autoAlpha: 0.30, duration: 0.60, ease: "power2.out" }, 5.10);
+      tl.to(rows2[1], { autoAlpha: 0.42, duration: 0.60, ease: "power2.out" }, 5.80);
+      tl.to(rows2[0], { scale: 1.012, duration: 0.50, ease: "power2.out" }, 6.50);
+      tl.to(rows2[2], { scale: 1.012, duration: 0.50, ease: "power2.out" }, 7.10);
+      tl.to(rows2[1], { autoAlpha: 1.0, duration: 0.70, ease: "power2.out" }, 7.95);
+      tl.fromTo("#r-sweep", { x: 0, autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, 4.6);
+      tl.fromTo("#r-sweep", { x: 0 }, { x: 1314, duration: 2.3, ease: "none", repeat: 1 }, 4.6);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 9.66);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["11-render"] = tl;
+    })();
+  </script>
+</template>

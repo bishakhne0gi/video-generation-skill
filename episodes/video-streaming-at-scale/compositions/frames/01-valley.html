@@ -1,0 +1,142 @@
+<template>
+  <style>
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-900.woff2") format("woff2"); font-weight: 900; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --paper: #F4EBD9; --paper-warm: #FBF6EA; --cloud: #FDFBF4;
+      --ink: #3B2F2A; --ink-soft: #6B5A4E;
+      --sky: #7FB4DC; --sky-deep: #2E5F8A;
+      --meadow: #7FA653; --meadow-deep: #3F6B34;
+      --terracotta: #C4552F; --terracotta-lit: #EE8557; --terracotta-ink: #9E4324;
+      --night: #1E2A38; --night-mute: #A8BACB;
+      background: var(--sky-deep);
+    }
+
+    /* the painted ground. #f1-cam carries the pull-back; #f1-wind carries the register's
+       one licensed idle motion. Two wrappers so the camera scale and the wind drift never
+       multiply each other's offsets. */
+    #f1-cam { position: absolute; inset: 0; transform-origin: 46% 62%; }
+    #f1-wind { position: absolute; inset: -18%; }
+    #f1-plate {
+      position: absolute; inset: 0;
+      background: url("public/img/valley-dawn.jpg") center/cover no-repeat;
+    }
+
+    /* the cold-open lines sit over the dawn sky, where --cloud measured 2.81:1 — under the
+       3:1 large-text floor. A scrim anchored to the type block, as everywhere else in the
+       film; picking a type colour that survived both ends of the plate would mean grey. */
+    #f1-scrim {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 44% 44% at 26% 26%, rgba(24,34,46,0.72) 0%, rgba(24,34,46,0.40) 52%, rgba(24,34,46,0) 78%);
+    }
+
+    #f1-stage { position: absolute; inset: 0; }
+
+    /* the window lights: one dot per house, warm, blooming in a staggered cascade.
+       Positions are hand-placed against the plate's own valley floor. */
+    .f1-lamp {
+      position: absolute; width: 7px; height: 7px; border-radius: 999px;
+      background: #FFD9A0; box-shadow: 0 0 11px 4px rgba(255,196,120,0.62);
+    }
+
+    /* type sits in the sky's quiet upper-left third, where the plate is flat cerulean.
+       cloud on that region measures well past AA; the shadow is for the few frames the
+       pull-back has cloud detail behind the line. */
+    .f1-line {
+      position: absolute; left: 132px;
+      font-family: "Zen Maru Gothic", sans-serif; font-weight: 900;
+      font-size: 104px; line-height: 0.98; letter-spacing: -0.02em;
+      color: var(--cloud); text-shadow: 0 6px 34px rgba(30,42,56,0.52), 0 2px 6px rgba(30,42,56,0.34);
+      white-space: nowrap;
+    }
+    #f1-l1 { top: 126px; }
+    #f1-l2 { top: 258px; }
+    #f1-l3 {
+      position: absolute; left: 136px; top: 408px;
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 500;
+      font-size: 40px; line-height: 1.4; letter-spacing: 0;
+      color: var(--cloud); text-shadow: 0 4px 22px rgba(30,42,56,0.62);
+      white-space: nowrap;
+    }
+
+    #f1-grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.055; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='170'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='170' height='170' filter='url(%23n)'/></svg>");
+    }
+  </style>
+
+  <div id="root" data-composition-id="01-valley" data-width="1920" data-height="1080">
+    <div id="f1-clip" class="clip" data-start="0" data-duration="9.0" data-track-index="0" data-layout-allow-overflow>
+      <div id="f1-stage">
+        <div id="f1-cam">
+          <div id="f1-wind"><div id="f1-plate"></div></div>
+        </div>
+        <div id="f1-scrim"></div>
+        <div id="f1-lamps"></div>
+        <div id="f1-l1" class="f1-line">One film.</div>
+        <div id="f1-l2" class="f1-line">A million people.</div>
+        <div id="f1-l3">All pressing play inside the same second.</div>
+        <div id="f1-grain"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // ---- the window lights. Deterministic placement (no Math.random): a fixed lattice
+      // over the valley floor, jittered by a closed-form hash so it reads as scattered
+      // houses rather than as a grid. 140 lamps.
+      var host = document.getElementById("f1-lamps");
+      var lamps = [];
+      for (var i = 0; i < 140; i++) {
+        var h = (i * 2654435761) % 4294967296;
+        var jx = ((h >>> 8) & 255) / 255, jy = ((h >>> 16) & 255) / 255;
+        var col = i % 20, row = (i / 20) | 0;
+        // valley floor only: x across the full width, y in the lower 42% of frame
+        var x = 40 + col * 94 + (jx - 0.5) * 78;
+        var y = 618 + row * 62 + (jy - 0.5) * 54;
+        var d = document.createElement("div");
+        d.className = "f1-lamp";
+        d.style.left = x + "px"; d.style.top = y + "px";
+        d.style.opacity = "0";
+        host.appendChild(d); lamps.push(d);
+      }
+
+      // Scene 1 (0.0-2.4s) + Scene 2: ONE unbroken decelerating pull-back, 1.42 -> 1.0.
+      // The plate is at full opacity from frame 0 — the frame never enters blank.
+      tl.fromTo("#f1-cam", { scale: 1.42 }, { scale: 1.0, duration: 5.0, ease: "power2.out" }, 0);
+
+      // the register's wind: one slow one-way drift, a direction not an oscillation.
+      tl.fromTo("#f1-wind", { xPercent: 0.9, yPercent: -0.3 },
+                            { xPercent: -1.1, yPercent: 0.4, duration: 9.0, ease: "none" }, 0);
+
+      // Scene 2 (2.4-5.0s): the first line, travelling left into place.
+      tl.fromTo("#f1-l1", { autoAlpha: 0, x: 74 }, { autoAlpha: 1, x: 0, duration: 0.62, ease: "power3.out" }, 2.36);
+
+      // Scene 3 (5.0-7.0s): the second line lands, and the count is SHOWN — 140 lamps
+      // blooming 18ms apart. The number is the picture, not a caption.
+      tl.fromTo("#f1-l2", { autoAlpha: 0, x: 74 }, { autoAlpha: 1, x: 0, duration: 0.62, ease: "power3.out" }, 4.62);
+      tl.to(lamps, { autoAlpha: 1, duration: 0.5, ease: "power2.out", stagger: 0.018 }, 4.86);
+      tl.fromTo("#f1-l3", { autoAlpha: 0, x: 56 }, { autoAlpha: 1, x: 0, duration: 0.55, ease: "power3.out" }, 6.16);
+
+      // Scene 4 (7.0-9.0s): still. The lamps hold; only the wind moves.
+
+      // ---- SEAM 1 -> 2: cut-the-curve LEFT (the current). Exit travel -238 on power4.in,
+      // hard-killed at the cut so it cannot bleed a frame into frame 2.
+      tl.to("#f1-stage", { x: -238, duration: 0.34, ease: "power4.in" }, 8.66);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["01-valley"] = tl;
+    })();
+  </script>
+</template>

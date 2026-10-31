@@ -1,0 +1,84 @@
+{
+  "_": "EP 17 — VectorDrop's storage migration, Supabase → Cloudflare R2. The STATION STRIP register (references/station-strip.md), built on VectorDrop's OWN dark-mode design system rather than the house look: #161516 ground, #0D0D0D panels, teal #14B8A6 as the single accent, #0D9488 demoted to hover and living only in the gradient, cyan #0891B2 only ever inside a gradient, pure #FFFFFF text. Type is the system UI face the brand's own fallback stack names — SF Pro, loaded from /System/Library/Fonts/SFNS.ttf — with Geist Mono for every path, figure and code line. EVERY NUMBER ON SCREEN IS FROM THE MIGRATION WRITE-UP: 1,156 distinct objects / 1.74 GB / ~1.53 MB average / 8.2 MB largest SVG against a 1 GB free tier; R2's free allowance is 10 GB storage, 1M Class A and 10M Class B operations; S3 egress is ~$0.09/GB and R2's is zero; the crash was NGHTTP2_INTERNAL_ERROR at object 25 of 1,156 with a bare Promise.all and a pipeline that still exited 0; the HEAD size discrepancy was 1,743 MB vs 468 MB, resolved to 1,743.04 MB with Accept-Encoding: identity; the SDK signed x-amz-checksum-crc32=AAAAAA== (CRC32 of empty) because presigning happens before a body exists, fixed with requestChecksumCalculation: WHEN_REQUIRED; final result 1,091 copied + 45 already present = 1,136 of 1,136, 1.69 GB, 0 failed, 0 database rows rewritten, 20 pre-existing broken rows.",
+  "series": "Ship It",
+  "episode": "EP 17",
+  "title": "The Meter Ran Out.",
+  "titleAccent": "Out.",
+  "subtitle": "Moving 1.69 GB to R2 without rewriting a single database row",
+  "hook": "The free tier ended. Uploads stopped. Nothing else was broken.",
+  "cta": "vectordrop",
+  "next": "Next: presigned URLs, and the five ways they lie to you",
+  "_theme": "New palette this episode — `vectordrop`, straight out of the product's DESIGN.md dark mode. The series continuity is the CONSTRUCTION and the cue set, never the colour; EP15/16 shared stripe-mesh for two episodes and this is the deliberate turn. Teal is the only filled hue on the frame: the gradient (#0D9488 → #14B8A6 → #0891B2 at 135°) is reserved for the title word and nothing else, exactly as the brand reserves it for the hero.",
+  "theme": "vectordrop",
+  "fps": 30,
+  "_voice": "Unchanged from EP 13–16 — same voice id, same model, same settings. The palette turns; the narrator does not.",
+  "voice": "nlyULslzTRhqlyv46oPj",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1717,
+  "_music": "Same 84bpm grid as EP 13–16 so scene lengths snap identically across the run.",
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.15,
+    "open": 0.34,
+    "mood": "calm-focus",
+    "bpm": 84,
+    "startAt": 0
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "Ten lines. Directive throughout — every line opens on an instruction verb. Definition then consequence, one clause a sentence. The five failures are stated as things the viewer should DO about them, not as things that happened to us.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Watch a free tier run out. One gigabyte of storage, one point seven used…\nand uploads stopped working."
+    },
+    {
+      "scene": 2,
+      "text": "Understand the shape first. A two hundred kilobyte photo traces into a multi-megabyte vector."
+    },
+    {
+      "scene": 3,
+      "text": "Now choose on egress, not storage. R2 charges nothing to send your data back out."
+    },
+    {
+      "scene": 4,
+      "text": "Move the broken thing, not its neighbours. Storage was full. Postgres was fine, so Postgres stayed."
+    },
+    {
+      "scene": 5,
+      "text": "Keep the object keys byte for byte. Every path already in the database still resolves."
+    },
+    {
+      "scene": 6,
+      "text": "Watch this one closely. Presigning is local maths — it signs URLs for files that never existed."
+    },
+    {
+      "scene": 7,
+      "text": "Distrust a confident plan. Bad credentials and an empty bucket produce identical output."
+    },
+    {
+      "scene": 8,
+      "text": "Chase the discrepancy. Supabase reported gzipped bytes, R2 reports raw, so nothing ever matched."
+    },
+    {
+      "scene": 9,
+      "text": "Budget for the transient failure. One dropped connection took down all eight workers at object twenty-five."
+    },
+    {
+      "scene": 10,
+      "text": "Then check the browser. Your storage host is now part of the frontend's security policy."
+    }
+  ],
+  "_shots": "No Kling. The station-strip register carries a full episode on graphics alone — the surface is the product's own dark UI, and the depth comes from real panels rather than footage.",
+  "shots": []
+}

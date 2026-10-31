@@ -1,0 +1,146 @@
+TOPIC: Incremental Static Regeneration (ISR) — Next.js
+
+Source of truth: Next.js 16.3.1 documentation,
+/docs/app/guides/incremental-static-regeneration (last updated 2026-06-23).
+Everything below is quoted or paraphrased from that page and its caveats section.
+
+--------------------------------------------------------------------------------
+WHAT IT IS
+--------------------------------------------------------------------------------
+
+Incremental Static Regeneration enables you to:
+  - Update static content without rebuilding the entire site
+  - Reduce server load by serving prerendered, static pages for most requests
+  - Ensure proper cache-control headers are automatically added to pages
+  - Handle large amounts of content pages without long `next build` times
+
+The problem it solves: a purely static site must rebuild everything to change
+anything. A fully dynamic site is fresh on every request but pays render cost on
+every request. ISR is neither — it is a static page with an expiry date.
+
+--------------------------------------------------------------------------------
+THE MECHANISM — the docs' own seven steps
+--------------------------------------------------------------------------------
+
+  1. `generateStaticParams` enables ISR for the dynamic route by returning the
+     list of posts to prerender
+  2. During `next build`, a page is prerendered for each post
+  3. All requests made to these pages (e.g. /blog/1) are cached and instantaneous
+  4. After 60 seconds has passed, the next request will still return the cached
+     (now stale) page
+  5. The cache is invalidated and a new version of the page begins generating in
+     the background
+  6. Once generated successfully, the next request will return the updated page
+     and cache it for subsequent requests
+  7. If /blog/26 is requested, and it exists, the page will be generated
+     on-demand. This behavior can be changed with `dynamicParams`. If the post
+     does not exist, 404 is returned.
+
+STEPS 4-6 ARE THE WHOLE EPISODE. The visitor who triggers the regeneration is
+NOT the visitor who benefits from it. They get the stale page, instantly. The
+next visitor gets the fresh one.
+
+--------------------------------------------------------------------------------
+TIME-BASED REVALIDATION
+--------------------------------------------------------------------------------
+
+    export const revalidate = 60
+
+Docs wording: "After an hour has passed, the next visitor will still receive the
+cached (stale) version of the page immediately for a fast response.
+Simultaneously, Next.js triggers regeneration of a fresh version in the
+background. Once the new version is successfully generated, it replaces the
+cached version, and subsequent visitors will receive the updated content."
+
+Docs recommendation: "We recommend setting a high revalidation time. For
+instance, 1 hour instead of 1 second. If you need more precision, consider using
+on-demand revalidation. If you need real-time data, consider switching to
+dynamic rendering."
+
+--------------------------------------------------------------------------------
+ON-DEMAND REVALIDATION
+--------------------------------------------------------------------------------
+
+    'use server'
+    import { revalidatePath } from 'next/cache'
+
+    export async function createPost() {
+      revalidatePath('/posts')
+    }
+
+    'use server'
+    import { revalidateTag } from 'next/cache'
+
+    export async function createPost() {
+      revalidateTag('posts', 'max')
+    }
+
+Tagging a fetch:
+    const data = await fetch('https://api.vercel.app/blog', {
+      next: { tags: ['posts'] },
+    })
+
+IMPORTANT NOTE from the docs: "revalidatePath invalidates the cache entries but
+regeneration happens on the next request. If you want to eagerly regenerate the
+cache entry immediately instead of waiting for the next request, you can use the
+Pages router res.revalidate method."
+
+Docs guidance: "For most use cases, prefer revalidating entire paths."
+
+--------------------------------------------------------------------------------
+THE OBSERVABLE ARTIFACT
+--------------------------------------------------------------------------------
+
+"You can use the `x-nextjs-cache` response header to observe cache behavior."
+
+    HIT          served from cache
+    STALE        served from cache, revalidating in background
+    MISS         not in cache, rendered fresh
+    REVALIDATED  regenerated via on-demand revalidation
+
+This header is the proof the mechanism is real, and it is what the episode
+follows from first frame to last.
+
+--------------------------------------------------------------------------------
+THE CAVEATS — the honest cost
+--------------------------------------------------------------------------------
+
+- "When running multiple instances, the default file-system cache is
+  per-instance. On-demand revalidation only invalidates the instance that
+  receives the call. Use a shared custom cache handler to coordinate across
+  instances."
+
+- "Background regeneration (stale-while-revalidate) runs on the instance that
+  receives the triggering request. On platforms with per-request billing, this
+  background work counts as additional compute."
+
+- ISR is only supported when using the Node.js runtime (default).
+- ISR is not supported when creating a Static Export.
+- If multiple fetches on a route have different revalidate frequencies, the
+  lowest time is used for ISR.
+- If any fetch has revalidate 0 or an explicit no-store, the route is rendered
+  dynamically instead.
+- Proxy is not executed for on-demand ISR requests — revalidate the exact path.
+- If an error is thrown while revalidating, the last successfully generated data
+  continues to be served, and Next.js retries on the next request.
+
+--------------------------------------------------------------------------------
+DEBUGGING
+--------------------------------------------------------------------------------
+
+    NEXT_PRIVATE_DEBUG_CACHE=1
+
+Makes the Next.js server log ISR cache hits and misses. Test with `next build`
+then `next start`, not in dev.
+
+--------------------------------------------------------------------------------
+AUDIENCE AND ANGLE
+--------------------------------------------------------------------------------
+
+Working web developers who know static vs dynamic rendering, and who have typed
+`export const revalidate = 60` without being able to say what the first request
+after second sixty-one actually receives.
+
+The angle is CONCEPT: teach the mechanism, then name its cost. The film's
+question is asked in the first ten seconds and answered at the midpoint, and the
+last act is the honest limitation rather than a recap.

@@ -1,0 +1,258 @@
+<template>
+  <style>
+@font-face{font-family:"Fraktur";src:url("assets/fonts/Fraktur-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Anton";src:url("assets/fonts/Anton-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Oswald";src:url("assets/fonts/Oswald-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-900.woff2") format("woff2");font-weight:900;font-style:normal;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-700i.woff2") format("woff2");font-weight:700;font-style:italic;font-display:block}
+@font-face{font-family:"Bodoni";src:url("assets/fonts/Bodoni-900.woff2") format("woff2");font-weight:900;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400i.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --news:#E3DDCE; --news2:#D3CBB8; --scrap:#F2EDE1; --plate:#141210;
+  --ink:#171310; --ink2:#4E4638; --stop:#C1272D; --stopt:#A81E24;
+  background:var(--news); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the .clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* The field OVER-SCANS. A frame whose exit shrinks (the reserved Z-back) would
+   otherwise show the stage edge for the length of the cut. -18% covers the largest
+   travel in a 1920-wide frame and costs nothing on the frames that never shrink. */
+.field{position:absolute;inset:-18%}
+
+/* ---- THE PAGE: newsprint is a HALFTONE, not a flat fill --------------------
+   A 4px dot screen in press black at low alpha. Static, always: a halftone that
+   moves is a moire and it will wreck the encode. */
+.screen{position:absolute;inset:-18%;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px, rgba(23,19,16,.115) 0.85px, transparent 0.9px);
+  background-size:4px 4px}
+/* the press never lays ink perfectly evenly */
+.grain{position:absolute;inset:-18%;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle at 2px 3px, rgba(23,19,16,.08) 1px, transparent 1.1px);
+  background-size:11px 9px}
+
+/* ---- TYPE: eight families, one job each ---------------------------------- */
+.mast{font-family:"Fraktur",serif;font-weight:400;line-height:.95;color:var(--ink)}
+.head{font-family:"Anton",sans-serif;font-weight:400;line-height:.88;
+  letter-spacing:-.005em;text-transform:uppercase;color:var(--ink)}
+.head2{font-family:"Oswald",sans-serif;font-weight:700;line-height:.94;
+  letter-spacing:.005em;text-transform:uppercase;color:var(--ink)}
+.quote{font-family:"Playfair",Georgia,serif;font-weight:900;line-height:1.10;color:var(--ink)}
+.qital{font-family:"Playfair",Georgia,serif;font-weight:700;font-style:italic;line-height:1.14}
+/* Bodoni Moda is loaded at optical size 96 — a DISPLAY cut. Below about 80px its
+   hairline stems vanish in the render and N becomes a bare diagonal, 1 a bare stem.
+   .fig is for BIG figures only; anything smaller uses .head2 (Oswald). Verified by
+   measuring the render, not by looking at the font in a browser. */
+.fig{font-family:"Bodoni",serif;font-weight:900;line-height:.86;color:var(--ink)}
+.body{font-family:"PTSerif",Georgia,serif;font-weight:400;line-height:1.30;color:var(--ink)}
+.bodyb{font-family:"PTSerif",Georgia,serif;font-weight:700;line-height:1.28}
+.bodyi{font-family:"PTSerif",Georgia,serif;font-style:italic;line-height:1.30}
+.mono{font-family:"Courier",monospace;font-weight:400;color:var(--ink)}
+.monob{font-family:"Courier",monospace;font-weight:700}
+.slug{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.20em;
+  text-transform:uppercase;font-size:20px;color:var(--ink2)}
+.red{color:var(--stopt)}      /* red as a LETTER — the only red allowed to be type */
+.faint{color:var(--ink2)}
+.rev{color:var(--scrap)}      /* reversed out of the black plate */
+.rev .faint{color:#A79E8D}
+.rev .slug{color:#A79E8D}
+
+/* ---- RULES: press furniture. Never a glyph. ------------------------------ */
+.rule{position:absolute;background:var(--ink);height:3px}
+.hair{position:absolute;background:var(--ink2);height:1px;opacity:.55}
+.rrule{position:absolute;background:var(--stop);height:5px}
+.revrule{position:absolute;background:var(--scrap);height:3px}
+
+/* ---- A CUTTING ----------------------------------------------------------
+   Four layers, and all four are required. The drop-shadow lives on a SIBLING,
+   not in box-shadow: box-shadow follows the border box, so on a clip-path shape
+   it draws a rectangle behind a torn edge — the single loudest tell in the register. */
+.cutw{position:absolute}                                   /* the slap wrapper */
+.cutsh{position:absolute;inset:0;background:rgba(23,19,16,.34);filter:blur(7px)}
+.cutfib{position:absolute;inset:0;background:#FFFCF4}      /* the torn fibre lip */
+.cutface{position:absolute;inset:0;background:var(--scrap);overflow:hidden}
+.cutbody{position:absolute;inset:0}
+
+/* ---- MISREGISTRATION -----------------------------------------------------
+   The one "effect" in the film, and it is a real press artifact: the spot plate lands
+   a hair off the black one. Carried as a TEXT-SHADOW on the headline itself, never as
+   a duplicated element — a second copy of the words in the same place is two text
+   blocks the layout gate is right to reject, and it doubles what a contrast checker
+   has to reason about. One impression, one fringe. */
+
+/* ---- THE STAMP ---------------------------------------------------------- */
+/* on the black plate the stamp turns CREAM: red type on plate measures 3.20:1 and
+   this register does not put red type on black. */
+.stampw{border-color:var(--scrap)!important;color:var(--scrap)!important}
+.stamp{position:absolute;border:4px solid var(--stop);color:var(--stopt);
+  font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:.10em;
+  text-transform:uppercase;opacity:.88;display:flex;align-items:center;
+  justify-content:center;white-space:nowrap}
+
+/* ---- THE PEN: red strokes drawn on the page. Never a glyph. -------------- */
+/* z-index 5 is load-bearing: a cutting is z-index 2, so a pen with auto z-index
+   draws UNDERNEATH the very thing it is marking and is invisible in the render. */
+.pen{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;overflow:visible;z-index:5}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--stop);stroke-linecap:round;
+  stroke-linejoin:round}
+.penk path,.penk line,.penk polyline{stroke:var(--ink)}
+.penw path,.penw line,.penw polyline{stroke:var(--scrap)}
+
+  </style>
+
+  <div id="root" data-composition-id="13-verdicts" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="field" data-layout-allow-overflow style="background:var(--news)"></div><div class="screen" data-layout-allow-overflow ></div><div class="grain" data-layout-allow-overflow></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-kick" class="slug" style="position:absolute;left:120px;top:110px;color:var(--stopt)">2015 &middot; THE TRAILERS</div>
+      <div id="s-rule" class="rrule" style="left:120px;top:146px;width:132px;transform-origin:0% 50%"></div>
+      <div id="s-head" class="head" style="position:absolute;left:120px;top:186px;width:1300px;font-size:84px;z-index:1;text-shadow:3px 2px 0 rgba(193,39,45,.42)">TWO HUNDRED OK.<br>AND NOT FOUND.</div>
+      <div id="s-deck" class="body" style="position:absolute;left:122px;top:371.20000000000005px;width:1320px;font-size:31px">One response. The transport reports success and the call reports failure, and both are correct.</div>
+
+      
+      <div id="f13-h" class="cutw" style="left:150px;top:470px;width:876px;height:158px;z-index:2;transform:rotate(-0.6deg)">
+        <div id="f13-h-sh"  class="cutsh"  style="clip-path:polygon(0.0px -2.5px,73.0px -0.1px,146.0px -1.8px,219.0px 0.3px,292.0px 1.0px,365.0px -0.7px,438.0px -0.4px,511.0px 2.3px,584.0px -0.3px,657.0px 1.1px,730.0px -1.2px,803.0px -0.6px,876.3px 0.0px,878.4px 79.0px,876.0px 158.7px,803.0px 155.7px,730.0px 159.0px,657.0px 157.6px,584.0px 157.7px,511.0px 158.5px,438.0px 156.1px,365.0px 156.4px,292.0px 158.1px,219.0px 158.8px,146.0px 159.0px,73.0px 159.7px,2.3px 158.0px,1.6px 79.0px)"></div>
+        <div id="f13-h-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px -0.7px,73.4px -0.4px,146.8px 2.3px,220.3px -0.3px,293.7px 1.1px,367.1px -1.2px,440.5px -0.6px,513.9px -0.3px,587.3px -2.4px,660.8px -0.7px,734.2px 2.3px,807.6px -1.0px,880.6px 0.0px,880.7px 81.5px,881.0px 163.5px,807.6px 161.1px,734.2px 161.4px,660.8px 163.1px,587.3px 163.8px,513.9px 164.0px,440.5px 164.7px,367.1px 160.7px,293.7px 161.4px,220.3px 160.4px,146.8px 162.5px,73.4px 165.6px,-0.6px 163.0px,-0.5px 81.5px)"></div>
+        <div id="f13-h-fc"  class="cutface" style="background:var(--scrap);clip-path:polygon(0.0px -2.5px,73.0px -0.1px,146.0px -1.8px,219.0px 0.3px,292.0px 1.0px,365.0px -0.7px,438.0px -0.4px,511.0px 2.3px,584.0px -0.3px,657.0px 1.1px,730.0px -1.2px,803.0px -0.6px,876.3px 0.0px,878.4px 79.0px,876.0px 158.7px,803.0px 155.7px,730.0px 159.0px,657.0px 157.6px,584.0px 157.7px,511.0px 158.5px,438.0px 156.1px,365.0px 156.4px,292.0px 158.1px,219.0px 158.8px,146.0px 159.0px,73.0px 159.7px,2.3px 158.0px,1.6px 79.0px)">
+          <div class="cutbody" style="padding:0px">
+  <div class="slug" style="position:absolute;left:32px;top:22px;font-size:14px">HEADERS</div>
+  <div class="slug faint" style="position:absolute;left:32px;top:22px;width:812px;text-align:right;font-size:13px">HTTP/2 HEADERS FRAME</div>
+  <div class="hair" style="left:32px;top:48px;width:812px"></div>
+  <pre class="mono" style="position:absolute;left:32px;top:62px;font-size:25px;line-height:38px;white-space:pre">:status       <span style="font-weight:700">200</span>
+content-type  application/grpc+proto</pre></div>
+        </div>
+      </div>
+
+      
+      <div id="f13-b" class="cutw" style="left:150px;top:646px;width:876px;height:120px;z-index:2;transform:rotate(0.7deg)">
+        <div id="f13-b-sh"  class="cutsh"  style="clip-path:polygon(0.0px -1.9px,73.0px 0.9px,146.0px -0.5px,219.0px -1.5px,292.0px -2.6px,365.0px -1.6px,438.0px 1.0px,511.0px 0.5px,584.0px 0.2px,657.0px 1.4px,730.0px 0.0px,803.0px 1.7px,874.6px 0.0px,875.6px 60.0px,876.0px 122.5px,803.0px 121.7px,730.0px 121.8px,657.0px 117.9px,584.0px 118.5px,511.0px 122.2px,438.0px 117.8px,365.0px 120.4px,292.0px 121.5px,219.0px 119.3px,146.0px 117.6px,73.0px 119.4px,1.7px 120.0px,2.4px 60.0px)"></div>
+        <div id="f13-b-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px -1.6px,73.4px 1.0px,146.8px 0.5px,220.3px 0.2px,293.7px 1.4px,367.1px 0.0px,440.5px 1.7px,513.9px 1.4px,587.3px 0.4px,660.8px -2.5px,734.2px -1.7px,807.6px -1.8px,878.9px 0.0px,879.5px 62.5px,881.0px 127.2px,807.6px 122.8px,734.2px 125.4px,660.8px 126.5px,587.3px 124.3px,513.9px 122.6px,440.5px 124.4px,367.1px 123.3px,293.7px 122.6px,220.3px 122.7px,146.8px 127.0px,73.4px 125.6px,-0.1px 125.0px,2.0px 62.5px)"></div>
+        <div id="f13-b-fc"  class="cutface" style="background:var(--news2);clip-path:polygon(0.0px -1.9px,73.0px 0.9px,146.0px -0.5px,219.0px -1.5px,292.0px -2.6px,365.0px -1.6px,438.0px 1.0px,511.0px 0.5px,584.0px 0.2px,657.0px 1.4px,730.0px 0.0px,803.0px 1.7px,874.6px 0.0px,875.6px 60.0px,876.0px 122.5px,803.0px 121.7px,730.0px 121.8px,657.0px 117.9px,584.0px 118.5px,511.0px 122.2px,438.0px 117.8px,365.0px 120.4px,292.0px 121.5px,219.0px 119.3px,146.0px 117.6px,73.0px 119.4px,1.7px 120.0px,2.4px 60.0px)">
+          <div class="cutbody" style="padding:0px">
+  <div class="slug" style="position:absolute;left:32px;top:22px;font-size:14px">MESSAGE</div>
+  <div class="slug faint" style="position:absolute;left:32px;top:22px;width:812px;text-align:right;font-size:13px">DATA FRAME</div>
+  <div class="hair" style="left:32px;top:48px;width:812px"></div>
+  <pre class="mono" style="position:absolute;left:32px;top:62px;font-size:25px;line-height:38px;white-space:pre">00 00 00 00 00                  <span class="faint">empty</span></pre></div>
+        </div>
+      </div>
+
+      
+      <div id="f13-t" class="cutw" style="left:150px;top:784px;width:876px;height:158px;z-index:2;transform:rotate(-0.9deg)">
+        <div id="f13-t-sh"  class="cutsh"  style="clip-path:polygon(0.0px 1.8px,25.8px -1.6px,51.5px -1.6px,77.3px 8.5px,103.1px -0.9px,128.8px 5.3px,154.6px -8.6px,180.4px 5.9px,206.1px -3.1px,231.9px 4.6px,257.6px -1.3px,283.4px 0.4px,309.2px -1.3px,334.9px -7.0px,360.7px -8.1px,386.5px 1.1px,412.2px 1.9px,438.0px -7.2px,463.8px 6.1px,489.5px 0.5px,515.3px 2.7px,541.1px -5.4px,566.8px 6.0px,592.6px 3.3px,618.4px -2.6px,644.1px -4.6px,669.9px 5.2px,695.6px -5.1px,721.4px 0.7px,747.2px -2.0px,772.9px 4.3px,798.7px -7.3px,824.5px 5.4px,850.2px 4.0px,871.2px 0.0px,881.9px 26.3px,881.4px 52.7px,874.8px 79.0px,874.7px 105.3px,881.0px 131.7px,876.0px 151.6px,850.2px 153.5px,824.5px 150.1px,798.7px 154.9px,772.9px 151.5px,747.2px 155.0px,721.4px 153.1px,695.6px 163.2px,669.9px 162.7px,644.1px 151.5px,618.4px 158.5px,592.6px 154.8px,566.8px 155.8px,541.1px 154.7px,515.3px 164.6px,489.5px 159.7px,463.8px 159.6px,438.0px 153.7px,412.2px 154.8px,386.5px 152.2px,360.7px 162.1px,334.9px 159.2px,309.2px 157.6px,283.4px 155.4px,257.6px 158.8px,231.9px 159.0px,206.1px 157.3px,180.4px 161.6px,154.6px 157.1px,128.8px 167.0px,103.1px 163.5px,77.3px 163.5px,51.5px 155.5px,25.8px 155.8px,3.7px 158.0px,-2.3px 131.7px,-4.7px 105.3px,5.3px 79.0px,6.7px 52.7px,2.3px 26.3px)"></div>
+        <div id="f13-t-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px -4.0px,25.9px 2.6px,51.8px 7.0px,77.7px 7.0px,103.6px -2.6px,129.6px -5.1px,155.5px 3.5px,181.4px -1.4px,207.3px -3.3px,233.2px 0.5px,259.1px 4.7px,285.0px 4.8px,310.9px 3.4px,336.9px -2.1px,362.8px -1.9px,388.7px -0.8px,414.6px 6.1px,440.5px 2.6px,466.4px -2.3px,492.3px -4.4px,518.2px -3.2px,544.1px -1.7px,570.1px -2.4px,596.0px -0.7px,621.9px 0.1px,647.8px 1.9px,673.7px -5.8px,699.6px 4.8px,725.5px -2.4px,751.4px -1.4px,777.4px 3.4px,803.3px -4.3px,829.2px 5.2px,855.1px -7.9px,879.7px 0.0px,874.4px 27.2px,877.2px 54.3px,883.3px 81.5px,887.6px 108.7px,883.3px 135.8px,881.0px 154.3px,855.1px 169.0px,829.2px 161.2px,803.3px 162.4px,777.4px 161.0px,751.4px 165.2px,725.5px 156.1px,699.6px 172.1px,673.7px 169.0px,647.8px 159.9px,621.9px 160.4px,596.0px 164.6px,570.1px 158.0px,544.1px 161.0px,518.2px 157.7px,492.3px 168.2px,466.4px 167.4px,440.5px 159.8px,414.6px 165.8px,388.7px 164.7px,362.8px 164.6px,336.9px 164.1px,310.9px 160.8px,285.0px 165.0px,259.1px 159.6px,233.2px 157.7px,207.3px 157.0px,181.4px 165.9px,155.5px 167.2px,129.6px 161.2px,103.6px 165.8px,77.7px 165.7px,51.8px 169.9px,25.9px 161.0px,-2.4px 163.0px,5.4px 135.8px,-2.8px 108.7px,9.3px 81.5px,1.2px 54.3px,2.6px 27.2px)"></div>
+        <div id="f13-t-fc"  class="cutface" style="background:var(--scrap);clip-path:polygon(0.0px 1.8px,25.8px -1.6px,51.5px -1.6px,77.3px 8.5px,103.1px -0.9px,128.8px 5.3px,154.6px -8.6px,180.4px 5.9px,206.1px -3.1px,231.9px 4.6px,257.6px -1.3px,283.4px 0.4px,309.2px -1.3px,334.9px -7.0px,360.7px -8.1px,386.5px 1.1px,412.2px 1.9px,438.0px -7.2px,463.8px 6.1px,489.5px 0.5px,515.3px 2.7px,541.1px -5.4px,566.8px 6.0px,592.6px 3.3px,618.4px -2.6px,644.1px -4.6px,669.9px 5.2px,695.6px -5.1px,721.4px 0.7px,747.2px -2.0px,772.9px 4.3px,798.7px -7.3px,824.5px 5.4px,850.2px 4.0px,871.2px 0.0px,881.9px 26.3px,881.4px 52.7px,874.8px 79.0px,874.7px 105.3px,881.0px 131.7px,876.0px 151.6px,850.2px 153.5px,824.5px 150.1px,798.7px 154.9px,772.9px 151.5px,747.2px 155.0px,721.4px 153.1px,695.6px 163.2px,669.9px 162.7px,644.1px 151.5px,618.4px 158.5px,592.6px 154.8px,566.8px 155.8px,541.1px 154.7px,515.3px 164.6px,489.5px 159.7px,463.8px 159.6px,438.0px 153.7px,412.2px 154.8px,386.5px 152.2px,360.7px 162.1px,334.9px 159.2px,309.2px 157.6px,283.4px 155.4px,257.6px 158.8px,231.9px 159.0px,206.1px 157.3px,180.4px 161.6px,154.6px 157.1px,128.8px 167.0px,103.1px 163.5px,77.3px 163.5px,51.5px 155.5px,25.8px 155.8px,3.7px 158.0px,-2.3px 131.7px,-4.7px 105.3px,5.3px 79.0px,6.7px 52.7px,2.3px 26.3px)">
+          <div class="cutbody" style="padding:0px">
+  <div class="slug" style="position:absolute;left:32px;top:22px;font-size:14px;color:var(--stopt)">TRAILERS</div>
+  <div class="slug faint" style="position:absolute;left:32px;top:22px;width:812px;text-align:right;font-size:13px">HTTP/2 HEADERS FRAME, END_STREAM</div>
+  <div class="hair" style="left:32px;top:48px;width:812px"></div>
+  <pre class="mono" style="position:absolute;left:32px;top:62px;font-size:25px;line-height:38px;white-space:pre">grpc-status   <span class="red" style="font-weight:700">5</span>
+grpc-message  feature not found</pre></div>
+        </div>
+      </div>
+
+      <svg id="f13-b1-svg" class="pen " viewBox="0 0 1920 1080"><path id="f13-b1" d="M409.6,535.3 L454.2,537.2 L453.3,564.0 L385.6,564.8 L385.8,535.7 L447.6,530.4" stroke-width="5"/></svg>
+      <svg id="f13-b2-svg" class="pen " viewBox="0 0 1920 1080"><path id="f13-b2" d="M412.9,853.5 L420.5,852.7 L420.5,879.7 L388.9,881.1 L389.2,854.9 L450.9,849.3" stroke-width="5"/></svg>
+      <svg id="f13-tick-svg" class="pen " viewBox="0 0 1920 1080"><path id="f13-tick" d="M476,548 L491.0,562.4 L517.0,529.0" stroke-width="6"/></svg>
+      <svg id="f13-cross-svg" class="pen " viewBox="0 0 1920 1080"><path id="f13-cross" d="M429.9,844.1 L473.2,883.0 M472.7,844.4 L429.8,885.3" stroke-width="6"/></svg>
+      <svg id="f13-arr-svg" class="pen " viewBox="0 0 1920 1080"><path id="f13-arr" d="M1046,520 Q1037.3,652.7 1130,748 M1109.6,739.8 L1130,748 L1122.4,727.3" stroke-width="5"/></svg>
+
+      <div id="f13-s1" class="stamp" style="left:1094px;top:470px;width:396px;height:76px;font-size:30px;transform:rotate(3.71deg);z-index:6">HTTP SAYS: OK</div>
+      <div id="f13-s2" class="stamp" style="left:1094px;top:736px;width:496px;height:76px;font-size:30px;transform:rotate(-1.43deg);z-index:6">GRPC SAYS: NOT_FOUND</div>
+
+      <div id="f13-r" class="rrule" style="left:1094px;top:570px;width:676px;transform-origin:0% 50%"></div>
+      <div id="f13-q" class="quote" style="position:absolute;left:1094px;top:592px;width:690px;font-size:26px">
+        &ldquo;This will prevent other HTTP/2 clients from interpreting a gRPC error response, which uses status 200 (OK), as successful.&rdquo;</div>
+
+      <div id="f13-q2" class="quote" style="position:absolute;left:1094px;top:848px;width:690px;font-size:30px">
+        &ldquo;Status must be sent in Trailers <span class="red">even if the status code is OK</span>.&rdquo;</div>
+      <div id="f13-a" class="slug" style="position:absolute;left:1094px;top:948px;font-size:15px">GRPC/GRPC &middot; DOC/PROTOCOL-HTTP2.MD &middot; VERBATIM</div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // SEAM ENTRY — Z-BACK continued: enters ABOVE 1.0 and settles DOWN to it, so
+      // both halves share the SIGN of the scale velocity. Mirroring reads as a bounce.
+      tl.fromTo("#stage", { scale: 1.48 }, { scale: 1, duration: 0.62, ease: "power4.out" }, 0);
+
+      // SEAM CARRIER — the kicker and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.42, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-head", { y: 15 }, { y: 0, duration: 0.50, ease: "power3.out" }, 0);
+      tl.fromTo("#s-deck", { autoAlpha: 0, y: 17 }, { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 0.30);
+      gsap.set("#f13-h", { autoAlpha: 0 });
+      tl.set("#f13-h", { autoAlpha: 1 }, 0.92);
+      gsap.set("#f13-h", { rotation: -11.76, scale: 1.13, y: -34 });
+      tl.fromTo("#f13-h", { rotation: -11.76, scale: 1.13, y: -34 }, { rotation: -0.6, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 0.92);
+      gsap.set("#f13-h-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f13-h-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 0.953);
+      var pen_f13b1_d = anime.svg.createDrawable("#f13-b1");
+      var pen_f13b1 = anime.animate(pen_f13b1_d, { draw: ["0 0", "0 1"], duration: 440, ease: anime.steps(7), autoplay: false });
+      var P_pen_f13b1 = { p: 0 };
+      tl.to(P_pen_f13b1, { p: 1, duration: 0.44, ease: "none", onUpdate: function () { pen_f13b1.seek(P_pen_f13b1.p * pen_f13b1.duration); } }, 1.54);
+      gsap.set("#f13-s1", { rotation: 3.71, scale: 1.30, autoAlpha: 0 });
+      tl.fromTo("#f13-s1", { rotation: 3.71, scale: 1.30, autoAlpha: 0 }, { rotation: 3.71, scale: 1, autoAlpha: 0.88, duration: 0.10, ease: "steps(2)" }, 2.06);
+
+      gsap.set("#f13-b", { autoAlpha: 0 });
+      tl.set("#f13-b", { autoAlpha: 1 }, 2.70);
+      gsap.set("#f13-b", { rotation: -8.12, scale: 1.13, y: -34 });
+      tl.fromTo("#f13-b", { rotation: -8.12, scale: 1.13, y: -34 }, { rotation: 0.7, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 2.70);
+      gsap.set("#f13-b-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f13-b-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 2.733);
+
+      // STILLNESS BEFORE THE CLIMAX — 0.6s of nothing, then the trailers land. It is
+      // the cheapest emphasis in the kit and this is the beat that has earned it.
+      gsap.set("#f13-t", { autoAlpha: 0 });
+      tl.set("#f13-t", { autoAlpha: 1 }, 4.10);
+      gsap.set("#f13-t", { rotation: 10.95, scale: 1.13, y: -34 });
+      tl.fromTo("#f13-t", { rotation: 10.95, scale: 1.13, y: -34 }, { rotation: -0.9, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 4.10);
+      gsap.set("#f13-t-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f13-t-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 4.133);
+      var pen_f13b2_d = anime.svg.createDrawable("#f13-b2");
+      var pen_f13b2 = anime.animate(pen_f13b2_d, { draw: ["0 0", "0 1"], duration: 420, ease: anime.steps(6), autoplay: false });
+      var P_pen_f13b2 = { p: 0 };
+      tl.to(P_pen_f13b2, { p: 1, duration: 0.42, ease: "none", onUpdate: function () { pen_f13b2.seek(P_pen_f13b2.p * pen_f13b2.duration); } }, 4.74);
+      var pen_f13arr_d = anime.svg.createDrawable("#f13-arr");
+      var pen_f13arr = anime.animate(pen_f13arr_d, { draw: ["0 0", "0 1"], duration: 500, ease: anime.steps(8), autoplay: false });
+      var P_pen_f13arr = { p: 0 };
+      tl.to(P_pen_f13arr, { p: 1, duration: 0.50, ease: "none", onUpdate: function () { pen_f13arr.seek(P_pen_f13arr.p * pen_f13arr.duration); } }, 5.20);
+      gsap.set("#f13-s2", { rotation: -1.43, scale: 1.30, autoAlpha: 0 });
+      tl.fromTo("#f13-s2", { rotation: -1.43, scale: 1.30, autoAlpha: 0 }, { rotation: -1.43, scale: 1, autoAlpha: 0.88, duration: 0.10, ease: "steps(2)" }, 5.72);
+
+      gsap.set("#f13-r", { scaleX: 0 });
+      tl.to("#f13-r", { scaleX: 1, duration: 0.44, ease: "power3.out" }, 6.60);
+      gsap.set("#f13-q", { autoAlpha: 0, y: 14 });
+      tl.to("#f13-q", { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 6.76);
+
+      gsap.set("#f13-q2", { autoAlpha: 0, y: 14 });
+      tl.to("#f13-q2", { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 8.90);
+      gsap.set("#f13-a", { autoAlpha: 0 });
+      tl.to("#f13-a", { autoAlpha: 1, duration: 0.30 }, 9.44);
+      // both verdicts marked, in the order the response delivers them
+      var pen_f13tick_d = anime.svg.createDrawable("#f13-tick");
+      var pen_f13tick = anime.animate(pen_f13tick_d, { draw: ["0 0", "0 1"], duration: 300, ease: anime.steps(5), autoplay: false });
+      var P_pen_f13tick = { p: 0 };
+      tl.to(P_pen_f13tick, { p: 1, duration: 0.30, ease: "none", onUpdate: function () { pen_f13tick.seek(P_pen_f13tick.p * pen_f13tick.duration); } }, 10.10);
+      var pen_f13cross_d = anime.svg.createDrawable("#f13-cross");
+      var pen_f13cross = anime.animate(pen_f13cross_d, { draw: ["0 0", "0 1"], duration: 320, ease: anime.steps(5), autoplay: false });
+      var P_pen_f13cross = { p: 0 };
+      tl.to(P_pen_f13cross, { p: 1, duration: 0.32, ease: "none", onUpdate: function () { pen_f13cross.seek(P_pen_f13cross.p * pen_f13cross.duration); } }, 10.60);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 12.16);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["13-verdicts"] = tl;
+    })();
+  </script>
+</template>

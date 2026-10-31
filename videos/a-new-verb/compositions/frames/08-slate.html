@@ -1,0 +1,87 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --paper:#F4F1EA; --paper2:#E7E1D4; --sheet:#FBF9F4;
+  --ink:#14110E; --ink2:#5A5245; --navy:#16233B;
+  --yellow:#FFEB00; --pen:#DC3220; --pentype:#B32414; --rule:#B8B0A0;
+  background:var(--paper); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* the coloured field travels WITH the stage, so a navy or yellow frame reads as a
+   card sliding over the page rather than as the ground changing colour. */
+.field{position:absolute;inset:0}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:88%;letter-spacing:-.045em;line-height:.90;color:var(--ink)}
+.deck{font-weight:500;line-height:1.26;color:var(--ink2)}
+.quote{font-family:"Serif",Georgia,serif;line-height:1.16;color:var(--ink)}
+.ital{font-family:"Serif",Georgia,serif;font-style:italic}
+.mono{font-family:"JBMono",monospace;color:var(--ink)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink2);font-size:21px}
+.redtype{color:var(--pentype)}
+.onnavy{color:var(--sheet)}
+.onnavy .tag,.onnavy .deck{color:#A9B6C9}
+
+/* ---- PAPER: a sheet is defined by its shadow and its edge, never by a stripe ---- */
+.sheet{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.16), 0 10px 24px rgba(20,17,14,.12)}
+.card{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.14), 0 7px 18px rgba(20,17,14,.10)}
+.hair{position:absolute;background:var(--rule);height:1px}
+.rule2{position:absolute;background:var(--ink);height:3px}
+
+/* ---- THE MARKER: sits BEHIND its phrase, skewed, origin left ---- */
+.mark{position:absolute;background:var(--yellow);z-index:0;transform-origin:0% 50%}
+.marknavy{background:var(--yellow)}
+.phrase{position:relative;z-index:1}
+
+/* ---- THE PEN: strokes only. Never a glyph, never on navy. ---- */
+.pen{position:absolute;pointer-events:none;overflow:visible}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--pen);stroke-linecap:round;
+  stroke-linejoin:round}
+.penY path,.penY line,.penY polyline{stroke:var(--yellow)}
+.penD path,.penD line,.penD polyline{stroke:var(--pentype)}
+.penI path,.penI line,.penI polyline{stroke:var(--ink)}
+
+  </style>
+
+  <div id="root" data-composition-id="08-slate" data-start="0" data-width="1920" data-height="1080">
+<div class="field" style="background:var(--navy)"></div>
+    <div id="stage" class="stage"><div class="inner onnavy">
+      <div id="f8-kick" class="ital" style="position:absolute;left:132px;top:344px;font-size:62px;color:var(--yellow)">there is now a third option</div>
+      <div id="f8-q" class="mono" style="position:absolute;left:126px;top:434px;font-size:210px;font-weight:700;letter-spacing:-.01em;color:var(--sheet)">QUERY</div>
+      <div id="f8-rule" style="position:absolute;left:132px;top:720px;width:1160px;height:6px;background:var(--yellow);transform-origin:0% 50%"></div>
+      <div id="f8-meta" class="mono" style="position:absolute;left:132px;top:760px;font-size:30px;font-weight:700;letter-spacing:.10em;color:var(--yellow)">SAFE · IDEMPOTENT · CACHEABLE · WITH A BODY</div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — Z-BACK continued: enters ABOVE 1.0 and settles DOWN to it, so both
+      // halves share the sign of the scale velocity. Mirroring reads as a bounce, not a move.
+      tl.fromTo("#stage", { scale: 1.48 }, { scale: 1, duration: 0.62, ease: "power4.out" }, 0);
+      // the two carriers ride the cut at full opacity and only settle
+      tl.fromTo("#f8-q", { y: 20 }, { y: 0, duration: 0.56, ease: "power3.out" }, 0);
+      tl.fromTo("#f8-kick", { autoAlpha: 0, x: -22 }, { autoAlpha: 1, x: 0, duration: 0.44, ease: "power3.out" }, 0.22);
+      tl.fromTo("#f8-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.54, ease: "power3.out" }, 0.44);
+      tl.fromTo("#f8-meta", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.38, ease: "power3.out" }, 0.72);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 2.27);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["08-slate"] = tl;
+    })();
+  </script>
+</template>

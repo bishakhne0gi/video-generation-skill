@@ -1,0 +1,425 @@
+<template>
+  <style>
+@font-face{font-family:"Fraktur";src:url("assets/fonts/Fraktur-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Anton";src:url("assets/fonts/Anton-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Oswald";src:url("assets/fonts/Oswald-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-900.woff2") format("woff2");font-weight:900;font-style:normal;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-700i.woff2") format("woff2");font-weight:700;font-style:italic;font-display:block}
+@font-face{font-family:"Bodoni";src:url("assets/fonts/Bodoni-900.woff2") format("woff2");font-weight:900;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400i.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --news:#E3DDCE; --news2:#D3CBB8; --scrap:#F2EDE1; --plate:#141210;
+  --ink:#171310; --ink2:#4E4638; --stop:#C1272D; --stopt:#A81E24;
+  background:var(--news); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the .clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* The field OVER-SCANS. A frame whose exit shrinks (the reserved Z-back) would
+   otherwise show the stage edge for the length of the cut. -18% covers the largest
+   travel in a 1920-wide frame and costs nothing on the frames that never shrink. */
+.field{position:absolute;inset:-18%}
+
+/* ---- THE PAGE: newsprint is a HALFTONE, not a flat fill --------------------
+   A 4px dot screen in press black at low alpha. Static, always: a halftone that
+   moves is a moire and it will wreck the encode. */
+.screen{position:absolute;inset:-18%;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px, rgba(23,19,16,.115) 0.85px, transparent 0.9px);
+  background-size:4px 4px}
+/* the press never lays ink perfectly evenly */
+.grain{position:absolute;inset:-18%;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle at 2px 3px, rgba(23,19,16,.08) 1px, transparent 1.1px);
+  background-size:11px 9px}
+
+/* ---- TYPE: eight families, one job each ---------------------------------- */
+.mast{font-family:"Fraktur",serif;font-weight:400;line-height:.95;color:var(--ink)}
+.head{font-family:"Anton",sans-serif;font-weight:400;line-height:.88;
+  letter-spacing:-.005em;text-transform:uppercase;color:var(--ink)}
+.head2{font-family:"Oswald",sans-serif;font-weight:700;line-height:.94;
+  letter-spacing:.005em;text-transform:uppercase;color:var(--ink)}
+.quote{font-family:"Playfair",Georgia,serif;font-weight:900;line-height:1.10;color:var(--ink)}
+.qital{font-family:"Playfair",Georgia,serif;font-weight:700;font-style:italic;line-height:1.14}
+/* Bodoni Moda is loaded at optical size 96 — a DISPLAY cut. Below about 80px its
+   hairline stems vanish in the render and N becomes a bare diagonal, 1 a bare stem.
+   .fig is for BIG figures only; anything smaller uses .head2 (Oswald). Verified by
+   measuring the render, not by looking at the font in a browser. */
+.fig{font-family:"Bodoni",serif;font-weight:900;line-height:.86;color:var(--ink)}
+.body{font-family:"PTSerif",Georgia,serif;font-weight:400;line-height:1.30;color:var(--ink)}
+.bodyb{font-family:"PTSerif",Georgia,serif;font-weight:700;line-height:1.28}
+.bodyi{font-family:"PTSerif",Georgia,serif;font-style:italic;line-height:1.30}
+.mono{font-family:"Courier",monospace;font-weight:400;color:var(--ink)}
+.monob{font-family:"Courier",monospace;font-weight:700}
+.slug{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.20em;
+  text-transform:uppercase;font-size:20px;color:var(--ink2)}
+.red{color:var(--stopt)}      /* red as a LETTER — the only red allowed to be type */
+.faint{color:var(--ink2)}
+.rev{color:var(--scrap)}      /* reversed out of the black plate */
+.rev .faint{color:#A79E8D}
+.rev .slug{color:#A79E8D}
+
+/* ---- RULES: press furniture. Never a glyph. ------------------------------ */
+.rule{position:absolute;background:var(--ink);height:3px}
+.hair{position:absolute;background:var(--ink2);height:1px;opacity:.55}
+.rrule{position:absolute;background:var(--stop);height:5px}
+.revrule{position:absolute;background:var(--scrap);height:3px}
+
+/* ---- A CUTTING ----------------------------------------------------------
+   Four layers, and all four are required. The drop-shadow lives on a SIBLING,
+   not in box-shadow: box-shadow follows the border box, so on a clip-path shape
+   it draws a rectangle behind a torn edge — the single loudest tell in the register. */
+.cutw{position:absolute}                                   /* the slap wrapper */
+.cutsh{position:absolute;inset:0;background:rgba(23,19,16,.34);filter:blur(7px)}
+.cutfib{position:absolute;inset:0;background:#FFFCF4}      /* the torn fibre lip */
+.cutface{position:absolute;inset:0;background:var(--scrap);overflow:hidden}
+.cutbody{position:absolute;inset:0}
+
+/* ---- MISREGISTRATION -----------------------------------------------------
+   The one "effect" in the film, and it is a real press artifact: the spot plate lands
+   a hair off the black one. Carried as a TEXT-SHADOW on the headline itself, never as
+   a duplicated element — a second copy of the words in the same place is two text
+   blocks the layout gate is right to reject, and it doubles what a contrast checker
+   has to reason about. One impression, one fringe. */
+
+/* ---- THE STAMP ---------------------------------------------------------- */
+/* on the black plate the stamp turns CREAM: red type on plate measures 3.20:1 and
+   this register does not put red type on black. */
+.stampw{border-color:var(--scrap)!important;color:var(--scrap)!important}
+.stamp{position:absolute;border:4px solid var(--stop);color:var(--stopt);
+  font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:.10em;
+  text-transform:uppercase;opacity:.88;display:flex;align-items:center;
+  justify-content:center;white-space:nowrap}
+
+/* ---- THE PEN: red strokes drawn on the page. Never a glyph. -------------- */
+/* z-index 5 is load-bearing: a cutting is z-index 2, so a pen with auto z-index
+   draws UNDERNEATH the very thing it is marking and is invisible in the render. */
+.pen{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;overflow:visible;z-index:5}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--stop);stroke-linecap:round;
+  stroke-linejoin:round}
+.penk path,.penk line,.penk polyline{stroke:var(--ink)}
+.penw path,.penw line,.penw polyline{stroke:var(--scrap)}
+
+  </style>
+
+  <div id="root" data-composition-id="15-streams" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="field" data-layout-allow-overflow style="background:var(--news)"></div><div class="screen" data-layout-allow-overflow ></div><div class="grain" data-layout-allow-overflow></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-kick" class="slug" style="position:absolute;left:120px;top:110px;color:var(--stopt)">2015 &middot; FOUR SHAPES</div>
+      <div id="s-rule" class="rrule" style="left:120px;top:146px;width:132px;transform-origin:0% 50%"></div>
+      <div id="s-head" class="head" style="position:absolute;left:120px;top:186px;width:1300px;font-size:84px;z-index:1;text-shadow:3px 2px 0 rgba(193,39,45,.42)">A FUNCTION<br>RETURNS ONCE</div>
+      <div id="s-deck" class="body" style="position:absolute;left:122px;top:371.20000000000005px;width:1320px;font-size:31px">A stream does not have to. All four shapes are declared in the .proto from the top of this film.</div>
+
+      <div id="f15-hc" class="slug" style="position:absolute;left:682px;top:436px;font-size:14px">CLIENT</div>
+      <div id="f15-hs" class="slug" style="position:absolute;left:1392px;top:436px;font-size:14px">SERVER</div>
+
+      
+      <div id="f15-r0">
+        <div class="head2 faint" style="position:absolute;left:150px;top:472px;font-size:38px">01</div>
+        <div class="head2" style="position:absolute;left:212px;top:470px;font-size:29px">UNARY</div>
+        <div class="mono faint" style="position:absolute;left:212px;top:506px;font-size:16px">GetFeature(Point) &rarr; Feature</div>
+        <div style="position:absolute;left:690px;top:500px;width:752px;height:2px;background:var(--ink2)"></div>
+        <div style="position:absolute;left:681px;top:491px;width:18px;height:18px;background:var(--ink)"></div>
+        <div style="position:absolute;left:1433px;top:491px;width:18px;height:18px;background:var(--ink)"></div>
+        <div class="monob" style="position:absolute;left:1488px;top:478px;font-size:34px;letter-spacing:.04em;color:var(--stopt)">1 &rarr; 1</div>
+        <div class="bodyi faint" style="position:absolute;left:212px;top:534px;width:440px;font-size:17px">&ldquo;a single request &hellip; and a single response back&rdquo;</div>
+      </div>
+      <div id="f15-r1">
+        <div class="head2 faint" style="position:absolute;left:150px;top:604px;font-size:38px">02</div>
+        <div class="head2" style="position:absolute;left:212px;top:602px;font-size:29px">SERVER STREAMING</div>
+        <div class="mono faint" style="position:absolute;left:212px;top:638px;font-size:16px">ListFeatures(Rectangle) &rarr; stream Feature</div>
+        <div style="position:absolute;left:690px;top:632px;width:752px;height:2px;background:var(--ink2)"></div>
+        <div style="position:absolute;left:681px;top:623px;width:18px;height:18px;background:var(--ink)"></div>
+        <div style="position:absolute;left:1433px;top:623px;width:18px;height:18px;background:var(--ink)"></div>
+        <div class="monob" style="position:absolute;left:1488px;top:610px;font-size:34px;letter-spacing:.04em;color:var(--stopt)">1 &rarr; N</div>
+        <div class="bodyi faint" style="position:absolute;left:212px;top:666px;width:440px;font-size:17px">&ldquo;a stream to read a sequence of messages back&rdquo;</div>
+      </div>
+      <div id="f15-r2">
+        <div class="head2 faint" style="position:absolute;left:150px;top:736px;font-size:38px">03</div>
+        <div class="head2" style="position:absolute;left:212px;top:734px;font-size:29px">CLIENT STREAMING</div>
+        <div class="mono faint" style="position:absolute;left:212px;top:770px;font-size:16px">RecordRoute(stream Point) &rarr; RouteSummary</div>
+        <div style="position:absolute;left:690px;top:764px;width:752px;height:2px;background:var(--ink2)"></div>
+        <div style="position:absolute;left:681px;top:755px;width:18px;height:18px;background:var(--ink)"></div>
+        <div style="position:absolute;left:1433px;top:755px;width:18px;height:18px;background:var(--ink)"></div>
+        <div class="monob" style="position:absolute;left:1488px;top:742px;font-size:34px;letter-spacing:.04em;color:var(--stopt)">N &rarr; 1</div>
+        <div class="bodyi faint" style="position:absolute;left:212px;top:798px;width:440px;font-size:17px">&ldquo;writes a sequence of messages and sends them&rdquo;</div>
+      </div>
+      <div id="f15-r3">
+        <div class="head2 faint" style="position:absolute;left:150px;top:868px;font-size:38px">04</div>
+        <div class="head2" style="position:absolute;left:212px;top:866px;font-size:29px">BIDIRECTIONAL</div>
+        <div class="mono faint" style="position:absolute;left:212px;top:902px;font-size:16px">RouteChat(stream RouteNote) &rarr; stream RouteNote</div>
+        <div style="position:absolute;left:690px;top:896px;width:752px;height:2px;background:var(--ink2)"></div>
+        <div style="position:absolute;left:681px;top:887px;width:18px;height:18px;background:var(--ink)"></div>
+        <div style="position:absolute;left:1433px;top:887px;width:18px;height:18px;background:var(--ink)"></div>
+        <div class="monob" style="position:absolute;left:1488px;top:874px;font-size:34px;letter-spacing:.04em;color:var(--stopt)">N &harr; N</div>
+        <div class="bodyi faint" style="position:absolute;left:212px;top:930px;width:440px;font-size:17px">&ldquo;the two streams operate independently&rdquo;</div>
+      </div>
+
+      <div id="f15-p0" style="position:absolute;left:680px;top:491px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p1" style="position:absolute;left:1432px;top:491px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p2" style="position:absolute;left:680px;top:623px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p3" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p4" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p5" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p6" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p7" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p8" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p9" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p10" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p11" style="position:absolute;left:1432px;top:755px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p12" style="position:absolute;left:680px;top:887px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p13" style="position:absolute;left:680px;top:887px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p14" style="position:absolute;left:680px;top:887px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p15" style="position:absolute;left:1432px;top:887px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p16" style="position:absolute;left:1432px;top:887px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p17" style="position:absolute;left:1432px;top:887px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p18" style="position:absolute;left:680px;top:491px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p19" style="position:absolute;left:1432px;top:491px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p20" style="position:absolute;left:680px;top:623px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p21" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p22" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p23" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p24" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p25" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p26" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p27" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p28" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p29" style="position:absolute;left:1432px;top:755px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p30" style="position:absolute;left:680px;top:887px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p31" style="position:absolute;left:680px;top:887px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p32" style="position:absolute;left:680px;top:887px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p33" style="position:absolute;left:1432px;top:887px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p34" style="position:absolute;left:1432px;top:887px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p35" style="position:absolute;left:1432px;top:887px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p36" style="position:absolute;left:680px;top:491px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p37" style="position:absolute;left:1432px;top:491px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p38" style="position:absolute;left:680px;top:623px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p39" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p40" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p41" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p42" style="position:absolute;left:1432px;top:623px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p43" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p44" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p45" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p46" style="position:absolute;left:680px;top:755px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p47" style="position:absolute;left:1432px;top:755px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p48" style="position:absolute;left:680px;top:887px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p49" style="position:absolute;left:680px;top:887px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p50" style="position:absolute;left:680px;top:887px;width:20px;height:20px;background:var(--ink)"></div><div id="f15-p51" style="position:absolute;left:1432px;top:887px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p52" style="position:absolute;left:1432px;top:887px;width:20px;height:20px;background:var(--stop)"></div><div id="f15-p53" style="position:absolute;left:1432px;top:887px;width:20px;height:20px;background:var(--stop)"></div>
+
+      <div id="f15-att" class="slug" style="position:absolute;left:150px;top:996px;font-size:15px">GRPC.IO &middot; CORE CONCEPTS &middot; GLOSSES VERBATIM</div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at FULL opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+
+      // SEAM CARRIER — the kicker and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.42, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-head", { y: 15 }, { y: 0, duration: 0.50, ease: "power3.out" }, 0);
+      tl.fromTo("#s-deck", { autoAlpha: 0, y: 17 }, { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 0.30);
+      gsap.set("#f15-hc", { autoAlpha: 0 }); gsap.set("#f15-hs", { autoAlpha: 0 });
+      tl.to("#f15-hc", { autoAlpha: 1, duration: 0.24 }, 0.70);
+      tl.to("#f15-hs", { autoAlpha: 1, duration: 0.24 }, 0.76);
+      gsap.set("#f15-r0", { autoAlpha: 0, x: -18 });
+      tl.to("#f15-r0", { autoAlpha: 1, x: 0, duration: 0.34, ease: "power2.out" }, 0.86);
+      gsap.set("#f15-r1", { autoAlpha: 0, x: -18 });
+      tl.to("#f15-r1", { autoAlpha: 1, x: 0, duration: 0.34, ease: "power2.out" }, 1.28);
+      gsap.set("#f15-r2", { autoAlpha: 0, x: -18 });
+      tl.to("#f15-r2", { autoAlpha: 1, x: 0, duration: 0.34, ease: "power2.out" }, 1.70);
+      gsap.set("#f15-r3", { autoAlpha: 0, x: -18 });
+      tl.to("#f15-r3", { autoAlpha: 1, x: 0, duration: 0.34, ease: "power2.out" }, 2.12);
+      // THE RUNNING SYSTEM — every rail carries its own real traffic pattern, three
+      // times over. Unary goes out and comes back; server-streaming answers once with
+      // four; client-streaming sends four and gets one; bidirectional does not take turns.
+      gsap.set("#f15-p0", { autoAlpha: 0 });
+      tl.set("#f15-p0", { autoAlpha: 1, x: 0 }, 3.30);
+      tl.fromTo("#f15-p0", { x: 0 }, { x: 752, duration: 0.72, ease: "none" }, 3.30);
+      tl.set("#f15-p0", { autoAlpha: 0 }, 4.02);
+      gsap.set("#f15-p1", { autoAlpha: 0 });
+      tl.set("#f15-p1", { autoAlpha: 1, x: 0 }, 4.16);
+      tl.fromTo("#f15-p1", { x: 0 }, { x: -752, duration: 0.72, ease: "none" }, 4.16);
+      tl.set("#f15-p1", { autoAlpha: 0 }, 4.88);
+      gsap.set("#f15-p2", { autoAlpha: 0 });
+      tl.set("#f15-p2", { autoAlpha: 1, x: 0 }, 3.30);
+      tl.fromTo("#f15-p2", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 3.30);
+      tl.set("#f15-p2", { autoAlpha: 0 }, 3.92);
+      gsap.set("#f15-p3", { autoAlpha: 0 });
+      tl.set("#f15-p3", { autoAlpha: 1, x: 0 }, 4.04);
+      tl.fromTo("#f15-p3", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 4.04);
+      tl.set("#f15-p3", { autoAlpha: 0 }, 4.70);
+      gsap.set("#f15-p4", { autoAlpha: 0 });
+      tl.set("#f15-p4", { autoAlpha: 1, x: 0 }, 4.24);
+      tl.fromTo("#f15-p4", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 4.24);
+      tl.set("#f15-p4", { autoAlpha: 0 }, 4.90);
+      gsap.set("#f15-p5", { autoAlpha: 0 });
+      tl.set("#f15-p5", { autoAlpha: 1, x: 0 }, 4.44);
+      tl.fromTo("#f15-p5", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 4.44);
+      tl.set("#f15-p5", { autoAlpha: 0 }, 5.10);
+      gsap.set("#f15-p6", { autoAlpha: 0 });
+      tl.set("#f15-p6", { autoAlpha: 1, x: 0 }, 4.64);
+      tl.fromTo("#f15-p6", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 4.64);
+      tl.set("#f15-p6", { autoAlpha: 0 }, 5.30);
+      gsap.set("#f15-p7", { autoAlpha: 0 });
+      tl.set("#f15-p7", { autoAlpha: 1, x: 0 }, 3.30);
+      tl.fromTo("#f15-p7", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 3.30);
+      tl.set("#f15-p7", { autoAlpha: 0 }, 3.92);
+      gsap.set("#f15-p8", { autoAlpha: 0 });
+      tl.set("#f15-p8", { autoAlpha: 1, x: 0 }, 3.48);
+      tl.fromTo("#f15-p8", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 3.48);
+      tl.set("#f15-p8", { autoAlpha: 0 }, 4.10);
+      gsap.set("#f15-p9", { autoAlpha: 0 });
+      tl.set("#f15-p9", { autoAlpha: 1, x: 0 }, 3.66);
+      tl.fromTo("#f15-p9", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 3.66);
+      tl.set("#f15-p9", { autoAlpha: 0 }, 4.28);
+      gsap.set("#f15-p10", { autoAlpha: 0 });
+      tl.set("#f15-p10", { autoAlpha: 1, x: 0 }, 3.84);
+      tl.fromTo("#f15-p10", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 3.84);
+      tl.set("#f15-p10", { autoAlpha: 0 }, 4.46);
+      gsap.set("#f15-p11", { autoAlpha: 0 });
+      tl.set("#f15-p11", { autoAlpha: 1, x: 0 }, 4.32);
+      tl.fromTo("#f15-p11", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 4.32);
+      tl.set("#f15-p11", { autoAlpha: 0 }, 4.98);
+      gsap.set("#f15-p12", { autoAlpha: 0 });
+      tl.set("#f15-p12", { autoAlpha: 1, x: 0 }, 3.30);
+      tl.fromTo("#f15-p12", { x: 0 }, { x: 752, duration: 0.70, ease: "none" }, 3.30);
+      tl.set("#f15-p12", { autoAlpha: 0 }, 4.00);
+      gsap.set("#f15-p13", { autoAlpha: 0 });
+      tl.set("#f15-p13", { autoAlpha: 1, x: 0 }, 3.56);
+      tl.fromTo("#f15-p13", { x: 0 }, { x: 752, duration: 0.70, ease: "none" }, 3.56);
+      tl.set("#f15-p13", { autoAlpha: 0 }, 4.26);
+      gsap.set("#f15-p14", { autoAlpha: 0 });
+      tl.set("#f15-p14", { autoAlpha: 1, x: 0 }, 3.82);
+      tl.fromTo("#f15-p14", { x: 0 }, { x: 752, duration: 0.70, ease: "none" }, 3.82);
+      tl.set("#f15-p14", { autoAlpha: 0 }, 4.52);
+      gsap.set("#f15-p15", { autoAlpha: 0 });
+      tl.set("#f15-p15", { autoAlpha: 1, x: 0 }, 3.42);
+      tl.fromTo("#f15-p15", { x: 0 }, { x: -752, duration: 0.70, ease: "none" }, 3.42);
+      tl.set("#f15-p15", { autoAlpha: 0 }, 4.12);
+      gsap.set("#f15-p16", { autoAlpha: 0 });
+      tl.set("#f15-p16", { autoAlpha: 1, x: 0 }, 3.68);
+      tl.fromTo("#f15-p16", { x: 0 }, { x: -752, duration: 0.70, ease: "none" }, 3.68);
+      tl.set("#f15-p16", { autoAlpha: 0 }, 4.38);
+      gsap.set("#f15-p17", { autoAlpha: 0 });
+      tl.set("#f15-p17", { autoAlpha: 1, x: 0 }, 3.94);
+      tl.fromTo("#f15-p17", { x: 0 }, { x: -752, duration: 0.70, ease: "none" }, 3.94);
+      tl.set("#f15-p17", { autoAlpha: 0 }, 4.64);
+      gsap.set("#f15-p18", { autoAlpha: 0 });
+      tl.set("#f15-p18", { autoAlpha: 1, x: 0 }, 6.00);
+      tl.fromTo("#f15-p18", { x: 0 }, { x: 752, duration: 0.72, ease: "none" }, 6.00);
+      tl.set("#f15-p18", { autoAlpha: 0 }, 6.72);
+      gsap.set("#f15-p19", { autoAlpha: 0 });
+      tl.set("#f15-p19", { autoAlpha: 1, x: 0 }, 6.86);
+      tl.fromTo("#f15-p19", { x: 0 }, { x: -752, duration: 0.72, ease: "none" }, 6.86);
+      tl.set("#f15-p19", { autoAlpha: 0 }, 7.58);
+      gsap.set("#f15-p20", { autoAlpha: 0 });
+      tl.set("#f15-p20", { autoAlpha: 1, x: 0 }, 6.00);
+      tl.fromTo("#f15-p20", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 6.00);
+      tl.set("#f15-p20", { autoAlpha: 0 }, 6.62);
+      gsap.set("#f15-p21", { autoAlpha: 0 });
+      tl.set("#f15-p21", { autoAlpha: 1, x: 0 }, 6.74);
+      tl.fromTo("#f15-p21", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 6.74);
+      tl.set("#f15-p21", { autoAlpha: 0 }, 7.40);
+      gsap.set("#f15-p22", { autoAlpha: 0 });
+      tl.set("#f15-p22", { autoAlpha: 1, x: 0 }, 6.94);
+      tl.fromTo("#f15-p22", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 6.94);
+      tl.set("#f15-p22", { autoAlpha: 0 }, 7.60);
+      gsap.set("#f15-p23", { autoAlpha: 0 });
+      tl.set("#f15-p23", { autoAlpha: 1, x: 0 }, 7.14);
+      tl.fromTo("#f15-p23", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 7.14);
+      tl.set("#f15-p23", { autoAlpha: 0 }, 7.80);
+      gsap.set("#f15-p24", { autoAlpha: 0 });
+      tl.set("#f15-p24", { autoAlpha: 1, x: 0 }, 7.34);
+      tl.fromTo("#f15-p24", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 7.34);
+      tl.set("#f15-p24", { autoAlpha: 0 }, 8.00);
+      gsap.set("#f15-p25", { autoAlpha: 0 });
+      tl.set("#f15-p25", { autoAlpha: 1, x: 0 }, 6.00);
+      tl.fromTo("#f15-p25", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 6.00);
+      tl.set("#f15-p25", { autoAlpha: 0 }, 6.62);
+      gsap.set("#f15-p26", { autoAlpha: 0 });
+      tl.set("#f15-p26", { autoAlpha: 1, x: 0 }, 6.18);
+      tl.fromTo("#f15-p26", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 6.18);
+      tl.set("#f15-p26", { autoAlpha: 0 }, 6.80);
+      gsap.set("#f15-p27", { autoAlpha: 0 });
+      tl.set("#f15-p27", { autoAlpha: 1, x: 0 }, 6.36);
+      tl.fromTo("#f15-p27", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 6.36);
+      tl.set("#f15-p27", { autoAlpha: 0 }, 6.98);
+      gsap.set("#f15-p28", { autoAlpha: 0 });
+      tl.set("#f15-p28", { autoAlpha: 1, x: 0 }, 6.54);
+      tl.fromTo("#f15-p28", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 6.54);
+      tl.set("#f15-p28", { autoAlpha: 0 }, 7.16);
+      gsap.set("#f15-p29", { autoAlpha: 0 });
+      tl.set("#f15-p29", { autoAlpha: 1, x: 0 }, 7.02);
+      tl.fromTo("#f15-p29", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 7.02);
+      tl.set("#f15-p29", { autoAlpha: 0 }, 7.68);
+      gsap.set("#f15-p30", { autoAlpha: 0 });
+      tl.set("#f15-p30", { autoAlpha: 1, x: 0 }, 6.00);
+      tl.fromTo("#f15-p30", { x: 0 }, { x: 752, duration: 0.70, ease: "none" }, 6.00);
+      tl.set("#f15-p30", { autoAlpha: 0 }, 6.70);
+      gsap.set("#f15-p31", { autoAlpha: 0 });
+      tl.set("#f15-p31", { autoAlpha: 1, x: 0 }, 6.26);
+      tl.fromTo("#f15-p31", { x: 0 }, { x: 752, duration: 0.70, ease: "none" }, 6.26);
+      tl.set("#f15-p31", { autoAlpha: 0 }, 6.96);
+      gsap.set("#f15-p32", { autoAlpha: 0 });
+      tl.set("#f15-p32", { autoAlpha: 1, x: 0 }, 6.52);
+      tl.fromTo("#f15-p32", { x: 0 }, { x: 752, duration: 0.70, ease: "none" }, 6.52);
+      tl.set("#f15-p32", { autoAlpha: 0 }, 7.22);
+      gsap.set("#f15-p33", { autoAlpha: 0 });
+      tl.set("#f15-p33", { autoAlpha: 1, x: 0 }, 6.12);
+      tl.fromTo("#f15-p33", { x: 0 }, { x: -752, duration: 0.70, ease: "none" }, 6.12);
+      tl.set("#f15-p33", { autoAlpha: 0 }, 6.82);
+      gsap.set("#f15-p34", { autoAlpha: 0 });
+      tl.set("#f15-p34", { autoAlpha: 1, x: 0 }, 6.38);
+      tl.fromTo("#f15-p34", { x: 0 }, { x: -752, duration: 0.70, ease: "none" }, 6.38);
+      tl.set("#f15-p34", { autoAlpha: 0 }, 7.08);
+      gsap.set("#f15-p35", { autoAlpha: 0 });
+      tl.set("#f15-p35", { autoAlpha: 1, x: 0 }, 6.64);
+      tl.fromTo("#f15-p35", { x: 0 }, { x: -752, duration: 0.70, ease: "none" }, 6.64);
+      tl.set("#f15-p35", { autoAlpha: 0 }, 7.34);
+      gsap.set("#f15-p36", { autoAlpha: 0 });
+      tl.set("#f15-p36", { autoAlpha: 1, x: 0 }, 8.70);
+      tl.fromTo("#f15-p36", { x: 0 }, { x: 752, duration: 0.72, ease: "none" }, 8.70);
+      tl.set("#f15-p36", { autoAlpha: 0 }, 9.42);
+      gsap.set("#f15-p37", { autoAlpha: 0 });
+      tl.set("#f15-p37", { autoAlpha: 1, x: 0 }, 9.56);
+      tl.fromTo("#f15-p37", { x: 0 }, { x: -752, duration: 0.72, ease: "none" }, 9.56);
+      tl.set("#f15-p37", { autoAlpha: 0 }, 10.28);
+      gsap.set("#f15-p38", { autoAlpha: 0 });
+      tl.set("#f15-p38", { autoAlpha: 1, x: 0 }, 8.70);
+      tl.fromTo("#f15-p38", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 8.70);
+      tl.set("#f15-p38", { autoAlpha: 0 }, 9.32);
+      gsap.set("#f15-p39", { autoAlpha: 0 });
+      tl.set("#f15-p39", { autoAlpha: 1, x: 0 }, 9.44);
+      tl.fromTo("#f15-p39", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 9.44);
+      tl.set("#f15-p39", { autoAlpha: 0 }, 10.10);
+      gsap.set("#f15-p40", { autoAlpha: 0 });
+      tl.set("#f15-p40", { autoAlpha: 1, x: 0 }, 9.64);
+      tl.fromTo("#f15-p40", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 9.64);
+      tl.set("#f15-p40", { autoAlpha: 0 }, 10.30);
+      gsap.set("#f15-p41", { autoAlpha: 0 });
+      tl.set("#f15-p41", { autoAlpha: 1, x: 0 }, 9.84);
+      tl.fromTo("#f15-p41", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 9.84);
+      tl.set("#f15-p41", { autoAlpha: 0 }, 10.50);
+      gsap.set("#f15-p42", { autoAlpha: 0 });
+      tl.set("#f15-p42", { autoAlpha: 1, x: 0 }, 10.04);
+      tl.fromTo("#f15-p42", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 10.04);
+      tl.set("#f15-p42", { autoAlpha: 0 }, 10.70);
+      gsap.set("#f15-p43", { autoAlpha: 0 });
+      tl.set("#f15-p43", { autoAlpha: 1, x: 0 }, 8.70);
+      tl.fromTo("#f15-p43", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 8.70);
+      tl.set("#f15-p43", { autoAlpha: 0 }, 9.32);
+      gsap.set("#f15-p44", { autoAlpha: 0 });
+      tl.set("#f15-p44", { autoAlpha: 1, x: 0 }, 8.88);
+      tl.fromTo("#f15-p44", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 8.88);
+      tl.set("#f15-p44", { autoAlpha: 0 }, 9.50);
+      gsap.set("#f15-p45", { autoAlpha: 0 });
+      tl.set("#f15-p45", { autoAlpha: 1, x: 0 }, 9.06);
+      tl.fromTo("#f15-p45", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 9.06);
+      tl.set("#f15-p45", { autoAlpha: 0 }, 9.68);
+      gsap.set("#f15-p46", { autoAlpha: 0 });
+      tl.set("#f15-p46", { autoAlpha: 1, x: 0 }, 9.24);
+      tl.fromTo("#f15-p46", { x: 0 }, { x: 752, duration: 0.62, ease: "none" }, 9.24);
+      tl.set("#f15-p46", { autoAlpha: 0 }, 9.86);
+      gsap.set("#f15-p47", { autoAlpha: 0 });
+      tl.set("#f15-p47", { autoAlpha: 1, x: 0 }, 9.72);
+      tl.fromTo("#f15-p47", { x: 0 }, { x: -752, duration: 0.66, ease: "none" }, 9.72);
+      tl.set("#f15-p47", { autoAlpha: 0 }, 10.38);
+      gsap.set("#f15-p48", { autoAlpha: 0 });
+      tl.set("#f15-p48", { autoAlpha: 1, x: 0 }, 8.70);
+      tl.fromTo("#f15-p48", { x: 0 }, { x: 752, duration: 0.70, ease: "none" }, 8.70);
+      tl.set("#f15-p48", { autoAlpha: 0 }, 9.40);
+      gsap.set("#f15-p49", { autoAlpha: 0 });
+      tl.set("#f15-p49", { autoAlpha: 1, x: 0 }, 8.96);
+      tl.fromTo("#f15-p49", { x: 0 }, { x: 752, duration: 0.70, ease: "none" }, 8.96);
+      tl.set("#f15-p49", { autoAlpha: 0 }, 9.66);
+      gsap.set("#f15-p50", { autoAlpha: 0 });
+      tl.set("#f15-p50", { autoAlpha: 1, x: 0 }, 9.22);
+      tl.fromTo("#f15-p50", { x: 0 }, { x: 752, duration: 0.70, ease: "none" }, 9.22);
+      tl.set("#f15-p50", { autoAlpha: 0 }, 9.92);
+      gsap.set("#f15-p51", { autoAlpha: 0 });
+      tl.set("#f15-p51", { autoAlpha: 1, x: 0 }, 8.82);
+      tl.fromTo("#f15-p51", { x: 0 }, { x: -752, duration: 0.70, ease: "none" }, 8.82);
+      tl.set("#f15-p51", { autoAlpha: 0 }, 9.52);
+      gsap.set("#f15-p52", { autoAlpha: 0 });
+      tl.set("#f15-p52", { autoAlpha: 1, x: 0 }, 9.08);
+      tl.fromTo("#f15-p52", { x: 0 }, { x: -752, duration: 0.70, ease: "none" }, 9.08);
+      tl.set("#f15-p52", { autoAlpha: 0 }, 9.78);
+      gsap.set("#f15-p53", { autoAlpha: 0 });
+      tl.set("#f15-p53", { autoAlpha: 1, x: 0 }, 9.34);
+      tl.fromTo("#f15-p53", { x: 0 }, { x: -752, duration: 0.70, ease: "none" }, 9.34);
+      tl.set("#f15-p53", { autoAlpha: 0 }, 10.04);
+      gsap.set("#f15-att", { autoAlpha: 0 });
+      tl.to("#f15-att", { autoAlpha: 1, duration: 0.28 }, 3.00);
+      // SEAM EXIT — ACT BREAK lift. Travels UP and pulls back to 0.86.
+      tl.to("#stage", { y: -300, duration: 0.46, ease: "power4.in" }, 11.41);
+      tl.to("#stage", { scale: 0.86, duration: 0.52, ease: "power2.in" }, 11.41);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["15-streams"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,179 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="17-field" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/lamplit.jpg');opacity:0.5"></div>
+  <div class="scrim" style="background:radial-gradient(78% 90% at 30% 26%, rgba(9,20,19,.30) 0%, rgba(9,20,19,.86) 62%, rgba(9,20,19,.96) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:112px">15 · THE FIELD</div>
+      <div id="s-rule" class="rule" style="left:118px;top:150px;width:96px;transform-origin:0% 50%"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:118px;top:176px;width:1180px;font-size:82px">Watch it where<br>the users are.</div>
+      <div id="s-lead" class="lead" style="position:absolute;left:120px;top:372px;width:840px;font-size:31px">Lab numbers are a rehearsal. Ship real user monitoring, put a budget in the pipeline, and let the build fail before the customer does.</div>
+
+      <div id="w-panel" class="panel" style="left:1006px;top:352px;width:812px;height:436px"></div>
+      <div id="w-grid" style="position:absolute;left:1042px;top:388px;width:740px;height:364px"></div>
+
+      <div id="w-ci" class="panel" style="left:118px;top:640px;width:800px;height:296px;background:#080C0B"></div>
+      <div id="w-cibar" style="position:absolute;left:118px;top:640px;width:800px;height:38px;
+        background:rgba(176,228,204,.05);border-bottom:1px solid rgba(176,228,204,.12);border-radius:10px 10px 0 0"></div>
+      <div class="mono" style="position:absolute;left:142px;top:651px;font-size:15px;letter-spacing:.12em;opacity:.55">performance budget &middot; pull request #412</div>
+      <div id="w-cilines" style="position:absolute;left:142px;top:702px;width:752px"></div>
+      <div id="w-verdict" style="position:absolute;left:142px;top:866px">
+        <span class="chipmint" style="background:var(--brass);font-size:17px;padding:8px 16px;letter-spacing:.1em">BUILD FAILED &mdash; LCP +410ms</span></div>
+
+      <div id="w-fixed" style="position:absolute;left:142px;top:866px">
+        <span class="chipmint" style="font-size:17px;padding:8px 16px;letter-spacing:.1em">BUILD PASSED &mdash; LCP 2.28s</span></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at full opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // SEAM CARRIER — the box tag and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up: the seam gate measures
+      // MOTION, so a station whose content fades in at 0.1s passes the gate while visibly
+      // entering on an empty frame. Only the rule and the lead line are staged.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30000000000000004);
+      tl.fromTo("#w-panel", { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.56, ease: "power3.out" }, 0.08);
+      // the route, redrawn as fifteen instruments — four across, four back, four across, three.
+      var D = ["distribution","LCP","CLS","INP","critical path","fonts","images","bundle","rendering","hydration","main thread","paint","caching","third parties","the field"], HOT = [1,2,3,4,7,13], g = document.querySelector("#w-grid");
+      var COLS = 4, CW = 185, CH = 91;
+      for (var i = 0; i < D.length; i++) {
+        var row = Math.floor(i / COLS), col = i % COLS;
+        if (row % 2 === 1) col = COLS - 1 - col;          // serpentine: alternate rows run back
+        var hot = HOT.indexOf(i) >= 0;
+        var cell = document.createElement("div");
+        cell.className = "dial";
+        cell.style.cssText = "position:absolute;left:" + (col*CW) + "px;top:" + (row*CH) + "px;width:" + (CW-18) + "px;height:" + (CH-16) + "px";
+        cell.innerHTML =
+          '<div style="position:absolute;left:0;top:0;width:56px;height:56px;border-radius:50%;' +
+            'background-image:url(\'assets/plates/brass.jpg\');background-size:cover;' +
+            'box-shadow:inset 1px 1px 3px rgba(255,236,196,.5),inset -2px -2px 4px rgba(0,0,0,.6),0 5px 12px rgba(0,0,0,.55)"></div>' +
+          '<div style="position:absolute;left:6px;top:6px;width:44px;height:44px;border-radius:50%;' +
+            'background:radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 52%, #091413 100%)"></div>' +
+          '<div class="mini" style="position:absolute;left:27px;top:12px;width:3px;height:17px;transform-origin:50% 100%;' +
+            'border-radius:2px;background:' + (hot ? "var(--brass)" : "var(--mint)") + '"></div>' +
+          '<div style="position:absolute;left:68px;top:14px;width:' + (CW-92) + 'px;font-family:JBMono,monospace;font-size:14px;' +
+            'line-height:1.32;color:' + (hot ? "var(--brass)" : "var(--emerald-lit)") + '">' + D[i] + '</div>';
+        g.appendChild(cell);
+        // each instrument lights in ROUTE order — the film replayed at a glance.
+        tl.fromTo(cell, { autoAlpha: 0, scale: 0.86 }, { autoAlpha: 1, scale: 1, duration: 0.34, ease: "back.out(1.6)" }, 0.60 + i*0.115);
+        var target = hot ? 58 : -34;
+        tl.fromTo(cell.querySelector(".mini"), { rotation: -120 }, { rotation: target, duration: 0.52, ease: "power3.out" }, 0.70 + i*0.115);
+      }
+      // hold with every station lit — the map complete, before the end card takes it.
+      // the CI gate: the number defended automatically, which is the actual takeaway.
+      tl.fromTo("#w-ci",    { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.50, ease: "power3.out" }, 2.60);
+      tl.fromTo("#w-cibar", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.34 }, 2.72);
+      var CI = [
+        '<span style="opacity:.5">$</span> npx lighthouse-ci assert',
+        '',
+        '  LCP        <span style="color:var(--mint)">2.31s</span> &rarr; <span class="hot">2.72s</span>   budget 2.50s  <span class="hot">FAIL</span>',
+        '  INP        <span style="color:var(--mint)">142ms</span> &rarr; <span style="color:var(--mint)">148ms</span>   budget  200ms  <span style="color:var(--mint)">pass</span>',
+        '  bundle     <span style="color:var(--mint)">178 KB</span> &rarr; <span style="color:var(--mint)">181 KB</span>  budget  200 KB  <span style="color:var(--mint)">pass</span>'
+      ];
+      var cw = document.querySelector("#w-cilines");
+      for (var k = 0; k < CI.length; k++) {
+        var ln = document.createElement("div");
+        ln.style.cssText = "font-family:JBMono,monospace;font-size:18px;line-height:1.72;color:var(--emerald-lit);white-space:nowrap";
+        ln.innerHTML = CI[k] || "&nbsp;"; cw.appendChild(ln);
+        tl.fromTo(ln, { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.30, ease: "power3.out" }, 2.90 + k*0.30);
+      }
+      tl.fromTo("#w-verdict", { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 0.46, ease: "back.out(1.6)" }, 4.70);
+      // 0.6s of stillness before the Z-back — the cheapest emphasis in the kit, spent on
+      // the one seam in the film that is allowed to be an arrival.
+      // the gate is the point of the station, so it has to be seen WORKING: the author
+      // pushes a fix, the run goes again, and the number is defended without anyone asking.
+      tl.to("#w-verdict", { autoAlpha: 0, y: -10, duration: 0.34, ease: "power2.in" }, 6.60);
+      gsap.set("#w-fixed", { autoAlpha: 0 });
+      var again = cw.children[2];
+      tl.to(again, { autoAlpha: 0.25, duration: 0.30 }, 6.70);
+      tl.to(again, { autoAlpha: 1, duration: 0.30 }, 7.30);
+      tl.fromTo("#w-fixed", { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 0.46, ease: "back.out(1.6)" }, 7.40);
+      // every instrument on the panel settles back into the green as the budget holds.
+      var minis = document.querySelectorAll("#w-grid .mini");
+      for (var f2 = 0; f2 < minis.length; f2++)
+        tl.to(minis[f2], { rotation: -34, backgroundColor: "#B0E4CC", duration: 0.60, ease: "power2.inOut" }, 7.60 + f2*0.052);
+      // SEAM EXIT — Z-BACK, the arrival vector. Reserved; spent once in this film.
+      tl.to("#stage", { scale: 0.62, duration: 0.52, ease: "power4.in" }, 9.48);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["17-field"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,132 @@
+EPISODE 23 — AUTHENTICATION vs AUTHORISATION
+Source material. Every claim below is verified; sources named inline.
+
+================================================================
+THE TWO QUESTIONS
+================================================================
+
+Authentication answers ONE question: who are you?
+Authorisation answers a DIFFERENT one: what are you allowed to touch?
+
+They run in that order, they are separate checks, and the second one is the
+one that gets left out.
+
+Shorthand: AuthN = who. AuthZ = what.
+
+================================================================
+THE REAL-LIFE EXAMPLE — A HOTEL
+================================================================
+
+You arrive at a hotel.
+
+1. AUTHENTICATION happens at the front desk. You hand over a passport. The
+   clerk checks the face against the photo and the name against the booking.
+   Satisfied, they encode a keycard and hand it to you. That is the whole of
+   authentication: a claim, a check, and a credential issued.
+
+   Fail this and you never get a card at all. In HTTP that is 401.
+
+2. AUTHORISATION happens at every door, every time. You hold the card to the
+   lock on room 412 and it opens. The gym opens. The pool opens.
+
+   Room 413 does not open. The manager's office does not open. The card is
+   perfectly valid — it was issued twenty seconds ago by the front desk. The
+   door is not asking whether the card is real. It is asking whether THIS card
+   is on the list for THIS door.
+
+   In HTTP that is 403.
+
+The load-bearing detail: the door lock does not re-run the passport check. It
+does not care who you are, only what you may open. And because the two checks
+are in different places, a system can pass the first and skip the second
+entirely — which is exactly the bug.
+
+Second load-bearing detail: authenticate ONCE, at the desk. Authorise EVERY
+TIME, at every door. Anyone who authorises once and then trusts the card
+forever has built the bug on purpose.
+
+================================================================
+401 vs 403 — THE NAMING TRAP (RFC 9110)
+================================================================
+
+RFC 9110, the current HTTP semantics specification:
+
+- 401 Unauthorized (§15.5.2) — the request lacks valid authentication
+  credentials for the target resource. The server is asking the client to
+  authenticate itself.
+
+- 403 Forbidden (§15.5.4) — the server understood the request and refuses to
+  fulfil it. The server is not obligated to explain why.
+
+So the status code named "Unauthorized" is the AUTHENTICATION failure, and the
+one named "Forbidden" is the AUTHORISATION failure. The name is a historical
+accident and it has misled two generations of developers.
+
+Read them as:
+  401 — I don't know who you are.
+  403 — I know exactly who you are, and the answer is no.
+
+================================================================
+WHAT IT LOOKS LIKE IN CODE
+================================================================
+
+The bug. An invoice endpoint that authenticates and stops:
+
+    app.get('/api/invoices/:id', requireAuth, async (req, res) => {
+      const invoice = await db.invoice.findById(req.params.id)
+      res.json(invoice)                      // 200 OK — to anyone signed in
+    })
+
+`requireAuth` is doing its job perfectly. The token is valid, unexpired,
+correctly signed. The caller is authenticated. And they just read someone
+else's invoice by changing a number in the URL.
+
+This class of bug has a name: IDOR — Insecure Direct Object Reference.
+
+The fix is one condition, and it is about ownership, not identity:
+
+    app.get('/api/invoices/:id', requireAuth, async (req, res) => {
+      const invoice = await db.invoice.findById(req.params.id)
+      if (invoice.ownerId !== req.user.id) return res.sendStatus(403)
+      res.json(invoice)
+    })
+
+A valid token got you through the front desk. It was never supposed to open
+every door.
+
+================================================================
+WHY IT MATTERS — OWASP TOP 10 2025
+================================================================
+
+Source: OWASP Top 10 2025, A01:2025 Broken Access Control.
+
+  Rank                         #1 (holds the position from 2021)
+  CWEs mapped                  40
+  Total occurrences            1,839,701
+  Total CVEs                   32,654
+  Applications tested with it  100%
+  Average incidence rate       3.74%
+  Max incidence rate           20.15%
+
+OWASP's definition: "Access control enforces policy such that users cannot act
+outside of their intended permissions."
+
+OWASP's own prevention list includes, verbatim:
+  - deny by default for all resources except public ones
+  - deploy access controls in trusted server-side code or serverless APIs
+  - "Enforce record ownership rather than allowing users to create, read,
+    update, or delete any record"
+  - invalidate session identifiers server-side after logout; keep JWTs
+    short-lived
+
+Note what that third bullet is. It is the one-line fix above, written as
+policy. The number-one security risk on the web is, in a large share of cases,
+a missing ownership check on a route that already authenticates correctly.
+
+================================================================
+THE TAKEAWAY
+================================================================
+
+Authenticate once. Authorise every time.
+
+A token proves the front desk let you in. It never proves the door should open.

@@ -1,0 +1,237 @@
+<template>
+  <style>
+@font-face{font-family:"Fraktur";src:url("assets/fonts/Fraktur-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Anton";src:url("assets/fonts/Anton-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Oswald";src:url("assets/fonts/Oswald-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-900.woff2") format("woff2");font-weight:900;font-style:normal;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-700i.woff2") format("woff2");font-weight:700;font-style:italic;font-display:block}
+@font-face{font-family:"Bodoni";src:url("assets/fonts/Bodoni-900.woff2") format("woff2");font-weight:900;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400i.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --news:#E3DDCE; --news2:#D3CBB8; --scrap:#F2EDE1; --plate:#141210;
+  --ink:#171310; --ink2:#4E4638; --stop:#C1272D; --stopt:#A81E24;
+  background:var(--news); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the .clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* The field OVER-SCANS. A frame whose exit shrinks (the reserved Z-back) would
+   otherwise show the stage edge for the length of the cut. -18% covers the largest
+   travel in a 1920-wide frame and costs nothing on the frames that never shrink. */
+.field{position:absolute;inset:-18%}
+
+/* ---- THE PAGE: newsprint is a HALFTONE, not a flat fill --------------------
+   A 4px dot screen in press black at low alpha. Static, always: a halftone that
+   moves is a moire and it will wreck the encode. */
+.screen{position:absolute;inset:-18%;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px, rgba(23,19,16,.115) 0.85px, transparent 0.9px);
+  background-size:4px 4px}
+/* the press never lays ink perfectly evenly */
+.grain{position:absolute;inset:-18%;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle at 2px 3px, rgba(23,19,16,.08) 1px, transparent 1.1px);
+  background-size:11px 9px}
+
+/* ---- TYPE: eight families, one job each ---------------------------------- */
+.mast{font-family:"Fraktur",serif;font-weight:400;line-height:.95;color:var(--ink)}
+.head{font-family:"Anton",sans-serif;font-weight:400;line-height:.88;
+  letter-spacing:-.005em;text-transform:uppercase;color:var(--ink)}
+.head2{font-family:"Oswald",sans-serif;font-weight:700;line-height:.94;
+  letter-spacing:.005em;text-transform:uppercase;color:var(--ink)}
+.quote{font-family:"Playfair",Georgia,serif;font-weight:900;line-height:1.10;color:var(--ink)}
+.qital{font-family:"Playfair",Georgia,serif;font-weight:700;font-style:italic;line-height:1.14}
+/* Bodoni Moda is loaded at optical size 96 — a DISPLAY cut. Below about 80px its
+   hairline stems vanish in the render and N becomes a bare diagonal, 1 a bare stem.
+   .fig is for BIG figures only; anything smaller uses .head2 (Oswald). Verified by
+   measuring the render, not by looking at the font in a browser. */
+.fig{font-family:"Bodoni",serif;font-weight:900;line-height:.86;color:var(--ink)}
+.body{font-family:"PTSerif",Georgia,serif;font-weight:400;line-height:1.30;color:var(--ink)}
+.bodyb{font-family:"PTSerif",Georgia,serif;font-weight:700;line-height:1.28}
+.bodyi{font-family:"PTSerif",Georgia,serif;font-style:italic;line-height:1.30}
+.mono{font-family:"Courier",monospace;font-weight:400;color:var(--ink)}
+.monob{font-family:"Courier",monospace;font-weight:700}
+.slug{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.20em;
+  text-transform:uppercase;font-size:20px;color:var(--ink2)}
+.red{color:var(--stopt)}      /* red as a LETTER — the only red allowed to be type */
+.faint{color:var(--ink2)}
+.rev{color:var(--scrap)}      /* reversed out of the black plate */
+.rev .faint{color:#A79E8D}
+.rev .slug{color:#A79E8D}
+
+/* ---- RULES: press furniture. Never a glyph. ------------------------------ */
+.rule{position:absolute;background:var(--ink);height:3px}
+.hair{position:absolute;background:var(--ink2);height:1px;opacity:.55}
+.rrule{position:absolute;background:var(--stop);height:5px}
+.revrule{position:absolute;background:var(--scrap);height:3px}
+
+/* ---- A CUTTING ----------------------------------------------------------
+   Four layers, and all four are required. The drop-shadow lives on a SIBLING,
+   not in box-shadow: box-shadow follows the border box, so on a clip-path shape
+   it draws a rectangle behind a torn edge — the single loudest tell in the register. */
+.cutw{position:absolute}                                   /* the slap wrapper */
+.cutsh{position:absolute;inset:0;background:rgba(23,19,16,.34);filter:blur(7px)}
+.cutfib{position:absolute;inset:0;background:#FFFCF4}      /* the torn fibre lip */
+.cutface{position:absolute;inset:0;background:var(--scrap);overflow:hidden}
+.cutbody{position:absolute;inset:0}
+
+/* ---- MISREGISTRATION -----------------------------------------------------
+   The one "effect" in the film, and it is a real press artifact: the spot plate lands
+   a hair off the black one. Carried as a TEXT-SHADOW on the headline itself, never as
+   a duplicated element — a second copy of the words in the same place is two text
+   blocks the layout gate is right to reject, and it doubles what a contrast checker
+   has to reason about. One impression, one fringe. */
+
+/* ---- THE STAMP ---------------------------------------------------------- */
+/* on the black plate the stamp turns CREAM: red type on plate measures 3.20:1 and
+   this register does not put red type on black. */
+.stampw{border-color:var(--scrap)!important;color:var(--scrap)!important}
+.stamp{position:absolute;border:4px solid var(--stop);color:var(--stopt);
+  font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:.10em;
+  text-transform:uppercase;opacity:.88;display:flex;align-items:center;
+  justify-content:center;white-space:nowrap}
+
+/* ---- THE PEN: red strokes drawn on the page. Never a glyph. -------------- */
+/* z-index 5 is load-bearing: a cutting is z-index 2, so a pen with auto z-index
+   draws UNDERNEATH the very thing it is marking and is invisible in the render. */
+.pen{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;overflow:visible;z-index:5}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--stop);stroke-linecap:round;
+  stroke-linejoin:round}
+.penk path,.penk line,.penk polyline{stroke:var(--ink)}
+.penw path,.penw line,.penw polyline{stroke:var(--scrap)}
+
+  </style>
+
+  <div id="root" data-composition-id="05-tableone" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="field" data-layout-allow-overflow style="background:var(--news)"></div><div class="screen" data-layout-allow-overflow ></div><div class="grain" data-layout-allow-overflow></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-kick" class="slug" style="position:absolute;left:120px;top:110px;color:var(--stopt)">1984 &middot; TABLE&nbsp;I</div>
+      <div id="s-rule" class="rrule" style="left:120px;top:146px;width:132px;transform-origin:0% 50%"></div>
+      <div id="s-head" class="head" style="position:absolute;left:120px;top:186px;width:1300px;font-size:86px;z-index:1;text-shadow:3px 2px 0 rgba(193,39,45,.42)">THEY PUBLISHED<br>THE NUMBER</div>
+      <div id="s-deck" class="body" style="position:absolute;left:122px;top:374.8px;width:1000px;font-size:31px">The same procedure, measured twice: once inside one process, once across a lightly-loaded Ethernet.</div>
+
+      
+      <div id="f5-tab" class="cutw" style="left:150px;top:474px;width:972px;height:386px;z-index:2;transform:rotate(-0.6deg)">
+        <div id="f5-tab-sh"  class="cutsh"  style="clip-path:polygon(0.0px 0.5px,74.8px 2.2px,149.5px 1.3px,224.3px 0.6px,299.1px -1.1px,373.8px 1.3px,448.6px -0.5px,523.4px -1.5px,598.2px -1.0px,672.9px -2.0px,747.7px -1.2px,822.5px -2.5px,897.2px -1.1px,971.8px 0.0px,971.5px 77.2px,971.2px 154.4px,972.2px 231.6px,972.0px 308.8px,972.0px 387.2px,897.2px 386.5px,822.5px 388.0px,747.7px 384.0px,672.9px 387.3px,598.2px 387.4px,523.4px 388.0px,448.6px 387.7px,373.8px 383.8px,299.1px 385.9px,224.3px 387.0px,149.5px 387.7px,74.8px 385.0px,-1.6px 386.0px,2.0px 308.8px,-0.5px 231.6px,-1.1px 154.4px,-0.6px 77.2px)"></div>
+        <div id="f5-tab-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px 1.3px,75.2px -0.5px,150.3px -1.5px,225.5px -1.0px,300.6px -2.0px,375.8px -1.2px,450.9px -2.5px,526.1px -1.1px,601.2px 0.2px,676.4px 0.5px,751.5px 0.8px,826.7px -0.2px,901.8px 0.0px,978.2px 0.0px,977.5px 78.2px,979.0px 156.4px,975.0px 234.6px,978.3px 312.8px,977.0px 392.4px,901.8px 393.0px,826.7px 392.7px,751.5px 388.8px,676.4px 390.9px,601.2px 392.0px,526.1px 392.7px,450.9px 390.0px,375.8px 392.6px,300.6px 389.0px,225.5px 391.5px,150.3px 392.1px,75.2px 391.6px,-1.1px 391.0px,-2.3px 312.8px,-2.3px 234.6px,-0.1px 156.4px,-1.7px 78.2px)"></div>
+        <div id="f5-tab-fc"  class="cutface" style="background:var(--scrap);clip-path:polygon(0.0px 0.5px,74.8px 2.2px,149.5px 1.3px,224.3px 0.6px,299.1px -1.1px,373.8px 1.3px,448.6px -0.5px,523.4px -1.5px,598.2px -1.0px,672.9px -2.0px,747.7px -1.2px,822.5px -2.5px,897.2px -1.1px,971.8px 0.0px,971.5px 77.2px,971.2px 154.4px,972.2px 231.6px,972.0px 308.8px,972.0px 387.2px,897.2px 386.5px,822.5px 388.0px,747.7px 384.0px,672.9px 387.3px,598.2px 387.4px,523.4px 388.0px,448.6px 387.7px,373.8px 383.8px,299.1px 385.9px,224.3px 387.0px,149.5px 387.7px,74.8px 385.0px,-1.6px 386.0px,2.0px 308.8px,-0.5px 231.6px,-1.1px 154.4px,-0.6px 77.2px)">
+          <div class="cutbody" style="padding:0px">
+          <div class="slug" style="position:absolute;left:40px;top:26px;font-size:13px;letter-spacing:.16em">TABLE&nbsp;I &mdash; PERFORMANCE RESULTS FOR SOME EXAMPLES OF REMOTE CALLS &middot; P.&nbsp;57</div>
+          <div style="position:absolute;left:40px;top:56px;display:table;width:904px">
+            <div style="display:table-row"><div style="display:table-cell;width:318px;padding:7px 0;font-size:19px;letter-spacing:.10em;text-transform:uppercase;font-family:'Archivo',sans-serif;font-weight:700;color:var(--ink2);">Procedure</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:19px;letter-spacing:.10em;text-transform:uppercase;font-family:'Archivo',sans-serif;font-weight:700;color:var(--ink2);text-align:right;padding-right:26px;">Minimum</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:19px;letter-spacing:.10em;text-transform:uppercase;font-family:'Archivo',sans-serif;font-weight:700;color:var(--ink2);text-align:right;padding-right:26px;">Median</div><div style="display:table-cell;width:190px;padding:7px 0;font-size:19px;letter-spacing:.10em;text-transform:uppercase;font-family:'Archivo',sans-serif;font-weight:700;color:var(--ink2);text-align:right;padding-right:26px;">Transmission</div><div style="display:table-cell;width:140px;padding:7px 0;font-size:19px;letter-spacing:.10em;text-transform:uppercase;font-family:'Archivo',sans-serif;font-weight:700;color:var(--ink2);text-align:right;padding-right:26px;">Local-only</div></div>
+          </div>
+          <div class="rule" style="left:40px;top:100px;width:904px;height:2px"></div>
+          <div id="f5-r0" style="position:absolute;left:40px;top:112px;display:table;width:904px">
+            <div style="display:table-row"><div style="display:table-cell;width:318px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;">no args/results</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1059</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1097</div><div style="display:table-cell;width:190px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">131</div><div style="display:table-cell;width:140px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">9</div></div></div><div id="f5-r1" style="position:absolute;left:40px;top:158px;display:table;width:904px">
+            <div style="display:table-row"><div style="display:table-cell;width:318px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;">1 arg/result</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1070</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1105</div><div style="display:table-cell;width:190px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">142</div><div style="display:table-cell;width:140px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">10</div></div></div><div id="f5-r2" style="position:absolute;left:40px;top:204px;display:table;width:904px">
+            <div style="display:table-row"><div style="display:table-cell;width:318px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;">2 args/results</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1077</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1127</div><div style="display:table-cell;width:190px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">152</div><div style="display:table-cell;width:140px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">11</div></div></div><div id="f5-r3" style="position:absolute;left:40px;top:250px;display:table;width:904px">
+            <div style="display:table-row"><div style="display:table-cell;width:318px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;">4 args/results</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1115</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1171</div><div style="display:table-cell;width:190px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">174</div><div style="display:table-cell;width:140px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">12</div></div></div><div id="f5-r4" style="position:absolute;left:40px;top:296px;display:table;width:904px">
+            <div style="display:table-row"><div style="display:table-cell;width:318px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;">10 args/results</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1222</div><div style="display:table-cell;width:128px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">1278</div><div style="display:table-cell;width:190px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">239</div><div style="display:table-cell;width:140px;padding:7px 0;font-size:25px;font-family:'Courier',monospace;text-align:right;padding-right:26px;">17</div></div></div>
+          <div class="hair" style="left:40px;top:344px;width:904px"></div>
+          <div class="body faint" style="position:absolute;left:40px;top:352px;font-size:17px;font-style:italic">All times in microseconds. Dorado workstations, 2.94&nbsp;Mbit Ethernet.</div></div>
+        </div>
+      </div>
+
+      <!-- ONE statement, not three. The table carries the figures and the bars carry
+           the feel, so this column does the arithmetic and stops. Explicit line-height
+           keeps the declared box within a few px of the INK box, which is what an
+           overlap gate actually measures — a tight line-height on a 132px face puts
+           45px of ink outside the element on each side. -->
+      <div id="f5-box" style="position:absolute;left:1176px;top:474px;width:604px;height:386px">
+        <div id="f5-l1" class="mono" style="position:absolute;left:0;top:0;font-size:25px;line-height:1.3">1097 &micro;s &divide; 9 &micro;s</div>
+        <div id="f5-n1" class="fig" style="position:absolute;left:0;top:52px;font-size:168px;line-height:1.5;color:var(--stopt)">121.9&times;</div>
+        <div id="f5-l2" class="head2" style="position:absolute;left:0;top:322px;width:604px;font-size:34px">SLOWER, ON<br>THEIR OWN NUMBERS</div>
+      </div>
+
+      <!-- ONE PIXEL PER MICROSECOND. The remote bar draws the length of the page. -->
+      <div id="f5-sc" class="slug" style="position:absolute;left:150px;top:892px;font-size:16px">DRAWN TO SCALE &mdash; ONE PIXEL PER MICROSECOND</div>
+      <div id="f5-la" class="slug" style="position:absolute;left:150px;top:930px;font-size:20px;color:var(--ink)">LOCAL</div>
+      <div id="f5-ba" style="position:absolute;left:452px;top:924px;width:9px;height:26px;background:var(--ink);transform-origin:0% 50%"></div>
+      <div id="f5-lb" class="slug" style="position:absolute;left:150px;top:978px;font-size:20px;color:var(--ink)">REMOTE</div>
+      <div id="f5-bb" style="position:absolute;left:452px;top:972px;width:1097px;height:26px;background:var(--stop);transform-origin:0% 50%"></div>
+      <svg id="f5-arr-svg" class="pen " viewBox="0 0 1920 1080"><path id="f5-arr" d="M524,936 Q494.6,925.0 466,938 M480.6,921.5 L466,938 L488.0,937.9" stroke-width="4"/></svg>
+      <div id="f5-nine" class="mono" style="position:absolute;left:532px;top:922px;font-size:23px;font-weight:700">9 px</div>
+      <div id="f5-end" class="mono" style="position:absolute;left:1567px;top:970px;font-size:23px;font-weight:700;color:var(--stopt)">1097 px</div>
+      <!-- the mark that ties the bars back to the source: a box round row one -->
+      <svg id="f5-box0-svg" class="pen " viewBox="0 0 1920 1080"><path id="f5-box0" d="M207.5,584.6 L1091.1,583.8 L1092.7,628.0 L183.5,628.0 L185.1,583.5 L245.5,577.7" stroke-width="4"/></svg>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at FULL opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+
+      // SEAM CARRIER — the kicker and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.42, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-head", { y: 15 }, { y: 0, duration: 0.50, ease: "power3.out" }, 0);
+      tl.fromTo("#s-deck", { autoAlpha: 0, y: 17 }, { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 0.30);
+      gsap.set("#f5-tab", { rotation: -11.19, scale: 1.13, y: -34 });
+      tl.fromTo("#f5-tab", { rotation: -11.19, scale: 1.13, y: -34 }, { rotation: -0.6, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 1.00);
+      gsap.set("#f5-tab-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f5-tab-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 1.033);
+      gsap.set("#f5-tab", { autoAlpha: 0 });
+      tl.set("#f5-tab", { autoAlpha: 1 }, 1.00);
+      gsap.set("#f5-r0", { autoAlpha: 0, x: -14 });
+      tl.to("#f5-r0", { autoAlpha: 1, x: 0, duration: 0.26, ease: "power2.out" }, 1.34);
+      gsap.set("#f5-r1", { autoAlpha: 0, x: -14 });
+      tl.to("#f5-r1", { autoAlpha: 1, x: 0, duration: 0.26, ease: "power2.out" }, 1.64);
+      gsap.set("#f5-r2", { autoAlpha: 0, x: -14 });
+      tl.to("#f5-r2", { autoAlpha: 1, x: 0, duration: 0.26, ease: "power2.out" }, 1.94);
+      gsap.set("#f5-r3", { autoAlpha: 0, x: -14 });
+      tl.to("#f5-r3", { autoAlpha: 1, x: 0, duration: 0.26, ease: "power2.out" }, 2.24);
+      gsap.set("#f5-r4", { autoAlpha: 0, x: -14 });
+      tl.to("#f5-r4", { autoAlpha: 1, x: 0, duration: 0.26, ease: "power2.out" }, 2.54);
+      // row one is the one that matters, and the pen says so
+      gsap.set("#f5-l1", { autoAlpha: 0 });
+      tl.to("#f5-l1", { autoAlpha: 1, duration: 0.28 }, 3.60);
+      gsap.set("#f5-n1", { autoAlpha: 0, scale: 0.74 });
+      tl.to("#f5-n1", { autoAlpha: 1, scale: 1, duration: 0.18, ease: "steps(3)" }, 4.10);
+      gsap.set("#f5-l2", { autoAlpha: 0, y: 16 });
+      tl.to("#f5-l2", { autoAlpha: 1, y: 0, duration: 0.40, ease: "power3.out" }, 4.60);
+
+      // THE RUNNING SYSTEM — the remote bar draws across the page at 1px per microsecond.
+      // Nothing else on the frame is doing anything for these two and a half seconds,
+      // and it does not need to: the length IS the fact.
+      gsap.set("#f5-sc", { autoAlpha: 0 });
+      tl.to("#f5-sc", { autoAlpha: 1, duration: 0.28 }, 6.20);
+      gsap.set("#f5-la", { autoAlpha: 0 }); gsap.set("#f5-lb", { autoAlpha: 0 });
+      tl.to("#f5-la", { autoAlpha: 1, duration: 0.24 }, 6.38);
+      gsap.set("#f5-ba", { scaleX: 0 });
+      tl.to("#f5-ba", { scaleX: 1, duration: 0.10, ease: "none" }, 6.50);
+      var pen_f5arr_d = anime.svg.createDrawable("#f5-arr");
+      var pen_f5arr = anime.animate(pen_f5arr_d, { draw: ["0 0", "0 1"], duration: 440, ease: anime.steps(7), autoplay: false });
+      var P_pen_f5arr = { p: 0 };
+      tl.to(P_pen_f5arr, { p: 1, duration: 0.44, ease: "none", onUpdate: function () { pen_f5arr.seek(P_pen_f5arr.p * pen_f5arr.duration); } }, 6.66);
+      gsap.set("#f5-nine", { autoAlpha: 0 });
+      tl.to("#f5-nine", { autoAlpha: 1, duration: 0.22 }, 7.06);
+      tl.to("#f5-lb", { autoAlpha: 1, duration: 0.24 }, 7.50);
+      gsap.set("#f5-bb", { scaleX: 0 });
+      tl.to("#f5-bb", { scaleX: 1, duration: 2.60, ease: "power1.inOut" }, 7.62);
+      gsap.set("#f5-end", { autoAlpha: 0 });
+      tl.to("#f5-end", { autoAlpha: 1, duration: 0.22 }, 10.30);
+      // and the pen goes back to the one row both numbers came out of
+      var pen_f5box0_d = anime.svg.createDrawable("#f5-box0");
+      var pen_f5box0 = anime.animate(pen_f5box0_d, { draw: ["0 0", "0 1"], duration: 740, ease: anime.steps(11), autoplay: false });
+      var P_pen_f5box0 = { p: 0 };
+      tl.to(P_pen_f5box0, { p: 1, duration: 0.74, ease: "none", onUpdate: function () { pen_f5box0.seek(P_pen_f5box0.p * pen_f5box0.duration); } }, 11.60);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 13.41);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["05-tableone"] = tl;
+    })();
+  </script>
+</template>

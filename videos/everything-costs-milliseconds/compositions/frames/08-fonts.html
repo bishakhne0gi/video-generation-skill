@@ -1,0 +1,184 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="08-fonts" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/interior.jpg');opacity:0.38"></div>
+  <div class="scrim" style="background:radial-gradient(84% 96% at 50% 46%, rgba(9,20,19,.52) 0%, rgba(9,20,19,.93) 66%, rgba(9,20,19,.99) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      <div class="plate" style="background-image:url('assets/plates/letterpress.jpg');opacity:.20;
+        mask-image:radial-gradient(56% 70% at 76% 62%, #000 0%, transparent 74%);
+        -webkit-mask-image:radial-gradient(56% 70% at 76% 62%, #000 0%, transparent 74%)"></div>
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:112px">06 · RENDER BLOCKING</div>
+      <div id="s-rule" class="rule" style="left:118px;top:150px;width:96px;transform-origin:0% 50%"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:118px;top:176px;width:1180px;font-size:82px">The head holds<br>the page shut.</div>
+      <div id="s-lead" class="lead" style="position:absolute;left:120px;top:372px;width:840px;font-size:31px">A stylesheet in the head stops first paint until it lands. A font does the same to the words &mdash; and then chooses whether to hide them or swap them.</div>
+
+      <div id="f-specs" style="position:absolute;left:118px;top:566px;width:1006px"></div>
+
+      <div id="f-code" class="panel" style="left:1176px;top:392px;width:632px;height:284px;background:#080C0B"></div>
+      <div id="f-codebar" style="position:absolute;left:1176px;top:392px;width:632px;height:36px;
+        background:rgba(176,228,204,.05);border-bottom:1px solid rgba(176,228,204,.12);border-radius:10px 10px 0 0"></div>
+      <div class="mono" style="position:absolute;left:1200px;top:402px;font-size:15px;letter-spacing:.12em;opacity:.55">index.html</div>
+      <div id="f-lines" style="position:absolute;left:1200px;top:452px;width:590px"></div>
+
+      <div id="f-note" style="position:absolute;left:1176px;top:706px;width:632px">
+        <div class="mono" style="font-size:19px;color:var(--emerald-lit);line-height:1.7">
+          <span class="hot">font-display: swap</span> &mdash; show fallback, swap on arrival<br>
+          <span class="hot">rel="preload"</span> &mdash; fetch it without waiting for CSS<br>
+          <span style="opacity:.6">one face above the fold. Not the family.</span></div></div>
+      <div id="f-tl" style="position:absolute;left:118px;top:906px;width:1006px">
+        <div class="mono" style="font-size:17px;letter-spacing:.15em;opacity:.55">WHEN THE WORDS BECOME READABLE</div>
+        <div id="f-tlbad" style="position:absolute;left:0;top:36px;width:640px;height:22px;border-radius:5px;transform-origin:0% 50%;
+          background:repeating-linear-gradient(112deg,rgba(232,161,60,.42) 0 9px,rgba(232,161,60,.12) 9px 20px);border:1px solid rgba(232,161,60,.6)"></div>
+        <div id="f-tlbadl" class="mono hot" style="position:absolute;left:656px;top:38px;font-size:18px;font-weight:700">2.4s &mdash; default</div>
+        <div id="f-tlok" style="position:absolute;left:0;top:70px;width:80px;height:22px;border-radius:5px;transform-origin:0% 50%;background:var(--mint)"></div>
+        <div id="f-tlokl" class="mono" style="position:absolute;left:96px;top:72px;font-size:18px;font-weight:700;color:var(--mint)">0.3s &mdash; preloaded, swapped</div></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at full opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // SEAM CARRIER — the box tag and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up: the seam gate measures
+      // MOTION, so a station whose content fades in at 0.1s passes the gate while visibly
+      // entering on an empty frame. Only the rule and the lead line are staged.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30000000000000004);
+      // the three specimens: what the reader actually gets, in order, on a slow connection.
+      var S = [
+        { t: "0.0s &mdash; 1.2s", l: "FOIT", d: "invisible text, nothing to read", cls: "blank" },
+        { t: "1.2s &mdash; 2.4s", l: "SWAP", d: "fallback face, readable immediately", cls: "fallback" },
+        { t: "2.4s", l: "LOADED", d: "brand face, one reflow", cls: "brand" }
+      ];
+      var wrap = document.querySelector("#f-specs");
+      for (var i = 0; i < 3; i++) {
+        var s = S[i], row = document.createElement("div");
+        row.style.cssText = "position:absolute;left:0;top:" + (i*116) + "px;width:1006px;height:100px";
+        var sample = s.cls === "blank"
+          ? '<span style="opacity:.13;color:var(--mint)">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</span>'
+          : 'Add to basket';
+        var famCss = s.cls === "brand"
+          ? "font-family:Archivo,sans-serif;font-weight:800;font-stretch:125%;letter-spacing:-.03em"
+          : "font-family:Georgia,serif;font-weight:400;letter-spacing:0";
+        row.innerHTML =
+          '<div style="position:absolute;left:0;top:8px;width:150px;font-family:JBMono,monospace;font-size:16px;' +
+            'letter-spacing:.10em;color:var(--emerald-lit);opacity:.72">' + s.t + '</div>' +
+          '<div style="position:absolute;left:172px;top:0;width:104px;height:32px;border-radius:5px;' +
+            'background:' + (s.cls === "brand" ? "var(--mint)" : "rgba(176,228,204,.16)") + ';display:flex;' +
+            'align-items:center;justify-content:center;font-family:JBMono,monospace;font-size:14px;font-weight:700;' +
+            'letter-spacing:.12em;color:' + (s.cls === "brand" ? "var(--ink)" : "var(--mint)") + '">' + s.l + '</div>' +
+          '<div style="position:absolute;left:172px;top:40px;font-size:44px;color:var(--mint);' + famCss + '">' + sample + '</div>' +
+          '<div style="position:absolute;left:600px;top:52px;font-family:JBMono,monospace;font-size:16px;' +
+            'color:var(--mint);opacity:.5">' + s.d + '</div>';
+        wrap.appendChild(row);
+        tl.fromTo(row, { autoAlpha: 0, x: -22 }, { autoAlpha: 1, x: 0, duration: 0.52, ease: "power3.out" }, 1.30 + i*1.10);
+      }
+      // the markup that causes it, typed rather than simply present.
+      tl.fromTo("#f-code",    { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.52, ease: "power3.out" }, 0.14);
+      tl.fromTo("#f-codebar", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.34 }, 0.24);
+      var L = [
+        '<span style="color:#5E8578">&lt;link</span> rel=<span style="color:var(--mint)">"stylesheet"</span>',
+        '      href=<span style="color:var(--mint)">"app.css"</span><span style="color:#5E8578">&gt;</span>',
+        '<span style="opacity:.42">  &#8627; blocks first paint</span>',
+        '<span style="color:#5E8578">&lt;link</span> rel=<span class="hot">"preload"</span> as=<span style="color:var(--mint)">"font"</span>',
+        '      href=<span style="color:var(--mint)">"brand.woff2"</span> crossorigin<span style="color:#5E8578">&gt;</span>'
+      ];
+      var lines = document.querySelector("#f-lines");
+      for (var k = 0; k < L.length; k++) {
+        var ln = document.createElement("div");
+        ln.style.cssText = "font-family:JBMono,monospace;font-size:19px;line-height:1.85;color:var(--emerald-lit);white-space:nowrap";
+        ln.innerHTML = L[k]; lines.appendChild(ln);
+        tl.fromTo(ln, { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: 0.34, ease: "power3.out" }, 0.50 + k*0.16);
+      }
+      tl.fromTo("#f-note", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 4.70);
+      // the two timelines side by side: the whole argument of the beat, in one shape.
+      tl.fromTo("#f-tl", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 6.10);
+      tl.fromTo("#f-tlbad", { scaleX: 0 }, { scaleX: 1, duration: 1.30, ease: "none" }, 6.40);
+      tl.fromTo("#f-tlbadl", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.30 }, 7.70);
+      tl.fromTo("#f-tlok", { scaleX: 0 }, { scaleX: 1, duration: 0.26, ease: "none" }, 8.10);
+      tl.fromTo("#f-tlokl", { autoAlpha: 0, x: -10 }, { autoAlpha: 1, x: 0, duration: 0.32, ease: "power3.out" }, 8.36);
+      // the brand specimen finally swaps in on the third row, live.
+      tl.fromTo(wrap.children[2], { scale: 0.985 }, { scale: 1, duration: 0.34, ease: "back.out(1.6)" }, 8.36);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 10.37);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["08-fonts"] = tl;
+    })();
+  </script>
+</template>

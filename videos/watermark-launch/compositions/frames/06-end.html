@@ -1,0 +1,151 @@
+<template>
+  <style>
+@font-face{font-family:Archivo;src:url("assets/fonts/Archivo.woff2")format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:InterV;src:url("assets/fonts/Inter.woff2")format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:JBMono;src:url("assets/fonts/JetBrainsMono.woff2")format("woff2");font-weight:100 900;font-display:block}
+
+*{margin:0;padding:0;box-sizing:border-box}
+#root{width:1920px;height:1080px;overflow:hidden;background:#0B0F16;
+  font-family:InterV,-apple-system,sans-serif;color:#0C1927;
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+
+/* ---- grounds -------------------------------------------------------------
+   Over-scanned by 18% so a seam entering from off-frame never exposes the
+   stage edge. */
+.ground{position:absolute;inset:-18%}
+.g-dark {background:#0B0F16}
+.g-paper{background:#FFFFFF}
+.g-brand{background:#4940FF}
+
+/* The atmosphere. On dark it is one soft indigo bloom off the upper right —
+   the product's own accent, at an alpha you should never quite notice. */
+.bloom{position:absolute;border-radius:50%;filter:blur(12px);pointer-events:none}
+.bloom-a{width:1500px;height:1500px;top:-460px;right:-320px;
+  background:radial-gradient(circle,rgba(73,64,255,0.20) 0%,rgba(73,64,255,0.08) 46%,transparent 70%)}
+.bloom-b{width:1020px;height:1020px;bottom:-260px;left:-180px;
+  background:radial-gradient(circle,rgba(73,64,255,0.11) 0%,rgba(73,64,255,0.04) 46%,transparent 70%)}
+/* on the white act the bloom inverts to a cool paper tint, or the frame glares */
+.bloom-p{background:radial-gradient(circle,rgba(73,64,255,0.055) 0%,rgba(73,64,255,0.02) 46%,transparent 70%)}
+
+/* Grain must MOVE. A static tile renders identical noise on every frame, which
+   reads as dirt on the lens rather than as film. 3x oversized, translated by
+   the timeline. */
+.grain{position:absolute;left:-640px;top:-360px;width:3200px;height:1800px;
+  pointer-events:none;background-image:url("assets/plates/noise.png");background-repeat:repeat}
+.grain-d{opacity:0.052;mix-blend-mode:overlay}
+.grain-l{opacity:0.030;mix-blend-mode:multiply}
+
+.vig{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 72% at 50% 46%,transparent 42%,rgba(0,0,0,0.50) 100%)}
+.vig-l{background:radial-gradient(ellipse 82% 74% at 50% 46%,transparent 46%,rgba(12,25,39,0.10) 100%)}
+
+/* ---- type ----------------------------------------------------------------
+   Archivo 700 at -0.03em is the product's own display setting, measured off
+   the hero h1. Inter carries every piece of UI. JetBrains Mono carries every
+   number, id, filename and dimension — the register the audience trusts. */
+.stage{position:absolute;inset:0}
+.inner{position:absolute;inset:0}
+
+.hdr{font-family:Archivo,sans-serif;font-weight:700;font-size:92px;line-height:1.04;
+  letter-spacing:-0.03em;color:#0C1927}
+.hdr-xl{font-size:132px;line-height:1.0}
+.hdr-on{color:#FFFFFF}
+.lead{font-size:27px;line-height:1.5;color:rgba(12,25,39,0.70);letter-spacing:-0.006em;max-width:820px}
+.lead-on{color:rgba(255,255,255,0.62)}
+
+/* The brand's marker band. A solid accent rectangle behind the glyphs, with the
+   type sitting on top — this is the hero's own move and the film's title card
+   is built on it. Skewless, sharp-cornered, and it wipes in from the left. */
+.mark{position:relative;display:inline-block;padding:0.02em 0.10em 0.10em}
+.mark-bg{position:absolute;left:0;top:0.08em;right:0;bottom:0.10em;background:#4940FF;
+  transform-origin:left center}
+.mark-tx{position:relative}
+
+.tag{font-family:JBMono,monospace;font-size:15px;letter-spacing:0.20em;
+  text-transform:uppercase;color:rgba(12,25,39,0.62)}
+.tag-on{color:rgba(255,255,255,0.46)}
+.tag-ac{color:#3A32E0}
+.mono{font-family:JBMono,monospace;font-variant-numeric:tabular-nums;letter-spacing:-0.005em}
+.rule{height:1px;background:#E3EAF3;transform-origin:left center}
+.rule-on{background:rgba(255,255,255,0.09)}
+
+/* ---- product surfaces ----------------------------------------------------
+   One ground and a 1px hairline for every panel in the film. Nothing carries a
+   coloured edge: colour belongs to the content, never to a container. Radius is
+   2px because that is what the product does. */
+.win{background:#FFFFFF;border:1px solid #E3EAF3;border-radius:2px;overflow:hidden}
+.win-d{background:#12171F;border:1px solid rgba(255,255,255,0.09);border-radius:2px;overflow:hidden}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:44px;padding:0 14px;
+  border-radius:2px;border:1px solid #E3EAF3;background:#FFFFFF;color:#0C1927;
+  font-family:InterV,sans-serif;font-size:14px;font-weight:500;white-space:nowrap}
+.btn-on{background:#4940FF;border-color:#4940FF;color:#fff}
+.btn-off{color:rgba(12,25,39,0.62);background:#FFFFFF}
+.btn-lg{height:52px;padding:0 20px;font-size:16px}
+.chip{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:2px;
+  border:1px solid #E3EAF3;background:#FFFFFF;font-size:13px;font-weight:500;color:rgba(12,25,39,0.70)}
+.chip-d{border-color:rgba(255,255,255,0.09);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.62)}
+
+/* The oversized macOS pointer. It is the film's only actor, so it runs 2.3x
+   life size — at 1:1 a cursor is invisible at this viewing distance. */
+.cursor{position:absolute;width:54px;height:54px;pointer-events:none;z-index:95;
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,0.45))}
+</style>
+  <div id="root" data-composition-id="06-end" data-start="0" data-width="1920" data-height="1080">
+    <div class="ground g-paper" data-layout-allow-overflow></div>
+    <div class="bloom bloom-a bloom-p" data-layout-allow-overflow></div>
+    <div class="bloom bloom-b bloom-p" data-layout-allow-overflow></div>
+    <div id="p6-grain" class="grain grain-l" data-layout-allow-overflow></div>
+    <div class="vig vig-l"></div>
+    <div id="stage" class="stage"><div class="inner">
+
+      <div style="position:absolute;left:210px;top:300px;width:1500px">
+        <div class="hdr" style="font-size:118px;line-height:1.02">
+          <div id="p6-l1">Remove <span class="mark"><span id="p6-m-bg" class="mark-bg"></span><span id="p6-m-tx" class="mark-tx">AI watermarks</span></span></div>
+          <div id="p6-l2" style="margin-top:6px">from your images</div>
+        </div>
+        <div id="p6-lead" class="lead" style="margin-top:38px;font-size:27px;max-width:900px">
+          Paint over it. It is filled in from the surrounding image, right here in your browser.</div>
+      </div>
+
+      <div id="p6-url" style="position:absolute;left:210px;top:806px">
+        <div class="mono" style="font-size:34px;color:#3A32E0;letter-spacing:-0.01em">watermarkairemover.com</div>
+        <div id="p6-ul" class="rule" style="margin-top:14px;width:436px;height:2px;background:#4940FF"></div>
+      </div>
+
+      <div id="p6-meta" style="position:absolute;right:210px;top:812px;display:flex;gap:12px">
+        <span class="chip">Free</span>
+        <span class="chip">No sign-up</span>
+        <span class="chip">Runs on your device</span>
+      </div>
+    </div></div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function(){
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#stage", { y: 267 }, { y: 0, duration: 0.42, ease: "power4.out" }, 0);
+      tl.fromTo("#p6-grain", { x: 0, y: 0 },
+        { x: -128, y: -74, duration: 4.00, ease: "none" }, 0);
+
+      // the two display lines arrive on their own, 0.14s apart — never as a block
+      tl.fromTo("#p6-l1", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.56, ease: "power3.out" }, 0.06);
+      tl.fromTo("#p6-l2", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.56, ease: "power3.out" }, 0.20);
+
+      // the marker band is drawn across the words, then the words come up over it
+      tl.fromTo("#p6-m-bg", { scaleX: 0 }, { scaleX: 1, duration: 0.56, ease: "power3.out" }, 0.460);
+      tl.fromTo("#p6-m-tx", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.20, ease: "none" }, 0.695);
+
+      tl.fromTo("#p6-lead", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.72);
+
+      tl.fromTo("#p6-url", { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 1.06);
+      tl.fromTo("#p6-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.62, ease: "power3.out" }, 1.30);
+
+      tl.fromTo("#p6-meta", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 1.34);
+
+      // and then it holds. Nothing else moves.
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["06-end"] = tl;
+    })();
+  </script>
+</template>

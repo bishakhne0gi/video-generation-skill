@@ -1,0 +1,195 @@
+<template>
+  <style>
+@font-face{font-family:"Fraktur";src:url("assets/fonts/Fraktur-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Anton";src:url("assets/fonts/Anton-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Oswald";src:url("assets/fonts/Oswald-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-900.woff2") format("woff2");font-weight:900;font-style:normal;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-700i.woff2") format("woff2");font-weight:700;font-style:italic;font-display:block}
+@font-face{font-family:"Bodoni";src:url("assets/fonts/Bodoni-900.woff2") format("woff2");font-weight:900;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400i.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --news:#E3DDCE; --news2:#D3CBB8; --scrap:#F2EDE1; --plate:#141210;
+  --ink:#171310; --ink2:#4E4638; --stop:#C1272D; --stopt:#A81E24;
+  background:var(--news); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the .clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* The field OVER-SCANS. A frame whose exit shrinks (the reserved Z-back) would
+   otherwise show the stage edge for the length of the cut. -18% covers the largest
+   travel in a 1920-wide frame and costs nothing on the frames that never shrink. */
+.field{position:absolute;inset:-18%}
+
+/* ---- THE PAGE: newsprint is a HALFTONE, not a flat fill --------------------
+   A 4px dot screen in press black at low alpha. Static, always: a halftone that
+   moves is a moire and it will wreck the encode. */
+.screen{position:absolute;inset:-18%;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px, rgba(23,19,16,.115) 0.85px, transparent 0.9px);
+  background-size:4px 4px}
+/* the press never lays ink perfectly evenly */
+.grain{position:absolute;inset:-18%;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle at 2px 3px, rgba(23,19,16,.08) 1px, transparent 1.1px);
+  background-size:11px 9px}
+
+/* ---- TYPE: eight families, one job each ---------------------------------- */
+.mast{font-family:"Fraktur",serif;font-weight:400;line-height:.95;color:var(--ink)}
+.head{font-family:"Anton",sans-serif;font-weight:400;line-height:.88;
+  letter-spacing:-.005em;text-transform:uppercase;color:var(--ink)}
+.head2{font-family:"Oswald",sans-serif;font-weight:700;line-height:.94;
+  letter-spacing:.005em;text-transform:uppercase;color:var(--ink)}
+.quote{font-family:"Playfair",Georgia,serif;font-weight:900;line-height:1.10;color:var(--ink)}
+.qital{font-family:"Playfair",Georgia,serif;font-weight:700;font-style:italic;line-height:1.14}
+/* Bodoni Moda is loaded at optical size 96 — a DISPLAY cut. Below about 80px its
+   hairline stems vanish in the render and N becomes a bare diagonal, 1 a bare stem.
+   .fig is for BIG figures only; anything smaller uses .head2 (Oswald). Verified by
+   measuring the render, not by looking at the font in a browser. */
+.fig{font-family:"Bodoni",serif;font-weight:900;line-height:.86;color:var(--ink)}
+.body{font-family:"PTSerif",Georgia,serif;font-weight:400;line-height:1.30;color:var(--ink)}
+.bodyb{font-family:"PTSerif",Georgia,serif;font-weight:700;line-height:1.28}
+.bodyi{font-family:"PTSerif",Georgia,serif;font-style:italic;line-height:1.30}
+.mono{font-family:"Courier",monospace;font-weight:400;color:var(--ink)}
+.monob{font-family:"Courier",monospace;font-weight:700}
+.slug{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.20em;
+  text-transform:uppercase;font-size:20px;color:var(--ink2)}
+.red{color:var(--stopt)}      /* red as a LETTER — the only red allowed to be type */
+.faint{color:var(--ink2)}
+.rev{color:var(--scrap)}      /* reversed out of the black plate */
+.rev .faint{color:#A79E8D}
+.rev .slug{color:#A79E8D}
+
+/* ---- RULES: press furniture. Never a glyph. ------------------------------ */
+.rule{position:absolute;background:var(--ink);height:3px}
+.hair{position:absolute;background:var(--ink2);height:1px;opacity:.55}
+.rrule{position:absolute;background:var(--stop);height:5px}
+.revrule{position:absolute;background:var(--scrap);height:3px}
+
+/* ---- A CUTTING ----------------------------------------------------------
+   Four layers, and all four are required. The drop-shadow lives on a SIBLING,
+   not in box-shadow: box-shadow follows the border box, so on a clip-path shape
+   it draws a rectangle behind a torn edge — the single loudest tell in the register. */
+.cutw{position:absolute}                                   /* the slap wrapper */
+.cutsh{position:absolute;inset:0;background:rgba(23,19,16,.34);filter:blur(7px)}
+.cutfib{position:absolute;inset:0;background:#FFFCF4}      /* the torn fibre lip */
+.cutface{position:absolute;inset:0;background:var(--scrap);overflow:hidden}
+.cutbody{position:absolute;inset:0}
+
+/* ---- MISREGISTRATION -----------------------------------------------------
+   The one "effect" in the film, and it is a real press artifact: the spot plate lands
+   a hair off the black one. Carried as a TEXT-SHADOW on the headline itself, never as
+   a duplicated element — a second copy of the words in the same place is two text
+   blocks the layout gate is right to reject, and it doubles what a contrast checker
+   has to reason about. One impression, one fringe. */
+
+/* ---- THE STAMP ---------------------------------------------------------- */
+/* on the black plate the stamp turns CREAM: red type on plate measures 3.20:1 and
+   this register does not put red type on black. */
+.stampw{border-color:var(--scrap)!important;color:var(--scrap)!important}
+.stamp{position:absolute;border:4px solid var(--stop);color:var(--stopt);
+  font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:.10em;
+  text-transform:uppercase;opacity:.88;display:flex;align-items:center;
+  justify-content:center;white-space:nowrap}
+
+/* ---- THE PEN: red strokes drawn on the page. Never a glyph. -------------- */
+/* z-index 5 is load-bearing: a cutting is z-index 2, so a pen with auto z-index
+   draws UNDERNEATH the very thing it is marking and is invisible in the render. */
+.pen{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;overflow:visible;z-index:5}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--stop);stroke-linecap:round;
+  stroke-linejoin:round}
+.penk path,.penk line,.penk polyline{stroke:var(--ink)}
+.penw path,.penw line,.penw polyline{stroke:var(--scrap)}
+
+  </style>
+
+  <div id="root" data-composition-id="02-title" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="field" data-layout-allow-overflow style="background:var(--plate)"></div><div class="screen" data-layout-allow-overflow  style="background-image:radial-gradient(circle at 1px 1px, rgba(242,237,225,.10) 0.85px, transparent 0.9px)"></div><div class="grain" data-layout-allow-overflow></div>
+    <div id="stage" class="stage"><div class="inner rev">
+
+      <div id="f2-mast" class="mast" style="position:absolute;left:0;top:74px;width:1920px;text-align:center;font-size:76px;color:var(--scrap)">The Distributed Times</div>
+      <div id="f2-h1" class="revrule" style="left:236px;top:178px;width:1448px;height:2px;transform-origin:0% 50%"></div>
+      <div id="f2-fol" class="slug" style="position:absolute;left:0;top:196px;width:1920px;text-align:center;font-size:19px;color:#A79E8D">VOL.&nbsp;XLII &middot; No.&nbsp;28 &middot; SATURDAY, AUGUST 22, 2026 &middot; PRICE: ONE DEADLINE</div>
+      <div id="f2-h2" class="revrule" style="left:236px;top:238px;width:1448px;height:2px;transform-origin:0% 50%"></div>
+
+      <div id="f2-a" style="position:absolute;left:236px;top:300px;font-size:128px;display:flex;flex-wrap:wrap;align-items:center;z-index:3"><span class="rl" id="f2-a-l0" style="display:inline-block;font-family:'PTSerif',Georgia,serif;font-weight:700;font-size:0.94em;line-height:1;background:var(--scrap);color:var(--stopt);padding:9px 13px;margin:0 7px;clip-path:polygon(-1.8% 2.4%,23.5% 2.1%,39.6% 3.1%,58.5% 3.5%,85.0% 1.3%,101.7% 1.2%,99.2% 15.6%,95.3% 39.3%,95.7% 63.3%,94.8% 83.6%,102.5% 98.7%,85.5% 94.6%,60.6% 99.0%,39.3% 103.8%,15.5% 96.6%,-4.2% 102.9%,1.6% 80.4%,1.1% 65.0%,-4.9% 39.3%,-0.7% 17.4%);transform:rotate(2.95deg) translateY(-2.3px)">O</span><span class="rl" id="f2-a-l1" style="display:inline-block;font-family:'Courier',monospace;font-weight:700;font-size:0.88em;line-height:1;background:var(--news);color:var(--ink2);padding:9px 7px;margin:0 7px;clip-path:polygon(5.0% -4.2%,20.3% -5.6%,40.2% 5.9%,65.4% -5.9%,83.1% -1.0%,103.4% -4.3%,101.1% 19.3%,94.1% 36.4%,101.1% 60.4%,96.2% 80.2%,101.6% 96.7%,82.3% 103.3%,60.9% 102.4%,34.2% 97.7%,19.4% 101.6%,-3.9% 95.2%,4.2% 78.5%,5.9% 58.2%,2.9% 40.2%,5.9% 14.7%);transform:rotate(-2.68deg) translateY(-1.3px)">N</span><span class="rl" id="f2-a-l2" style="display:inline-block;font-family:'Bodoni',serif;font-weight:900;font-size:1.04em;line-height:1;background:var(--ink);color:var(--scrap);padding:6px 11px;margin:0 7px;clip-path:polygon(-3.8% 1.0%,20.3% -4.9%,39.7% -0.2%,60.3% 2.0%,83.3% -5.9%,100.2% 3.4%,103.4% 21.5%,104.9% 42.7%,96.8% 61.1%,96.4% 79.5%,103.1% 95.2%,78.5% 97.3%,54.8% 100.1%,43.2% 95.7%,20.2% 101.4%,5.9% 98.2%,0.1% 78.6%,-1.5% 54.8%,-4.1% 43.9%,-4.9% 18.8%);transform:rotate(-4.66deg) translateY(5.3px)">E</span><span style="display:inline-block;width:33px"></span><span class="rl" id="f2-a-l3" style="display:inline-block;font-family:'Courier',monospace;font-weight:700;font-size:0.88em;line-height:1;background:var(--scrap);color:var(--ink);padding:7px 10px;margin:0 7px;clip-path:polygon(-0.9% 1.6%,34.8% -2.3%,67.7% -0.6%,97.8% -0.3%,99.9% 34.4%,98.9% 67.0%,99.3% 99.9%,65.3% 99.9%,34.5% 97.7%,-2.1% 101.5%,0.0% 64.5%,-0.1% 32.5%);transform:rotate(-4.70deg) translateY(-2.5px)">C</span><span class="rl" id="f2-a-l4" style="display:inline-block;font-family:'Bodoni',serif;font-weight:900;font-size:1.04em;line-height:1;background:var(--ink);color:var(--scrap);padding:8px 10px;margin:0 7px;clip-path:polygon(-1.2% -0.7%,32.6% -1.2%,67.1% -0.3%,99.8% -1.3%,97.9% 33.0%,100.9% 68.2%,99.3% 97.7%,65.8% 98.6%,34.8% 100.4%,2.3% 100.2%,-0.1% 65.4%,-1.3% 32.7%);transform:rotate(4.55deg) translateY(-0.3px)">A</span><span class="rl" id="f2-a-l5" style="display:inline-block;font-family:'Playfair',Georgia,serif;font-weight:900;font-size:0.96em;line-height:1;background:var(--news2);color:var(--ink);padding:6px 8px;margin:0 7px;clip-path:polygon(-0.1% 0.9%,33.1% -0.5%,66.9% -1.5%,97.7% -1.3%,101.7% 33.0%,98.9% 64.7%,101.3% 102.2%,67.0% 100.3%,35.4% 101.2%,1.9% 101.3%,1.0% 66.8%,0.1% 35.1%);transform:rotate(-3.75deg) translateY(-0.8px)">L</span><span class="rl" id="f2-a-l6" style="display:inline-block;font-family:'Bodoni',serif;font-weight:900;font-size:1.04em;line-height:1;background:var(--news);color:var(--ink2);padding:3px 11px;margin:0 7px;clip-path:polygon(1.3% 5.9%,20.4% -3.8%,42.6% 1.8%,55.3% 3.1%,83.9% 5.7%,103.1% -1.6%,103.2% 24.6%,105.0% 37.4%,100.6% 61.9%,103.3% 85.3%,94.6% 100.4%,76.0% 102.4%,63.0% 94.4%,41.6% 95.2%,23.7% 96.6%,2.7% 101.3%,4.4% 79.3%,2.9% 63.1%,-3.6% 34.5%,2.6% 17.4%);transform:rotate(5.23deg) translateY(3.8px)">L</span><span class="rl" id="f2-a-l7" style="display:inline-block;font-family:'Courier',monospace;font-weight:700;font-size:0.88em;line-height:1;background:var(--news);color:var(--ink);padding:7px 10px;margin:0 7px;clip-path:polygon(-1.3% -0.2%,33.4% 1.2%,65.9% 0.8%,100.2% -2.4%,99.0% 35.5%,98.5% 69.0%,98.8% 98.2%,64.6% 99.6%,32.9% 99.4%,2.2% 100.4%,-0.3% 66.8%,-1.0% 32.4%);transform:rotate(-4.68deg) translateY(-4.1px)">,</span></div>
+      <div id="f2-b" style="position:absolute;left:236px;top:466px;font-size:128px;display:flex;flex-wrap:wrap;align-items:center;z-index:3"><span class="rl" id="f2-b-l0" style="display:inline-block;font-family:'Bodoni',serif;font-weight:900;font-size:1.04em;line-height:1;background:var(--ink);color:var(--scrap);padding:7px 9px;margin:0 7px;clip-path:polygon(-0.7% 4.3%,20.5% -4.4%,34.2% -5.1%,55.3% 0.5%,79.2% -0.0%,103.0% -0.1%,100.1% 20.1%,105.0% 37.6%,97.1% 65.3%,97.9% 81.9%,97.5% 103.7%,83.8% 97.2%,59.1% 101.3%,35.6% 102.7%,18.2% 96.0%,-1.3% 105.0%,1.9% 78.1%,0.6% 55.1%,3.8% 37.1%,0.5% 22.6%);transform:rotate(1.73deg) translateY(0.6px)">T</span><span class="rl" id="f2-b-l1" style="display:inline-block;font-family:'Courier',monospace;font-weight:700;font-size:0.88em;line-height:1;background:var(--ink);color:var(--scrap);padding:10px 7px;margin:0 7px;clip-path:polygon(-0.6% 2.4%,35.1% 1.4%,66.0% -2.1%,98.5% 2.0%,98.4% 34.1%,98.5% 64.7%,97.9% 99.3%,66.0% 102.3%,31.8% 99.5%,0.5% 100.0%,-1.1% 68.8%,-0.3% 33.6%);transform:rotate(3.99deg) translateY(-4.3px)">W</span><span class="rl" id="f2-b-l2" style="display:inline-block;font-family:'Courier',monospace;font-weight:700;font-size:0.88em;line-height:1;background:var(--news);color:var(--ink);padding:10px 11px;margin:0 7px;clip-path:polygon(-5.7% -0.4%,23.1% 2.0%,36.7% -4.7%,64.4% 4.6%,76.1% -3.0%,99.1% -3.8%,98.2% 24.9%,99.7% 35.1%,104.4% 60.2%,101.8% 78.9%,96.6% 100.7%,78.9% 97.9%,65.7% 102.8%,37.3% 94.6%,19.5% 104.1%,-2.4% 104.1%,-2.6% 78.6%,3.4% 62.0%,-4.3% 38.2%,2.4% 19.9%);transform:rotate(-1.84deg) translateY(3.9px)">O</span><span style="display:inline-block;width:33px"></span><span class="rl" id="f2-b-l3" style="display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:0.98em;line-height:1;background:var(--scrap);color:var(--stopt);padding:6px 9px;margin:0 7px;clip-path:polygon(0.8% -0.8%,20.1% 1.3%,36.9% 4.3%,57.5% -2.8%,79.0% 5.2%,100.9% -0.4%,104.4% 15.2%,99.5% 36.8%,98.4% 60.1%,99.0% 84.5%,103.7% 96.4%,74.1% 105.8%,55.4% 94.2%,40.6% 96.2%,24.6% 94.2%,-0.8% 104.9%,4.3% 74.6%,0.5% 59.4%,5.1% 36.9%,-2.2% 20.8%);transform:rotate(-1.27deg) translateY(1.1px)">V</span><span class="rl" id="f2-b-l4" style="display:inline-block;font-family:'Courier',monospace;font-weight:700;font-size:0.88em;line-height:1;background:var(--scrap);color:var(--stopt);padding:9px 9px;margin:0 7px;clip-path:polygon(-0.6% 1.1%,32.8% -1.8%,67.0% 0.3%,100.6% -0.2%,101.8% 34.7%,100.4% 68.2%,98.8% 98.6%,67.9% 99.8%,35.2% 99.3%,0.1% 100.9%,0.5% 65.9%,2.4% 32.5%);transform:rotate(1.83deg) translateY(-3.3px)">E</span><span class="rl" id="f2-b-l5" style="display:inline-block;font-family:'Playfair',Georgia,serif;font-weight:900;font-size:0.96em;line-height:1;background:var(--ink);color:var(--scrap);padding:8px 7px;margin:0 7px;clip-path:polygon(-0.7% -1.6%,31.7% -2.1%,65.5% 0.1%,98.8% -0.4%,99.3% 32.8%,98.5% 65.3%,102.0% 99.9%,67.4% 100.4%,33.3% 97.9%,-0.9% 100.0%,0.5% 64.5%,-0.4% 31.7%);transform:rotate(-1.62deg) translateY(-1.2px)">R</span><span class="rl" id="f2-b-l6" style="display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:0.98em;line-height:1;background:var(--scrap);color:var(--ink);padding:8px 11px;margin:0 7px;clip-path:polygon(2.3% -5.4%,16.1% -2.7%,34.7% 3.7%,55.5% -4.9%,74.9% -1.1%,102.1% 3.6%,96.0% 20.0%,96.9% 40.6%,95.1% 57.3%,104.9% 82.7%,102.6% 95.2%,83.0% 105.8%,58.7% 96.7%,35.7% 103.4%,21.6% 104.0%,5.1% 101.1%,1.0% 82.9%,4.9% 63.7%,-1.2% 37.3%,2.2% 14.6%);transform:rotate(1.59deg) translateY(2.2px)">D</span><span class="rl" id="f2-b-l7" style="display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:0.98em;line-height:1;background:var(--ink);color:var(--scrap);padding:5px 6px;margin:0 7px;clip-path:polygon(1.8% 2.3%,31.6% 0.6%,65.0% 2.3%,98.3% 2.3%,99.6% 33.4%,99.7% 65.2%,98.4% 100.0%,65.8% 100.1%,34.2% 99.9%,-0.3% 100.7%,0.7% 68.0%,1.6% 35.4%);transform:rotate(-1.74deg) translateY(-0.7px)">I</span><span class="rl" id="f2-b-l8" style="display:inline-block;font-family:'Courier',monospace;font-weight:700;font-size:0.88em;line-height:1;background:var(--scrap);color:var(--stopt);padding:5px 7px;margin:0 7px;clip-path:polygon(-1.5% -1.3%,33.9% -1.4%,68.9% 0.2%,101.7% 1.1%,101.3% 33.5%,99.4% 67.8%,99.0% 101.8%,66.2% 98.6%,31.2% 101.0%,0.6% 101.4%,-0.1% 67.1%,2.0% 31.0%);transform:rotate(-1.03deg) translateY(3.3px)">C</span><span class="rl" id="f2-b-l9" style="display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:0.98em;line-height:1;background:var(--scrap);color:var(--ink);padding:7px 7px;margin:0 7px;clip-path:polygon(2.7% 1.2%,22.9% -4.8%,39.3% -2.3%,54.1% -4.4%,74.2% 2.5%,96.1% 2.5%,94.6% 18.2%,103.2% 42.9%,96.6% 55.5%,100.3% 76.2%,102.5% 102.2%,78.9% 101.2%,57.2% 100.2%,34.1% 99.2%,19.4% 95.9%,5.3% 100.5%,-0.2% 85.2%,0.6% 56.8%,-5.5% 35.5%,-5.9% 22.0%);transform:rotate(-2.50deg) translateY(1.7px)">T</span><span class="rl" id="f2-b-l10" style="display:inline-block;font-family:'Playfair',Georgia,serif;font-weight:900;font-size:0.96em;line-height:1;background:var(--ink);color:var(--scrap);padding:4px 6px;margin:0 7px;clip-path:polygon(0.3% -5.9%,22.6% 0.5%,39.2% -5.8%,63.4% -4.4%,75.6% 0.0%,103.3% 2.4%,94.5% 15.4%,94.2% 42.4%,97.9% 63.8%,101.0% 83.9%,105.6% 103.5%,79.7% 104.5%,64.1% 96.1%,40.5% 102.5%,15.9% 96.7%,-3.4% 102.8%,5.8% 84.9%,-4.1% 61.7%,-0.1% 43.5%,-1.6% 16.4%);transform:rotate(-2.54deg) translateY(2.2px)">S</span></div>
+
+      <div id="f2-deck" class="body" style="position:absolute;left:240px;top:660px;width:1180px;font-size:34px;font-style:italic;color:#CFC6B4">
+        g&#8203;RPC, and forty-two years of arguing about what a remote call really is</div>
+      <div id="f2-rule" class="rrule" style="left:240px;top:636px;width:1160px;transform-origin:0% 50%"></div>
+
+      <div id="f2-ep" class="slug" style="position:absolute;left:240px;top:742px;font-size:21px;color:#A79E8D">SHIP&nbsp;IT &middot; EPISODE TWENTY-EIGHT</div>
+
+      <!-- the pen rings the joke in the folio line. White, because red on the black
+           plate measures 3.20:1 and this register does not put red type on black. -->
+      <svg id="f2-ring-svg" class="pen penw" viewBox="0 0 1920 1080"><path id="f2-ring" d="M1439.7,190.0 L1445.3,191.5 L1450.3,193.2 L1455.0,194.8 L1459.2,196.5 L1463.0,198.3 L1466.4,200.1 L1469.2,202.0 L1471.4,203.9 L1472.7,205.9 L1473.1,207.9 L1472.3,209.9 L1470.3,211.9 L1467.1,213.8 L1462.6,215.6 L1457.0,217.3 L1450.4,218.8 L1443.1,220.3 L1435.2,221.5 L1427.0,222.7 L1418.7,223.7 L1410.3,224.7 L1401.9,225.6 L1393.5,226.5 L1385.1,227.3 L1376.5,228.2 L1367.7,229.0 L1358.5,229.7 L1349.1,230.3 L1339.2,230.8 L1329.1,231.2 L1318.8,231.3 L1308.5,231.2 L1298.2,231.0 L1288.1,230.5 L1278.3,229.8 L1268.8,229.0 L1259.8,228.1 L1251.1,227.0 L1242.9,225.8 L1235.1,224.5 L1227.8,223.1 L1221.0,221.7 L1214.8,220.1 L1209.3,218.5 L1204.5,216.8 L1200.7,215.0 L1197.8,213.1 L1195.9,211.2 L1195.1,209.3 L1195.1,207.4 L1195.9,205.5 L1197.3,203.7 L1199.2,201.9 L1201.4,200.1 L1203.8,198.3 L1206.4,196.6 L1209.2,194.8 L1212.3,193.1 L1215.8,191.3 L1219.8,189.5 L1224.5,187.8 L1230.1,186.1 L1236.7,184.5 L1244.1,183.1 L1252.5,181.8 L1261.7,180.8 L1271.5,180.0 L1281.7,179.4 L1292.1,179.0 L1302.6,178.9 L1313.1,178.9 L1323.4,179.0 L1333.5,179.2 L1343.4,179.6 L1353.2,180.0 L1362.8,180.4 L1372.2,181.0 L1381.5,181.6 L1390.6,182.3 L1399.4,183.2 L1407.9,184.2 L1415.9,185.3 L1423.5,186.5 L1430.5,187.8 L1436.9,189.3 L1442.7,190.8 L1448.0,192.4 L1452.8,194.0 L1457.3,195.7 L1461.3,197.5 L1464.9,199.3 L1467.9,201.1 L1470.4,203.0 L1472.2,205.0 L1473.0,207.0 L1472.8,209.0 L1471.4,210.9 L1468.8,212.9 L1464.8,214.7 L1459.7,216.5" stroke-width="4"/></svg>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // SEAM ENTRY — ACT BREAK lift. The page is turned up and over.
+      tl.fromTo("#stage", { y: 372 }, { y: 0, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#stage", { scale: 0.86 }, { scale: 1, duration: 0.78, ease: "power2.out" }, 0);
+      // SEAM CARRIER — the masthead is at full opacity from frame zero and rides the cut.
+      tl.fromTo("#f2-mast", { y: 14 }, { y: 0, duration: 0.54, ease: "power3.out" }, 0);
+      gsap.set("#f2-h1", { scaleX: 0 }); gsap.set("#f2-h2", { scaleX: 0 });
+      tl.to("#f2-h1", { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.16);
+      tl.to("#f2-h2", { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.24);
+      gsap.set("#f2-fol", { autoAlpha: 0 });
+      tl.to("#f2-fol", { autoAlpha: 1, duration: 0.30 }, 0.34);
+
+      // THE RANSOM HEADLINE — letter by letter, stepped, seeded scatter.
+      var rn_f2a_r = anime.createSeededRandom(4885);
+      var rn_f2a_e = [];
+      for (var i_rn_f2a = 0; i_rn_f2a < 8; i_rn_f2a++) rn_f2a_e.push(document.getElementById("f2-a-l" + i_rn_f2a));
+      var rn_f2a = anime.animate(rn_f2a_e.filter(Boolean), {
+        scale: [function () { return 1.5 + 0.7 * rn_f2a_r(); }, 1],
+        y: [function () { return -70 - 90 * rn_f2a_r(); }, 0],
+        opacity: [0, 1],
+        duration: 150, ease: anime.steps(3), autoplay: false,
+        delay: anime.stagger(64) });
+      var P_rn_f2a = { p: 0 };
+      tl.to(P_rn_f2a, { p: 1, duration: 0.66, ease: "none", onUpdate: function () { rn_f2a.seek(P_rn_f2a.p * rn_f2a.duration); } }, 0.62);
+      var rn_f2b_r = anime.createSeededRandom(10747);
+      var rn_f2b_e = [];
+      for (var i_rn_f2b = 0; i_rn_f2b < 11; i_rn_f2b++) rn_f2b_e.push(document.getElementById("f2-b-l" + i_rn_f2b));
+      var rn_f2b = anime.animate(rn_f2b_e.filter(Boolean), {
+        scale: [function () { return 1.5 + 0.7 * rn_f2b_r(); }, 1],
+        y: [function () { return -70 - 90 * rn_f2b_r(); }, 0],
+        opacity: [0, 1],
+        duration: 150, ease: anime.steps(3), autoplay: false,
+        delay: anime.stagger(60) });
+      var P_rn_f2b = { p: 0 };
+      tl.to(P_rn_f2b, { p: 1, duration: 0.81, ease: "none", onUpdate: function () { rn_f2b.seek(P_rn_f2b.p * rn_f2b.duration); } }, 1.44);
+
+      gsap.set("#f2-rule", { scaleX: 0 });
+      tl.to("#f2-rule", { scaleX: 1, duration: 0.44, ease: "power3.out" }, 2.36);
+      gsap.set("#f2-deck", { autoAlpha: 0, y: 16 });
+      tl.to("#f2-deck", { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 2.52);
+      gsap.set("#f2-ep", { autoAlpha: 0 });
+      tl.to("#f2-ep", { autoAlpha: 1, duration: 0.32 }, 3.02);
+
+      // the last beat does work: the pen finds the price.
+      var pen_f2ring_d = anime.svg.createDrawable("#f2-ring");
+      var pen_f2ring = anime.animate(pen_f2ring_d, { draw: ["0 0", "0 1"], duration: 620, ease: anime.steps(9), autoplay: false });
+      var P_pen_f2ring = { p: 0 };
+      tl.to(P_pen_f2ring, { p: 1, duration: 0.62, ease: "none", onUpdate: function () { pen_f2ring.seek(P_pen_f2ring.p * pen_f2ring.duration); } }, 3.62);
+      // SEAM EXIT — ACT BREAK lift. Travels UP and pulls back to 0.86.
+      tl.to("#stage", { y: -300, duration: 0.46, ease: "power4.in" }, 4.54);
+      tl.to("#stage", { scale: 0.86, duration: 0.52, ease: "power2.in" }, 4.54);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["02-title"] = tl;
+    })();
+  </script>
+</template>

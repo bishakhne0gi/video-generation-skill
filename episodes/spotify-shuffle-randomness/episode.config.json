@@ -1,0 +1,96 @@
+{
+  "_": "EP 08 — Spotify's shuffle. Vox register: paper-white graphics, cinematic dark footage. Kling is used ONLY for the two footage families and the one morph bridge; every number, table, dot field and the Spotify mark are Remotion.",
+
+  "series": "Ship It",
+  "episode": "EP 08",
+  "title": "Spotify's shuffle wasn't broken. Randomness was.",
+  "titleAccent": "Randomness",
+  "subtitle": "Why a provably fair algorithm felt rigged — and why the fix was to make it less random",
+  "hook": "“Spotify shuffle is broken.”",
+  "cta": "Read Poláček's post",
+  "next": "Follow for more",
+
+  "theme": "white-light",
+  "fps": 30,
+
+  "voice": "onwK4e9ZLuTAKqWW03F9",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": { "stability": 0.45, "similarity_boost": 0.82, "style": 0.18, "use_speaker_boost": true },
+
+  "music": { "file": "audio/music/bed.wav", "volume": 0.17, "mood": "dark-tech", "search": "ambient documentary strings" },
+
+  "audio": { "vo": true, "music": true },
+
+  "vo": [
+    { "scene": 1,  "text": "In twenty fourteen, Spotify users were furious. The shuffle, they said, was broken." },
+    { "scene": 2,  "text": "It wasn't broken. But they weren't wrong either." },
+    { "scene": 3,  "text": "It keeps playing the same artist. Fix your shuffle. I pay for this. Thousands of them, saying the same thing." },
+    { "scene": 4,  "text": "So Spotify checked. The shuffle was Fisher-Yates. Every possible ordering exactly equally likely." },
+    { "scene": 5,  "text": "Provably uniform. There was no bug." },
+    { "scene": 6,  "text": "Chapter one. The clump." },
+    { "scene": 7,  "text": "Here is one perfectly fair shuffle. Ten artists, ten songs each. This is what fair actually looks like." },
+    { "scene": 8,  "text": "Nine back-to-back repeats in a hundred songs, from the correct algorithm. The users were reporting it accurately." },
+    { "scene": 9,  "text": "So which of these is random? Almost everyone picks the even one. The even one is the fake." },
+    { "scene": 10, "text": "Londoners were certain the flying bombs were aimed. The clusters were obvious. Whole districts, they said, were being targeted." },
+    { "scene": 11, "text": "An actuary counted them. Five hundred and thirty-seven bombs, five hundred and seventy-six squares." },
+    { "scene": 12, "text": "Zero point nine three per square. The same number, twice. A cluster is not a plan. It is what randomness looks like." },
+    { "scene": 13, "text": "Chapter two. The fix." },
+    { "scene": 14, "text": "So Spotify stopped being fair. Group by artist, space them evenly, offset at random, then add a little jitter." },
+    { "scene": 15, "text": "Less random by every measure that exists. Far more random to a human being. Engineers call it blue noise." },
+    { "scene": 16, "text": "When the maths is right and it still feels wrong, the feeling is data too." }
+  ],
+
+  "_shots": "5 Kling jobs total, generated through the Kling MCP. Two visual families only: 2014 commute (warm, shallow) and 1944 London (archival mono). Never text, UI, numbers or logos.",
+
+  "shots": [
+    {
+      "id": "ep08_open",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic close shot of a young commuter on a city bus at dusk in 2014, white wired earbuds in, thumb resting on a phone screen that glows faintly, face turned to the window and out of focus, warm sodium streetlight streaking past, shallow depth of field, slow push in, photoreal, 24fps film look, anamorphic",
+      "negative": "text, watermark, logo, subtitles, user interface, app screen content, cartoon, distorted hands, warped faces, low resolution, flicker, morphing geometry"
+    },
+    {
+      "id": "ep08_london",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Archival black and white aerial footage of South London rooftops in 1944, terraced streets in a dense grid, thin smoke rising from two distant blocks, heavy film grain and slight gate weave, slow drift forward, overcast flat daylight, photoreal wartime newsreel look",
+      "negative": "text, watermark, logo, subtitles, maps, numbers, modern cars, colour, cartoon, distorted buildings, low resolution, flicker, morphing geometry"
+    },
+    {
+      "id": "ep08_morph",
+      "kind": "bridge",
+      "model": "kling-video-v2_5",
+      "duration": 5,
+      "resolution": "1080p",
+      "from": "public/stills/ep08_a.png",
+      "to": "public/stills/ep08_b.png",
+      "prompt": "Seamless cinematic morph, continuous slow forward camera move, scattered dots dissolve and reassemble into a city seen from above, motion blur, no cuts",
+      "negative": "text, watermark, logo, subtitles, cartoon, low resolution, flicker"
+    },
+    {
+      "id": "ep08_cut_person",
+      "kind": "image",
+      "model": "kling-image-v3_0",
+      "aspect": "3:4",
+      "img_resolution": "2k",
+      "prompt": "Full body studio photograph of an irritated young commuter in a winter coat holding up a smartphone and pulling one white wired earbud out of their ear, mid-2010s styling, isolated on a flat pure white seamless background, even soft studio lighting, sharp focus, photoreal, magazine cut-out subject",
+      "negative": "text, watermark, logo, subtitles, phone screen content, background scenery, shadows on backdrop, cartoon, distorted hands, warped face, low resolution"
+    },
+    {
+      "id": "ep08_cut_earbuds",
+      "kind": "image",
+      "model": "kling-image-v3_0",
+      "aspect": "1:1",
+      "img_resolution": "2k",
+      "prompt": "Product photograph of a pair of tangled white wired earbuds lying loosely coiled, isolated on a flat pure white seamless background, even soft studio lighting, sharp focus, photoreal, magazine cut-out object",
+      "negative": "text, watermark, logo, subtitles, brand marks, background scenery, cartoon, low resolution"
+    }
+  ]
+}

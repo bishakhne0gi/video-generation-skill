@@ -1,0 +1,95 @@
+{
+  "_": "EP 14 — computer use. WORKSPACE REGISTER CARRYING NARRATION, mars-cream palette, exactly the EP 13 construction: one continuous vertical strip the camera travels, stations rather than slides, an icon family on every box, and the marquee drag+zoom as the teaching instrument on the two beats where the narration says 'look at this part'. The subject is the mechanism, not the product: a screenshot goes in, one action comes out, the screenshot is taken again. Every number on screen is real and dated — computer_20250124, 1024x768, ~1049 tokens per XGA screenshot, OSWorld screenshot-only 14.9% at the October 2024 launch against ~72% human. The honest ceiling stays in.",
+  "series": "Ship It",
+  "episode": "EP 14",
+  "title": "Look. Decide. Click.",
+  "titleAccent": "Click.",
+  "subtitle": "How Claude actually operates a computer — screenshot in, coordinates out",
+  "hook": "Most software has no API. It has pixels, and a cursor.",
+  "cta": "cosx",
+  "next": "Next: the regular expression that broke the internet",
+  "_theme": "mars-cream, unchanged from EP 13. Two episodes in the same palette is what makes it read as a series rather than a template; the material family changes, the surface does not.",
+  "theme": "mars-cream",
+  "fps": 30,
+  "_voice": "Same voice as EP 13. Model and settings unchanged — v2 cannot perform audio tags at all, which is what keeps the directive register structural rather than a setting that drifts.",
+  "voice": "nlyULslzTRhqlyv46oPj",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1414,
+  "_music": "Energetic generated bed on the same 84bpm grid as EP 13, so scene lengths snap identically across the two.",
+  "music": {
+    "file": "audio/music/bed.wav",
+    "volume": 0.15,
+    "open": 0.34,
+    "mood": "driving-build",
+    "bpm": 84,
+    "startAt": 0
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "TEACHING FIRST. Arc: why the capability exists, the loop, the tool declaration, the action vocabulary, one exchange on the wire, who actually executes, the coordinate trap, the economics, the serial cost, the two failures, prompt injection, the honest benchmark, and finally the judgement call. Definition then consequence, one clause per sentence, no hedges. The title card and the end card are silent so the bed lifts.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Most software has no API. No endpoint, no schema, no docs.\nJust pixels, and a cursor."
+    },
+    {
+      "scene": 2,
+      "text": "Here is the whole mechanism. A screenshot goes in. One action comes out.\nThen the screenshot is taken again."
+    },
+    {
+      "scene": 3,
+      "text": "The computer is declared as a single tool. Width, height, display number.\nThree integers, and that is the entire interface."
+    },
+    {
+      "scene": 4,
+      "text": "The model gets what your hands get. Click, type, press keys, scroll, drag, wait.\nThere is no privileged access underneath."
+    },
+    {
+      "scene": 5,
+      "text": "Watch one step. The model emits a tool use block. Your code performs it.\nYou return the new screenshot."
+    },
+    {
+      "scene": 6,
+      "text": "Now find the part Anthropic runs. It is not on this diagram.\nThe model names the action. YOUR process moves the mouse."
+    },
+    {
+      "scene": 7,
+      "text": "Coordinates are where this breaks. Resize a screenshot and you must map the click back.\nSkip that, and every click lands beside the button."
+    },
+    {
+      "scene": 8,
+      "text": "Hold the display at one thousand and twenty four by seven six eight.\nEach screenshot costs about a thousand tokens. Forty steps is forty thousand."
+    },
+    {
+      "scene": 9,
+      "text": "The loop is strictly serial. Model, action, screenshot, again.\nPrefer keyboard shortcuts. One keystroke replaces three clicks."
+    },
+    {
+      "scene": 10,
+      "text": "Separate two failures. A wrong click appears in the next screenshot and gets corrected.\nState that never rendered is simply invisible."
+    },
+    {
+      "scene": 11,
+      "text": "Treat the screen as untrusted input. A web page can carry instructions.\nSandbox it. Withhold real credentials. Confirm anything irreversible."
+    },
+    {
+      "scene": 12,
+      "text": "Be honest about the ceiling. Screenshot-only OSWorld at launch: fourteen point nine percent.\nA person scores about seventy two."
+    },
+    {
+      "scene": 13,
+      "text": "So use the judgement. If a thing has an API, call the API.\nDrive the screen only when there is nothing else to drive."
+    }
+  ],
+  "shots": []
+}

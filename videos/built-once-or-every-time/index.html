@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <script src="assets/vendor/gsap.min.js"></script>
+    <!-- anime.js v4.5.0 (MIT), vendored. Loaded at the ROOT so every frame's script can
+         see the global; each frame drives its own instances off its own GSAP clock. -->
+    <script src="assets/vendor/anime.umd.min.js"></script>
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      html,body{width:1920px;height:1080px;overflow:hidden;background:#f9f7f3}
+      /* opaque stage-ground: the CREAM SHEET shows through at every seam, which is
+         the intended look — a sheet sliding over a sheet, never a flash of nothing.
+         A white #root here would lose the brand temperature in one frame. */
+      #root{position:relative;width:1920px;height:1080px;overflow:hidden;background:#f9f7f3}
+      .scene{position:absolute;inset:0;width:100%;height:100%}
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="207.391" data-width="1920" data-height="1080">
+      <div id="el-01-open" class="scene" data-composition-id="01-open" data-composition-src="compositions/frames/01-open.html" data-start="0.000" data-duration="10.435" data-track-index="1"></div>
+      <audio id="au-01-open" src="assets/voice/01.wav" data-start="0.000" data-duration="8.640" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-02-title" class="scene" data-composition-id="02-title" data-composition-src="compositions/frames/02-title.html" data-start="10.435" data-duration="5.217" data-track-index="1"></div>
+
+      <div id="el-03-slate1" class="scene" data-composition-id="03-slate1" data-composition-src="compositions/frames/03-slate1.html" data-start="15.652" data-duration="2.609" data-track-index="1"></div>
+
+      <div id="el-04-bytes" class="scene" data-composition-id="04-bytes" data-composition-src="compositions/frames/04-bytes.html" data-start="18.261" data-duration="12.391" data-track-index="1"></div>
+      <audio id="au-04-bytes" src="assets/voice/02.wav" data-start="18.261" data-duration="10.750" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-05-template" class="scene" data-composition-id="05-template" data-composition-src="compositions/frames/05-template.html" data-start="30.652" data-duration="11.739" data-track-index="1"></div>
+      <audio id="au-05-template" src="assets/voice/03.wav" data-start="30.652" data-duration="10.300" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-06-etag" class="scene" data-composition-id="06-etag" data-composition-src="compositions/frames/06-etag.html" data-start="42.391" data-duration="14.348" data-track-index="1"></div>
+      <audio id="au-06-etag" src="assets/voice/04.wav" data-start="42.391" data-duration="12.890" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-07-slate2" class="scene" data-composition-id="07-slate2" data-composition-src="compositions/frames/07-slate2.html" data-start="56.739" data-duration="2.609" data-track-index="1"></div>
+
+      <div id="el-08-when" class="scene" data-composition-id="08-when" data-composition-src="compositions/frames/08-when.html" data-start="59.348" data-duration="12.391" data-track-index="1"></div>
+      <audio id="au-08-when" src="assets/voice/05.wav" data-start="59.348" data-duration="11.200" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-09-jekyll08" class="scene" data-composition-id="09-jekyll08" data-composition-src="compositions/frames/09-jekyll08.html" data-start="71.739" data-duration="14.348" data-track-index="1"></div>
+      <audio id="au-09-jekyll08" src="assets/voice/06.wav" data-start="71.739" data-duration="13.210" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-10-slate3" class="scene" data-composition-id="10-slate3" data-composition-src="compositions/frames/10-slate3.html" data-start="86.087" data-duration="2.609" data-track-index="1"></div>
+
+      <div id="el-11-bundle" class="scene" data-composition-id="11-bundle" data-composition-src="compositions/frames/11-bundle.html" data-start="88.696" data-duration="15.652" data-track-index="1"></div>
+      <audio id="au-11-bundle" src="assets/voice/07.wav" data-start="88.696" data-duration="14.400" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-12-weight" class="scene" data-composition-id="12-weight" data-composition-src="compositions/frames/12-weight.html" data-start="104.348" data-duration="14.348" data-track-index="1"></div>
+      <audio id="au-12-weight" src="assets/voice/08.wav" data-start="104.348" data-duration="12.950" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-13-strip" class="scene" data-composition-id="13-strip" data-composition-src="compositions/frames/13-strip.html" data-start="118.696" data-duration="11.087" data-track-index="1"></div>
+      <audio id="au-13-strip" src="assets/voice/09.wav" data-start="118.696" data-duration="9.920" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-14-paint" class="scene" data-composition-id="14-paint" data-composition-src="compositions/frames/14-paint.html" data-start="129.783" data-duration="15.652" data-track-index="1"></div>
+      <audio id="au-14-paint" src="assets/voice/10.wav" data-start="129.783" data-duration="13.700" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-15-turn" class="scene" data-composition-id="15-turn" data-composition-src="compositions/frames/15-turn.html" data-start="145.435" data-duration="11.087" data-track-index="1"></div>
+      <audio id="au-15-turn" src="assets/voice/11.wav" data-start="145.435" data-duration="9.880" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-16-exist" class="scene" data-composition-id="16-exist" data-composition-src="compositions/frames/16-exist.html" data-start="156.522" data-duration="11.739" data-track-index="1"></div>
+      <audio id="au-16-exist" src="assets/voice/12.wav" data-start="156.522" data-duration="10.330" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-17-rule" class="scene" data-composition-id="17-rule" data-composition-src="compositions/frames/17-rule.html" data-start="168.261" data-duration="12.391" data-track-index="1"></div>
+      <audio id="au-17-rule" src="assets/voice/13.wav" data-start="168.261" data-duration="11.140" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-18-mistake" class="scene" data-composition-id="18-mistake" data-composition-src="compositions/frames/18-mistake.html" data-start="180.652" data-duration="16.304" data-track-index="1"></div>
+      <audio id="au-18-mistake" src="assets/voice/14.wav" data-start="180.652" data-duration="14.720" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-19-end" class="scene" data-composition-id="19-end" data-composition-src="compositions/frames/19-end.html" data-start="196.956" data-duration="10.435" data-track-index="1"></div>
+      <audio id="au-19-end" src="assets/voice/15.wav" data-start="196.956" data-duration="8.510" data-track-index="10" data-volume="1"></audio>
+      <div id="el-tab" class="scene" data-composition-id="00-tab" data-composition-src="compositions/frames/00-tab.html" data-start="0" data-duration="207.391" data-track-index="4"></div>
+      <audio id="au-bed" src="assets/audio/bed.mp3" data-start="0" data-duration="207.391" data-track-index="11" data-volume="1"></audio>
+      <audio id="au-sfx" src="assets/audio/sfx.mp3" data-start="0" data-duration="207.391" data-track-index="20" data-volume="1"></audio>
+    </div>
+    <script>
+      // The root carries no animation of its own — every move lives in a frame — but the
+      // contract still requires main to register a timeline.
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

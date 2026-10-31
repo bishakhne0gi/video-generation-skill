@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      html,body{width:1920px;height:1080px;overflow:hidden;background:#0B0F16}
+      /* An opaque stage ground. Without it a seam's opacity dip shows the page
+         through, which on a dark film reads as a white flash at every cut. */
+      #root{position:relative;width:1920px;height:1080px;overflow:hidden;background:#0B0F16}
+      .scene{position:absolute;inset:0;width:100%;height:100%}
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="26.417" data-width="1920" data-height="1080">
+      <div id="el-01-prompt" class="scene" data-composition-id="01-prompt" data-composition-src="compositions/frames/01-prompt.html" data-start="0.000" data-duration="4.323" data-track-index="1"></div>
+      <div id="el-02-image" class="scene" data-composition-id="02-image" data-composition-src="compositions/frames/02-image.html" data-start="4.323" data-duration="4.323" data-track-index="1"></div>
+      <div id="el-03-post" class="scene" data-composition-id="03-post" data-composition-src="compositions/frames/03-post.html" data-start="8.646" data-duration="4.323" data-track-index="1"></div>
+      <div id="el-04-fix" class="scene" data-composition-id="04-fix" data-composition-src="compositions/frames/04-fix.html" data-start="12.969" data-duration="6.724" data-track-index="1"></div>
+      <div id="el-05-clean" class="scene" data-composition-id="05-clean" data-composition-src="compositions/frames/05-clean.html" data-start="19.693" data-duration="3.842" data-track-index="1"></div>
+      <div id="el-06-end" class="scene" data-composition-id="06-end" data-composition-src="compositions/frames/06-end.html" data-start="23.535" data-duration="2.882" data-track-index="1"></div>
+
+      <audio id="bed" src="assets/audio/bed.mp3" data-start="0.000" data-duration="26.417" data-track-index="5" data-volume="0.72"></audio>
+
+      <audio id="cu-0" src="assets/sfx/key1.wav" data-start="0.120" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-1" src="assets/sfx/key4.wav" data-start="0.235" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-2" src="assets/sfx/key3.wav" data-start="0.351" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-3" src="assets/sfx/key2.wav" data-start="0.466" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-4" src="assets/sfx/key1.wav" data-start="0.582" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-5" src="assets/sfx/key4.wav" data-start="0.697" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-6" src="assets/sfx/key3.wav" data-start="0.812" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-7" src="assets/sfx/key2.wav" data-start="0.928" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-8" src="assets/sfx/key1.wav" data-start="1.043" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-9" src="assets/sfx/key4.wav" data-start="1.158" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-10" src="assets/sfx/key3.wav" data-start="1.274" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-11" src="assets/sfx/key2.wav" data-start="1.389" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-12" src="assets/sfx/key1.wav" data-start="1.505" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-13" src="assets/sfx/key4.wav" data-start="1.620" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-14" src="assets/sfx/key3.wav" data-start="1.735" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cu-15" src="assets/sfx/click.wav" data-start="2.470" data-duration="0.080" data-track-index="20" data-volume="0.518"></audio>
+      <audio id="cu-16" src="assets/sfx/blip.wav" data-start="2.640" data-duration="0.050" data-track-index="20" data-volume="0.322"></audio>
+      <audio id="cu-17" src="assets/sfx/whoosh.wav" data-start="4.203" data-duration="0.500" data-track-index="20" data-volume="0.403"></audio>
+      <audio id="cu-18" src="assets/sfx/sub.wav" data-start="4.623" data-duration="1.100" data-track-index="21" data-volume="0.304"></audio>
+      <audio id="cu-19" src="assets/sfx/latch.wav" data-start="5.673" data-duration="0.300" data-track-index="20" data-volume="0.379"></audio>
+      <audio id="cu-20" src="assets/sfx/thunk.wav" data-start="6.243" data-duration="0.550" data-track-index="20" data-volume="0.562"></audio>
+      <audio id="cu-21" src="assets/sfx/notify.wav" data-start="6.283" data-duration="0.900" data-track-index="21" data-volume="0.24"></audio>
+      <audio id="cu-22" src="assets/sfx/thunk.wav" data-start="8.526" data-duration="0.550" data-track-index="20" data-volume="0.499"></audio>
+      <audio id="cu-23" src="assets/sfx/whoosh.wav" data-start="9.506" data-duration="0.500" data-track-index="20" data-volume="0.346"></audio>
+      <audio id="cu-24" src="assets/sfx/latch.wav" data-start="9.626" data-duration="0.300" data-track-index="21" data-volume="0.411"></audio>
+      <audio id="cu-25" src="assets/sfx/notify.wav" data-start="10.666" data-duration="0.900" data-track-index="20" data-volume="0.408"></audio>
+      <audio id="cu-26" src="assets/sfx/blip.wav" data-start="11.226" data-duration="0.050" data-track-index="21" data-volume="0.347"></audio>
+      <audio id="cu-27" src="assets/sfx/tick.wav" data-start="12.086" data-duration="0.120" data-track-index="20" data-volume="0.208"></audio>
+      <audio id="cu-28" src="assets/sfx/sub.wav" data-start="12.849" data-duration="1.100" data-track-index="20" data-volume="0.442"></audio>
+      <audio id="cu-29" src="assets/sfx/tick.wav" data-start="14.479" data-duration="0.120" data-track-index="20" data-volume="0.234"></audio>
+      <audio id="cu-30" src="assets/sfx/tick.wav" data-start="14.589" data-duration="0.120" data-track-index="21" data-volume="0.195"></audio>
+      <audio id="cu-31" src="assets/sfx/tick.wav" data-start="14.854" data-duration="0.120" data-track-index="20" data-volume="0.195"></audio>
+      <audio id="cu-32" src="assets/sfx/tick.wav" data-start="15.118" data-duration="0.120" data-track-index="20" data-volume="0.195"></audio>
+      <audio id="cu-33" src="assets/sfx/tick.wav" data-start="15.383" data-duration="0.120" data-track-index="20" data-volume="0.195"></audio>
+      <audio id="cu-34" src="assets/sfx/latch.wav" data-start="15.569" data-duration="0.300" data-track-index="20" data-volume="0.379"></audio>
+      <audio id="cu-35" src="assets/sfx/click.wav" data-start="16.289" data-duration="0.080" data-track-index="20" data-volume="0.518"></audio>
+      <audio id="cu-36" src="assets/sfx/sub.wav" data-start="16.529" data-duration="1.100" data-track-index="20" data-volume="0.414"></audio>
+      <audio id="cu-37" src="assets/sfx/blip.wav" data-start="16.589" data-duration="0.050" data-track-index="21" data-volume="0.322"></audio>
+      <audio id="cu-38" src="assets/sfx/tick.wav" data-start="17.149" data-duration="0.120" data-track-index="21" data-volume="0.208"></audio>
+      <audio id="cu-39" src="assets/sfx/tick.wav" data-start="17.309" data-duration="0.120" data-track-index="21" data-volume="0.208"></audio>
+      <audio id="cu-40" src="assets/sfx/tick.wav" data-start="17.469" data-duration="0.120" data-track-index="21" data-volume="0.208"></audio>
+      <audio id="cu-41" src="assets/sfx/click.wav" data-start="18.389" data-duration="0.080" data-track-index="20" data-volume="0.486"></audio>
+      <audio id="cu-42" src="assets/sfx/success.wav" data-start="18.489" data-duration="1.300" data-track-index="20" data-volume="0.471"></audio>
+      <audio id="cu-43" src="assets/sfx/swipe.wav" data-start="19.573" data-duration="0.300" data-track-index="21" data-volume="0.36"></audio>
+      <audio id="cu-44" src="assets/sfx/whoosh.wav" data-start="19.993" data-duration="0.500" data-track-index="20" data-volume="0.317"></audio>
+      <audio id="cu-45" src="assets/sfx/swipe.wav" data-start="20.653" data-duration="0.300" data-track-index="20" data-volume="0.33"></audio>
+      <audio id="cu-46" src="assets/sfx/swipe.wav" data-start="20.833" data-duration="0.300" data-track-index="21" data-volume="0.27"></audio>
+      <audio id="cu-47" src="assets/sfx/success.wav" data-start="21.273" data-duration="1.300" data-track-index="20" data-volume="0.521"></audio>
+      <audio id="cu-48" src="assets/sfx/tick.wav" data-start="21.453" data-duration="0.120" data-track-index="21" data-volume="0.208"></audio>
+      <audio id="cu-49" src="assets/sfx/swipe.wav" data-start="23.415" data-duration="0.300" data-track-index="20" data-volume="0.36"></audio>
+      <audio id="cu-50" src="assets/sfx/latch.wav" data-start="23.995" data-duration="0.300" data-track-index="20" data-volume="0.474"></audio>
+    </div>
+    <script>
+      // The root needs its own registered timeline or the runtime reports
+      // missing_timeline_registry and nothing plays.
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

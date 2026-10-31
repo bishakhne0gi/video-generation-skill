@@ -1,0 +1,54 @@
+{
+  "fps": 30,
+  "seams": [
+    {
+      "id": "question→title",
+      "cut": 8.59,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": { "selector": "#f1-stage", "axis": "x", "dir": -1 },
+      "entry": { "selector": "#f2-stage", "axis": "x", "dir": -1 }
+    },
+    {
+      "id": "title→options",
+      "cut": 13.59,
+      "technique": "zoom-through — deeper into the same thought",
+      "exit": { "selector": "#f2-stage", "axis": "z", "dir": 1 },
+      "entry": { "selector": "#f3-stage", "axis": "z", "dir": 1, "scanRoot": "#f3-stage" }
+    },
+    {
+      "id": "options→sixtyone",
+      "cut": 25.08,
+      "technique": "inverse zoom — ARRIVAL, the thesis lands",
+      "exit": { "selector": "#f3-stage", "axis": "z", "dir": -1 },
+      "entry": { "selector": "#f4-stage", "axis": "z", "dir": -1, "scanRoot": "#f4-stage" }
+    },
+    {
+      "id": "sixtyone→nextvisitor",
+      "cut": 32.99,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": { "selector": "#f4-stage", "axis": "x", "dir": -1 },
+      "entry": { "selector": "#f5-stage", "axis": "x", "dir": -1 }
+    },
+    {
+      "id": "nextvisitor→ondemand",
+      "cut": 41.56,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": { "selector": "#f5-stage", "axis": "x", "dir": -1 },
+      "entry": { "selector": "#f6-stage", "axis": "x", "dir": -1 }
+    },
+    {
+      "id": "ondemand→cost",
+      "cut": 51.71,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": { "selector": "#f6-stage", "axis": "x", "dir": -1 },
+      "entry": { "selector": "#f7-stage", "axis": "x", "dir": -1 }
+    },
+    {
+      "id": "cost→signoff",
+      "cut": 63.1,
+      "technique": "cut UP — elevation into the conclusion",
+      "exit": { "selector": "#f7-stage", "axis": "y", "dir": -1 },
+      "entry": { "selector": "#f8-stage", "axis": "y", "dir": -1 }
+    }
+  ]
+}

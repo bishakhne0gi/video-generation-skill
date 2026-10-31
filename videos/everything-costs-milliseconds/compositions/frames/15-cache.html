@@ -1,0 +1,201 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="15-cache" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/lamplit.jpg');opacity:0.5"></div>
+  <div class="scrim" style="background:radial-gradient(78% 90% at 30% 26%, rgba(9,20,19,.30) 0%, rgba(9,20,19,.86) 62%, rgba(9,20,19,.96) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:112px">13 · CACHING</div>
+      <div id="s-rule" class="rule" style="left:118px;top:150px;width:96px;transform-origin:0% 50%"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:118px;top:176px;width:1180px;font-size:82px">The fastest request<br>is never made.</div>
+      <div id="s-lead" class="lead" style="position:absolute;left:120px;top:372px;width:840px;font-size:31px">Hash the filename and it can be immutable forever. Then serve what you already have while you quietly go and check.</div>
+
+      <div id="k-cab" class="panel" style="left:1016px;top:376px;width:786px;height:392px"></div>
+      <div id="k-drawers" style="position:absolute;left:1044px;top:404px;width:730px;height:336px"></div>
+
+      <div id="k-hdr" class="mono" style="position:absolute;left:118px;top:600px;font-size:17px;letter-spacing:.15em;opacity:.6">IMMUTABLE ONLY WORKS IF THE NAME CHANGES</div>
+      <div id="k-names" style="position:absolute;left:118px;top:634px;width:790px"></div>
+
+      <div id="k-swr" style="position:absolute;left:118px;top:812px;width:790px">
+        <div class="mono" style="font-size:17px;letter-spacing:.15em;color:var(--emerald-lit);opacity:.8">STALE WHILE REVALIDATE</div>
+        <div id="k-swrrow" style="position:relative;width:790px;height:96px;margin-top:14px"></div></div>
+
+      <div id="k-rate" style="position:absolute;left:118px;top:952px;width:800px">
+        <span class="mono" style="font-size:17px;letter-spacing:.15em;opacity:.55">EDGE HIT RATE AFTER ONE DAY</span>
+        <div id="k-hr" style="position:relative;position:absolute;left:520px;top:-14px;width:200px;height:56px;font-family:'JBMono',monospace;font-size:44px;font-weight:700;color:var(--mint)"><span id="k-hr-0" style="position:absolute;left:0;top:0;white-space:nowrap">31%</span><span id="k-hr-1" style="position:absolute;left:0;top:0;white-space:nowrap">58%</span><span id="k-hr-2" style="position:absolute;left:0;top:0;white-space:nowrap">79%</span><span id="k-hr-3" style="position:absolute;left:0;top:0;white-space:nowrap">94%</span></div></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — ACT BREAK lift. Rises from below through a softer scale curve
+      // than the travel, so the pull-back reads as the camera stepping up and over.
+      tl.fromTo("#stage", { y: 372, scale: 0.84 }, { y: 0, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#stage", { scale: 0.84 }, { scale: 1, duration: 0.78, ease: "power2.out" }, 0);
+      // SEAM CARRIER — the box tag and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up: the seam gate measures
+      // MOTION, so a station whose content fades in at 0.1s passes the gate while visibly
+      // entering on an empty frame. Only the rule and the lead line are staged.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30000000000000004);
+      tl.fromTo("#k-cab", { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.54, ease: "power3.out" }, 0.10);
+      // three drawers: browser, edge, origin. The one that answers SLIDES OPEN — a real
+      // drawer, so the layer that served the request is a physical event.
+      var D = [
+        { n: "BROWSER CACHE", d: "0ms", hit: true },
+        { n: "CDN EDGE",      d: "24ms", hit: false },
+        { n: "ORIGIN",        d: "310ms", hit: false }
+      ];
+      var dw = document.querySelector("#k-drawers");
+      for (var i = 0; i < 3; i++) {
+        var d = D[i], el = document.createElement("div");
+        el.className = "dr";
+        el.style.cssText = "position:absolute;left:0;top:" + (i*116) + "px;width:730px;height:96px;border-radius:8px;" +
+          "background:linear-gradient(180deg,#1B4034 0%, #12291F 100%);border:1px solid rgba(176,228,204,.16);" +
+          "box-shadow:inset 0 2px 0 rgba(176,228,204,.14), 0 10px 22px rgba(0,0,0,.5)";
+        el.innerHTML =
+          '<div style="position:absolute;left:22px;top:32px;font-family:JBMono,monospace;font-size:22px;font-weight:700;' +
+            'letter-spacing:.12em;color:' + (d.hit ? "var(--mint)" : "var(--emerald-lit)") + ';opacity:' + (d.hit ? "1" : ".62") + '">' + d.n + '</div>' +
+          '<div style="position:absolute;right:150px;top:34px;font-family:JBMono,monospace;font-size:22px;font-weight:700;' +
+            'color:' + (d.hit ? "var(--mint)" : "var(--emerald-lit)") + ';opacity:' + (d.hit ? "1" : ".5") + '">' + d.d + '</div>' +
+          '<div style="position:absolute;right:26px;top:34px;width:96px;height:30px;border-radius:6px;' +
+            'background:' + (d.hit ? "var(--mint)" : "transparent") + ';border:1px solid ' +
+            (d.hit ? "var(--mint)" : "rgba(176,228,204,.22)") + ';display:flex;align-items:center;justify-content:center;' +
+            'font-family:JBMono,monospace;font-size:14px;font-weight:700;letter-spacing:.12em;color:' +
+            (d.hit ? "var(--ink)" : "rgba(176,228,204,.45)") + '">' + (d.hit ? "HIT" : "&mdash;") + '</div>' +
+          '<div style="position:absolute;left:22px;top:14px;width:52px;height:6px;border-radius:3px;' +
+            'background-image:url(\'assets/plates/brass.jpg\');background-size:cover;opacity:.8"></div>';
+        dw.appendChild(el);
+        tl.fromTo(el, { autoAlpha: 0, x: 26 }, { autoAlpha: 1, x: 0, duration: 0.44, ease: "power3.out" }, 0.40 + i*0.16);
+      }
+      // the browser drawer slides out and answers. Cause, then effect.
+      tl.to(dw.children[0], { x: 84, duration: 0.46, ease: "back.out(1.4)" }, 2.00);
+      tl.to(dw.children[0], { x: 72, duration: 0.36, ease: "power2.out" }, 2.46);
+      // the filenames that make it safe.
+      var N = [
+        { n: "app.js", h: "no-cache, revalidate every load", ok: false },
+        { n: "app.4f2c9a.js", h: "max-age=31536000, immutable", ok: true }
+      ];
+      var nw = document.querySelector("#k-names");
+      for (var j = 0; j < 2; j++) {
+        var o = N[j], row = document.createElement("div");
+        row.style.cssText = "position:absolute;left:0;top:" + (j*66) + "px;width:790px;height:56px";
+        row.innerHTML =
+          '<div style="font-family:JBMono,monospace;font-size:23px;font-weight:700;color:' +
+            (o.ok ? "var(--mint)" : "var(--brass)") + '">' + o.n + '</div>' +
+          '<div style="font-family:JBMono,monospace;font-size:16px;margin-top:5px;color:' +
+            (o.ok ? "var(--emerald-lit)" : "var(--brass)") + ';opacity:.72">' + o.h + '</div>';
+        nw.appendChild(row);
+        tl.fromTo(row, { autoAlpha: 0, x: -18 }, { autoAlpha: 1, x: 0, duration: 0.42, ease: "power3.out" }, 2.90 + j*0.44);
+      }
+      // stale-while-revalidate, drawn as what it is: answer now, check behind.
+      tl.fromTo("#k-swr", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 4.10);
+      var sw = document.querySelector("#k-swrrow");
+      var served = document.createElement("div");
+      served.style.cssText = "position:absolute;left:0;top:0;width:300px;height:34px;border-radius:6px;transform-origin:0% 50%;" +
+        "background:var(--mint);display:flex;align-items:center;padding-left:14px;font-family:JBMono,monospace;" +
+        "font-size:15px;font-weight:700;color:var(--ink)";
+      served.textContent = "served instantly from cache";
+      var revalid = document.createElement("div");
+      revalid.style.cssText = "position:absolute;left:0;top:48px;width:470px;height:34px;border-radius:6px;transform-origin:0% 50%;" +
+        "background:rgba(64,138,113,.5);display:flex;align-items:center;padding-left:14px;font-family:JBMono,monospace;" +
+        "font-size:15px;color:var(--mint)";
+      revalid.textContent = "revalidated in the background \u2014 nobody waited";
+      sw.appendChild(served); sw.appendChild(revalid);
+      tl.fromTo(served,  { scaleX: 0 }, { scaleX: 1, duration: 0.34, ease: "power3.out" }, 4.40);
+      tl.fromTo(revalid, { scaleX: 0 }, { scaleX: 1, duration: 0.78, ease: "power2.out" }, 4.60);
+      // the drawer keeps answering: three more requests arrive and none of them travel.
+      tl.fromTo("#k-rate", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 6.10);
+      for (var _r = 0; _r < 4; _r++) gsap.set("#k-hr-" + _r, { autoAlpha: 0 });
+      tl.set("#k-hr-0", { autoAlpha: 1 }, 6.40);
+      tl.set("#k-hr-1", { autoAlpha: 1 }, 7.10);
+      tl.set("#k-hr-0", { autoAlpha: 0 }, 7.10);
+      tl.set("#k-hr-2", { autoAlpha: 1 }, 7.80);
+      tl.set("#k-hr-1", { autoAlpha: 0 }, 7.80);
+      tl.set("#k-hr-3", { autoAlpha: 1 }, 8.50);
+      tl.set("#k-hr-2", { autoAlpha: 0 }, 8.50);
+      for (var h2 = 0; h2 < 3; h2++) {
+        var ht = 6.60 + h2*0.98;
+        tl.to(dw.children[0], { x: 96, duration: 0.22, ease: "power3.out" }, ht);
+        tl.to(dw.children[0], { x: 72, duration: 0.30, ease: "power2.out" }, ht + 0.24);
+      }
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 10.37);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["15-cache"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,164 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --paper:#F4F1EA; --paper2:#E7E1D4; --sheet:#FBF9F4;
+  --ink:#14110E; --ink2:#5A5245; --navy:#16233B;
+  --yellow:#FFEB00; --pen:#DC3220; --pentype:#B32414; --rule:#B8B0A0;
+  background:var(--paper); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* the coloured field travels WITH the stage, so a navy or yellow frame reads as a
+   card sliding over the page rather than as the ground changing colour. */
+.field{position:absolute;inset:0}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:88%;letter-spacing:-.045em;line-height:.90;color:var(--ink)}
+.deck{font-weight:500;line-height:1.26;color:var(--ink2)}
+.quote{font-family:"Serif",Georgia,serif;line-height:1.16;color:var(--ink)}
+.ital{font-family:"Serif",Georgia,serif;font-style:italic}
+.mono{font-family:"JBMono",monospace;color:var(--ink)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink2);font-size:21px}
+.redtype{color:var(--pentype)}
+.onnavy{color:var(--sheet)}
+.onnavy .tag,.onnavy .deck{color:#A9B6C9}
+
+/* ---- PAPER: a sheet is defined by its shadow and its edge, never by a stripe ---- */
+.sheet{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.16), 0 10px 24px rgba(20,17,14,.12)}
+.card{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.14), 0 7px 18px rgba(20,17,14,.10)}
+.hair{position:absolute;background:var(--rule);height:1px}
+.rule2{position:absolute;background:var(--ink);height:3px}
+
+/* ---- THE MARKER: sits BEHIND its phrase, skewed, origin left ---- */
+.mark{position:absolute;background:var(--yellow);z-index:0;transform-origin:0% 50%}
+.marknavy{background:var(--yellow)}
+.phrase{position:relative;z-index:1}
+
+/* ---- THE PEN: strokes only. Never a glyph, never on navy. ---- */
+.pen{position:absolute;pointer-events:none;overflow:visible}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--pen);stroke-linecap:round;
+  stroke-linejoin:round}
+.penY path,.penY line,.penY polyline{stroke:var(--yellow)}
+.penD path,.penD line,.penD polyline{stroke:var(--pentype)}
+.penI path,.penI line,.penI polyline{stroke:var(--ink)}
+
+  </style>
+
+  <div id="root" data-composition-id="12-name" data-start="0" data-width="1920" data-height="1080">
+<div class="field" style="background:var(--paper)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:108px">12 · the name</div>
+      <div id="s-rule" class="rule2" style="left:118px;top:146px;width:104px;transform-origin:0% 50%;"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:114px;top:172px;width:1240px;font-size:88px">IT NEARLY<br>WASN'T QUERY.</div>
+      
+
+      <div class="tag" style="position:absolute;left:112px;top:382px;font-size:18px">THREE SAFE, IDEMPOTENT METHODS ALREADY EXISTED</div>
+      
+      <div id="f12-c0" class="card" style="left:112px;top:420px;width:452px;height:224px;transform:rotate(-0.09deg)"></div>
+      <div id="f12-c0t" style="position:absolute;left:112px;top:420px;width:452px;height:224px;transform:rotate(-0.09deg)">
+        <div class="mono" style="position:absolute;left:26px;top:26px;font-size:32px;font-weight:700">PROPFIND</div>
+        <div class="hair" style="left:26px;top:76px;width:400px"></div>
+        <div class="deck" style="position:absolute;left:26px;top:92px;font-size:25px">safe &middot; idempotent</div>
+        <div class="deck" style="position:absolute;left:26px;top:126px;font-size:25px">already in the registry</div>
+        <div class="tag" style="position:absolute;left:26px;top:174px;font-size:17px">RFC 4918 · WEBDAV</div>
+      </div>
+      <div id="f12-c1" class="card" style="left:594px;top:420px;width:452px;height:224px;transform:rotate(-1.18deg)"></div>
+      <div id="f12-c1t" style="position:absolute;left:594px;top:420px;width:452px;height:224px;transform:rotate(-1.18deg)">
+        <div class="mono" style="position:absolute;left:26px;top:26px;font-size:32px;font-weight:700">REPORT</div>
+        <div class="hair" style="left:26px;top:76px;width:400px"></div>
+        <div class="deck" style="position:absolute;left:26px;top:92px;font-size:25px">safe &middot; idempotent</div>
+        <div class="deck" style="position:absolute;left:26px;top:126px;font-size:25px">already in the registry</div>
+        <div class="tag" style="position:absolute;left:26px;top:174px;font-size:17px">RFC 3253 · WEBDAV VERSIONING</div>
+      </div>
+      <div id="f12-c2" class="card" style="left:1076px;top:420px;width:452px;height:224px;transform:rotate(-0.80deg)"></div>
+      <div id="f12-c2t" style="position:absolute;left:1076px;top:420px;width:452px;height:224px;transform:rotate(-0.80deg)">
+        <div class="mono" style="position:absolute;left:26px;top:26px;font-size:32px;font-weight:700">SEARCH</div>
+        <div class="hair" style="left:26px;top:76px;width:400px"></div>
+        <div class="deck" style="position:absolute;left:26px;top:92px;font-size:25px">safe &middot; idempotent</div>
+        <div class="deck" style="position:absolute;left:26px;top:126px;font-size:25px">already in the registry</div>
+        <div class="tag" style="position:absolute;left:26px;top:174px;font-size:17px">RFC 5323 · WEBDAV SEARCH</div>
+      </div>
+      <svg id="f12-x0-svg" class="pen " style="left:0;top:0;width:1920px;height:1080px" viewBox="0 0 1920 1080">
+      <path id="f12-x0" d="M254.25578093136573,445.91158518380144 L424.4358817106622,614.7259957582171 M421.8911146327373,449.78438178551005 L256.4365924745507,615.0508759795739" stroke-width="7" style="stroke-dasharray:488;stroke-dashoffset:488"/>
+    </svg>
+      <svg id="f12-x1-svg" class="pen " style="left:0;top:0;width:1920px;height:1080px" viewBox="0 0 1920 1080">
+      <path id="f12-x1" d="M737.78438178551,450.4365924745507 L903.0508759795739,617.9208740954127 M905.1466223518073,448.98879527227837 L737.5058241719817,618.4211005958205" stroke-width="7" style="stroke-dasharray:488;stroke-dashoffset:488"/>
+    </svg>
+      <svg id="f12-x2-svg" class="pen " style="left:0;top:0;width:1920px;height:1080px" viewBox="0 0 1920 1080">
+      <path id="f12-x2" d="M1218.9887952722784,449.50582417198166 L1388.4211005958205,617.2450378000722 M1385.170298680251,446.79155719467235 L1218.5651714593387,615.7837315049765" stroke-width="7" style="stroke-dasharray:488;stroke-dashoffset:488"/>
+    </svg>
+
+      <div style="position:absolute;left:112px;top:700px;width:1720px">
+        <div id="f12-mk" class="mark" style="left:-8px;top:76px;width:1002px;height:56px"></div>
+        <div class="quote" style="position:absolute;left:0;top:0;font-size:50px">they all originate from the WebDAV activity,</div>
+        <div id="f12-q2" class="phrase quote" style="position:relative;top:68px;font-size:50px">about which many have mixed feelings</div>
+        <div id="f12-cite" class="tag" style="position:absolute;left:2px;top:150px;font-size:19px;opacity:0">RFC 10008 APPENDIX B · SELECTION OF THE METHOD NAME 'QUERY'</div>
+      </div>
+
+      <div id="f12-chip" class="card" style="left:1264px;top:894px;width:552px;height:104px;display:flex;align-items:center;justify-content:center;opacity:0">
+        <span class="mono" style="font-size:46px;font-weight:700">QUERY</span>
+      </div>
+      <div id="f12-why" class="card" style="left:1264px;top:688px;width:552px;height:186px;transform:rotate(0.68deg);opacity:0"></div>
+      <div id="f12-whyt" style="position:absolute;left:1264px;top:688px;width:552px;height:186px;transform:rotate(0.68deg);opacity:0">
+        <div class="tag" style="position:absolute;left:26px;top:22px;font-size:17px">SO INSTEAD</div>
+        <div class="deck" style="position:absolute;left:26px;top:54px;width:500px;font-size:27px;color:var(--ink)">&ldquo;QUERY&rdquo; captures the relation with the URI's query component well.</div>
+      </div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — ACT BREAK lift. Rises from below through a softer scale curve
+      // than the travel, so the pull-back reads as the page being turned up and over.
+      tl.fromTo("#stage", { y: 372 }, { y: 0, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#stage", { scale: 0.86 }, { scale: 1, duration: 0.78, ease: "power2.out" }, 0);
+      // SEAM CARRIER — the tag and the headline are at FULL opacity from frame zero and
+      // ride the cut in on the stage. They are never faded up: the gate measures MOTION,
+      // so a frame whose content fades in at 0.1s passes while visibly entering blank.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.46, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 16 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      gsap.set(["#f12-c0","#f12-c0t"], { autoAlpha: 0 });
+      tl.to(["#f12-c0","#f12-c0t"], { autoAlpha: 1, duration: 0.22, ease: "steps(3)" }, 0.50);
+      gsap.set(["#f12-c1","#f12-c1t"], { autoAlpha: 0 });
+      tl.to(["#f12-c1","#f12-c1t"], { autoAlpha: 1, duration: 0.22, ease: "steps(3)" }, 0.84);
+      gsap.set(["#f12-c2","#f12-c2t"], { autoAlpha: 0 });
+      tl.to(["#f12-c2","#f12-c2t"], { autoAlpha: 1, duration: 0.22, ease: "steps(3)" }, 1.18);
+      // the first quote line is a seam-safe printed line; only the second is marked
+      gsap.set("#f12-q2", { autoAlpha: 0 });
+      tl.fromTo("#f12-q2", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.38, ease: "power3.out" }, 2.40);
+
+      gsap.set("#f12-mk", { scaleX: 0, skewX: -1.2 });
+      tl.fromTo("#f12-mk", { scaleX: 0, skewX: -1.2 }, { scaleX: 1, skewX: -1.2, duration: 0.5, ease: "steps(8)" }, 3.20);
+      tl.fromTo("#f12-cite", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.24, ease: "steps(4)" }, 3.90);
+
+      gsap.set("#f12-x0", { strokeDashoffset: 488 });
+      tl.to("#f12-x0", { strokeDashoffset: 0, duration: 0.34, ease: "steps(5)" }, 4.90);
+      gsap.set("#f12-x1", { strokeDashoffset: 488 });
+      tl.to("#f12-x1", { strokeDashoffset: 0, duration: 0.34, ease: "steps(5)" }, 5.95);
+      gsap.set("#f12-x2", { strokeDashoffset: 488 });
+      tl.to("#f12-x2", { strokeDashoffset: 0, duration: 0.34, ease: "steps(5)" }, 7.00);
+      tl.to(["#f12-c0t","#f12-c1t","#f12-c2t"], { autoAlpha: 0.46, duration: 0.44, ease: "power2.out", stagger: 0.12 }, 5.40);
+      tl.to(["#f12-why","#f12-whyt"], { autoAlpha: 1, duration: 0.26, ease: "steps(4)" }, 8.20);
+      tl.fromTo("#f12-chip", { autoAlpha: 0, y: -46, rotation: -7 }, { autoAlpha: 1, y: 0, rotation: 1.4, duration: 0.34, ease: "steps(5)" }, 9.70);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 11.40);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["12-name"] = tl;
+    })();
+  </script>
+</template>

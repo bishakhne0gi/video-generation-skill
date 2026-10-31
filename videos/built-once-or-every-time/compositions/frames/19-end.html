@@ -1,0 +1,209 @@
+<template>
+  <style>
+@font-face{font-family:'Bric';src:url('assets/fonts/Bricolage-800.woff2') format('woff2');font-weight:800;font-display:block}
+@font-face{font-family:'BricM';src:url('assets/fonts/Bricolage-600.woff2') format('woff2');font-weight:600;font-display:block}
+@font-face{font-family:'Inter';src:url('assets/fonts/Inter-400.woff2') format('woff2');font-weight:400;font-display:block}
+@font-face{font-family:'InterS';src:url('assets/fonts/Inter-600.woff2') format('woff2');font-weight:600;font-display:block}
+@font-face{font-family:'Mono';src:url('assets/fonts/Mono-400.woff2') format('woff2');font-weight:400;font-display:block}
+@font-face{font-family:'MonoB';src:url('assets/fonts/Mono-700.woff2') format('woff2');font-weight:700;font-display:block}
+@font-face{font-family:'Instr';src:url('assets/fonts/Instrument-400i.woff2') format('woff2');font-style:italic;font-display:block}
+
+:root{
+  --canvas:#f9f7f3; --bone:#f3f0e8; --card:#ffffff; --dark:#202020; --deep:#000000;
+  --ink:#202020; --body:#3a3a3a; --charcoal:#575757; --mute:#646464;
+  --ash:#8d8d8d; --stone:#bbbbbb; --on-dark:#fcfcfc;
+  --primary:#ea2804; --primary-deep:#c01f00; --glow:#ff6a3d; --pink:#f4a8a0;
+  --success:#2b9a66; --hair:rgba(32,32,32,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--canvas);
+  -webkit-font-smoothing:antialiased}
+
+/* THE SHEET. Over-scanned by 18% so the Z-BACK never shows the stage edge; the
+   overflow is declared, not accidental. */
+.field{position:absolute;inset:-18%}
+.stage{position:absolute;inset:0}
+.inner{position:absolute;inset:0}
+
+/* ---- TYPE — three lanes, one accent. Tracking is EXPLICIT at every size because
+   the substitutes track looser than the licensed faces they stand in for. ---- */
+.disp{font-family:'Bric',system-ui,sans-serif;font-weight:800;line-height:1.0;
+  letter-spacing:-0.028em;color:var(--ink)}
+.dispm{font-family:'BricM',system-ui,sans-serif;font-weight:600;line-height:1.06;
+  letter-spacing:-0.018em;color:var(--ink)}
+.body{font-family:'Inter',system-ui,sans-serif;font-weight:400;line-height:1.5;
+  color:var(--body);letter-spacing:0}
+.bodys{font-family:'InterS',system-ui,sans-serif;font-weight:600;line-height:1.4;
+  color:var(--ink);letter-spacing:-0.006em}
+.mono{font-family:'Mono',ui-monospace,monospace;font-weight:400;
+  font-variant-numeric:tabular-nums;letter-spacing:0;color:var(--ink)}
+.monob{font-family:'MonoB',ui-monospace,monospace;font-weight:700;
+  font-variant-numeric:tabular-nums;letter-spacing:0;color:var(--ink)}
+.acc{font-family:'Instr',Georgia,serif;font-style:italic;letter-spacing:-0.01em}
+/* the SLUG: Replicate's small metadata lane. Never orange — 4.09:1 fails at this size. */
+.slug{font-family:'MonoB',ui-monospace,monospace;font-weight:700;font-size:21px;
+  letter-spacing:0.16em;text-transform:uppercase;color:var(--charcoal)}
+
+/* ---- A WELL — a dark print pull-quote. Elevation is COLOUR-BLOCKING: no shadow on
+   cream, ever, and never a coloured edge. One black, one hairline, and the bytes
+   tell the wells apart. ---- */
+.well{position:absolute;background:var(--dark);border-radius:10px;overflow:hidden}
+.welltab{position:absolute;left:0;top:0;height:44px;width:100%;background:var(--deep);
+  display:flex;align-items:center;gap:26px;padding:0 20px}
+.tab{font-family:'Mono',ui-monospace,monospace;font-size:17px;color:rgba(252,252,252,.72);
+  letter-spacing:0.04em;padding:0 2px;height:44px;line-height:44px}
+.tab.on{color:var(--on-dark);box-shadow:inset 0 -2px 0 0 var(--primary)}
+.wellbody{position:absolute;left:26px;right:22px;font-family:'Mono',ui-monospace,monospace;
+  font-size:24px;line-height:1.62;color:var(--on-dark);white-space:pre;
+  font-variant-numeric:tabular-nums}
+.cmt{color:var(--ash)}
+.dim{color:var(--stone)}
+.hot{color:var(--glow)}
+.tag{color:#8FD6FF}
+.att{color:#F5C77E}
+
+/* ---- A PLATE — the one element in the film that is photography.
+   The system allows exactly one soft drop shadow here, and it COST TWO RENDERS: a
+   24px-blur box-shadow on an element being scaled and translated forces the compositor
+   to re-raster the whole blurred layer every single frame, and capture died at frame
+   750 of 6222 — inside the one frame that carries two of them — twice, once on protocol
+   timeout and once with the Chrome process gone (write EPIPE). A 1px hairline reads as
+   printed rather than floating, which is more on-register anyway, and it costs nothing.
+   Replicate's own rule is that elevation is colour-blocking, not shadow. ---- */
+.plate{position:absolute;background:var(--card);border-radius:10px;overflow:hidden;
+  border:1px solid var(--hair)}
+.plate img{display:block;width:100%;height:auto}
+.platecap{position:absolute;font-family:'Mono',ui-monospace,monospace;font-size:18px;
+  color:var(--charcoal);letter-spacing:0.03em}
+
+/* ---- RADIUS FULL on everything interactive-looking. There are no sharp corners on
+   this sheet outside a full-bleed band. ---- */
+.pill{position:absolute;display:inline-flex;align-items:center;gap:12px;height:46px;
+  padding:0 22px;border-radius:9999px;border:1px solid var(--hair);background:var(--card);
+  font-family:'MonoB',ui-monospace,monospace;font-size:20px;color:var(--ink);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill.dark{background:var(--dark);border-color:rgba(252,252,252,.16);color:var(--on-dark)}
+.stamp{position:absolute;display:inline-flex;align-items:center;height:52px;padding:0 26px;
+  border-radius:9999px;background:var(--primary);color:#ffffff;
+  font-family:'Bric',system-ui,sans-serif;font-weight:800;font-size:26px;
+  letter-spacing:0.02em;white-space:nowrap}
+
+/* rules: the hairline replaces shadow on cream. The HEADER rule is --ink, not orange:
+   a 4px orange bar on every one of nineteen frames would spend the one-orange-per-frame
+   budget before the frame had said anything. Replicate's own hairline-strong IS #202020,
+   so this is the system's own token, not a substitution. --primary is kept for the four
+   places it earns: the hero band, the active code-tab underline inside a dark well, a
+   bar FILL, and the single stamp on the cream sheet. */
+.hair{position:absolute;height:1px;background:var(--hair)}
+.hairD{position:absolute;height:1px;background:rgba(252,252,252,.18)}
+.krule{position:absolute;height:4px;background:var(--ink);border-radius:2px}
+.krule.dk{background:var(--on-dark)}
+.orule{position:absolute;height:4px;background:var(--primary);border-radius:2px}
+
+/* the byte bar — a fill, so --primary is correct here */
+.barbg{position:absolute;height:18px;border-radius:9999px;background:rgba(32,32,32,.10)}
+.barbg.on-dark{background:rgba(252,252,252,.14)}
+.barfg{position:absolute;height:18px;border-radius:9999px;background:var(--primary);
+  transform-origin:0% 50%}
+.barfg.ink{background:var(--ink)}
+.barfg.dark{background:var(--on-dark)}
+
+/* the two clocks */
+.clock{position:absolute;right:112px;top:112px;text-align:right}
+.clockk{font-family:'MonoB',ui-monospace,monospace;font-size:17px;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--mute)}
+.clockv{font-family:'Mono',ui-monospace,monospace;font-size:27px;color:var(--ink);
+  font-variant-numeric:tabular-nums;margin-top:5px}
+
+/* the ORANGE HERO BAND — Replicate's atmospheric mesh, hero band only.
+   MEASURED, and it writes the layout: white on --primary is 4.37:1 (AA-large), on
+   --hero-glow 2.85 and on --hero-pink 1.92 — both of which FAIL even for display type.
+   So the light pools are pushed into the right third, where nothing is ever set, and
+   the left 60% runs #a81a00 -> #ea2804, which holds white at 4.37:1 or better all the
+   way across. Every word on a hero frame lives in that left band. */
+.hero{position:absolute;inset:0;background:
+  radial-gradient(58% 54% at 90% 84%, rgba(244,168,160,.92) 0%, rgba(244,168,160,0) 62%),
+  radial-gradient(52% 58% at 94% 18%, rgba(255,138,92,.88) 0%, rgba(255,138,92,0) 60%),
+  radial-gradient(46% 44% at 74% 52%, rgba(255,106,61,.55) 0%, rgba(255,106,61,0) 66%),
+  linear-gradient(102deg, #a81a00 0%, #c01f00 30%, #de2504 62%, #ea2804 100%)}
+
+svg.pen{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;z-index:5}
+svg.pen path{fill:none;stroke:var(--primary);stroke-linecap:round;stroke-linejoin:round}
+svg.pen path.ink{stroke:var(--ink)}
+svg.pen path.dk{stroke:var(--on-dark)}
+
+  </style>
+
+  <div id="root" data-composition-id="19-end" data-start="0" data-width="1920" data-height="1080">
+      <div class="field" data-layout-allow-overflow style="background:var(--deep)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      <div id="z-slug" class="slug" style="position:absolute;left:132px;top:118px;color:#8d8d8d">Ship It · Episode 29</div>
+      <div id="z-rule" style="position:absolute;left:132px;top:160px;width:150px;height:4px;background:var(--on-dark);border-radius:2px;transform-origin:0% 50%"></div>
+
+      
+      <div class="z-t" style="position:absolute;left:132px;top:228px;width:1080px">
+        <div class="disp" style="font-size:46px;line-height:1.06;letter-spacing:-1.1px;color:var(--on-dark)">Build what everyone shares.</div>
+        <div class="body" style="margin-top:16px;font-size:26px;color:var(--stone);width:1000px">If the bytes are the same for every visitor, produce them once and cache them anywhere.</div>
+      </div>
+      <div class="z-t" style="position:absolute;left:132px;top:404px;width:1080px">
+        <div class="disp" style="font-size:46px;line-height:1.06;letter-spacing:-1.1px;color:var(--on-dark)">Render on the device only what only the device knows.</div>
+        <div class="body" style="margin-top:16px;font-size:26px;color:var(--stone);width:1000px">The drawing, the cart, the inbox. Nothing else has earned a bundle.</div>
+      </div>
+      <div class="z-t" style="position:absolute;left:132px;top:580px;width:1080px">
+        <div class="disp" style="font-size:46px;line-height:1.06;letter-spacing:-1.1px;color:var(--on-dark)">Measure the first pixel, not the payload.</div>
+        <div class="body" style="margin-top:16px;font-size:26px;color:var(--stone);width:1000px">A page that sends less HTML can still take five seconds to show a word.</div>
+      </div>
+
+      <div id="z-sk" class="slug" style="position:absolute;left:1300px;top:232px;color:#8d8d8d">Sources</div>
+      <div id="z-sr" class="hairD" style="left:1300px;top:274px;width:508px;transform-origin:0% 50%"></div>
+      
+      <div class="z-s mono" style="position:absolute;left:1300px;top:304px;width:508px;font-size:19px;color:var(--ash);line-height:1.42">Tom Preston-Werner · “Blogging Like a Hacker” · 17 Nov 2008</div>
+      <div class="z-s mono" style="position:absolute;left:1300px;top:378px;width:508px;font-size:19px;color:var(--ash);line-height:1.42">web.dev · “Rendering on the Web” · Osmani &amp; Miller · 2019, upd. 2026</div>
+      <div class="z-s mono" style="position:absolute;left:1300px;top:452px;width:508px;font-size:19px;color:var(--ash);line-height:1.42">create-react-app · cra-template/template/public/index.html · MIT</div>
+      <div class="z-s mono" style="position:absolute;left:1300px;top:526px;width:508px;font-size:19px;color:var(--ash);line-height:1.42">jekyllrb.com and excalidraw.com · headers, bytes and traces, 2026-08-23</div>
+      <div class="z-s mono" style="position:absolute;left:1300px;top:600px;width:508px;font-size:19px;color:var(--ash);line-height:1.42">Chrome DevTools · Slow 4G, 4× CPU, cold cache · traces archived</div>
+
+      <div id="z-hr" class="hairD" style="left:132px;top:856px;width:1676px;transform-origin:0% 50%"></div>
+      <div id="z-n" class="mono" style="position:absolute;left:132px;top:900px;font-size:23px;color:#8d8d8d;letter-spacing:0.16em;text-transform:uppercase">Next</div>
+      <div id="z-nx" class="disp" style="position:absolute;left:132px;top:936px;font-size:66px;letter-spacing:-1.6px;color:var(--on-dark)">EP 30 · Subagents</div>
+      <div id="z-bd" class="mono" style="position:absolute;left:1300px;top:944px;width:508px;font-size:19px;color:var(--ash);line-height:1.42">music: “Lost in Memory” by gurdonark<br>ccMixter · CC BY 3.0</div>
+
+            <svg id="p-next-svg" class="pen" viewBox="0 0 1920 1080"><path id="p-next" class="" d="M 122 922.5 L 898 924.3 L 893 1022 L 109 1018.5 L 111.9 920 L 146 922.9" stroke-width="4.5"/></svg>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — ACT BREAK lift. The sheet is turned up and over.
+      tl.fromTo("#stage", { y: 372 }, { y: 0, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#stage", { scale: 0.86 }, { scale: 1, duration: 0.78, ease: "power2.out" }, 0);
+      gsap.set([".z-t", "#z-sk", ".z-s", "#z-n", "#z-nx", "#z-bd"], { autoAlpha: 0 });
+      gsap.set(["#z-rule", "#z-sr", "#z-hr"], { scaleX: 0 });
+      tl.fromTo("#z-slug", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.36, ease: "power3.out" }, 0.20);
+      tl.to("#z-rule", { scaleX: 1, duration: 0.44, ease: "power3.out" }, 0.34);
+
+      // the three instructions land on the three clauses of the narration
+
+      tl.fromTo(".z-t", { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.48, ease: "power3.out", stagger: 2.100 }, 0.62);
+
+      tl.fromTo("#z-sk", { autoAlpha: 0, x: 16 }, { autoAlpha: 1, x: 0, duration: 0.34, ease: "power3.out" }, 4.60);
+      tl.to("#z-sr", { scaleX: 1, duration: 0.46, ease: "power3.out" }, 4.74);
+
+      tl.fromTo(".z-s", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out", stagger: 0.260 }, 4.96);
+
+      tl.to("#z-hr", { scaleX: 1, duration: 0.56, ease: "power3.out" }, 6.90);
+      tl.fromTo("#z-n", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.32, ease: "power3.out" }, 7.14);
+      tl.fromTo("#z-nx", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.48, ease: "power3.out" }, 7.34);
+      tl.fromTo("#z-bd", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 8.10);
+
+      var pen_pnext_d = anime.svg.createDrawable("#p-next");
+      var pen_pnext = anime.animate(pen_pnext_d, { draw: ["0 0", "0 1"], duration: 620, ease: anime.steps(9), autoplay: false });
+      var P_pen_pnext = { p: 0 };
+      tl.to(P_pen_pnext, { p: 1, duration: 0.62, ease: "none", onUpdate: function () { pen_pnext.seek(P_pen_pnext.p * pen_pnext.duration); } }, 8.60);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["19-end"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,125 @@
+{
+  "fps": 30,
+  "seams": [
+    {
+      "id": "status→title",
+      "cut": 10.0,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f1-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f2-stage",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "title→origin",
+      "cut": 15.5,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f2-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f3-stage",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "origin→mirror",
+      "cut": 27.5,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f3-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f4-stage",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "mirror→shape",
+      "cut": 40.0,
+      "technique": "zoom-through — deeper into the same thought: the diagram becomes the general case",
+      "exit": {
+        "selector": "#f4-stage",
+        "axis": "z",
+        "dir": 1
+      },
+      "entry": {
+        "selector": "#f5-stage",
+        "axis": "z",
+        "dir": 1
+      }
+    },
+    {
+      "id": "shape→failure",
+      "cut": 51.0,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f5-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f6-stage",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "failure→boundary",
+      "cut": 63.0,
+      "technique": "inverse zoom — ARRIVAL, the thesis lands: commits merge, metadata does not",
+      "exit": {
+        "selector": "#f6-stage",
+        "axis": "z",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f7-stage",
+        "axis": "z",
+        "dir": -1
+      }
+    },
+    {
+      "id": "boundary→agent",
+      "cut": 78.0,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f7-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f8-stage",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "agent→takeaway",
+      "cut": 89.0,
+      "technique": "elevation — up into the conclusion",
+      "exit": {
+        "selector": "#f8-stage",
+        "axis": "y",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f9-stage",
+        "axis": "y",
+        "dir": -1
+      }
+    }
+  ]
+}

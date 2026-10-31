@@ -1,0 +1,925 @@
+{
+  "tts_provider": "kokoro",
+  "voice_id": "am_michael",
+  "bgm": null,
+  "bgm_pending": false,
+  "bgm_provider": null,
+  "bgm_pid": null,
+  "bgm_log": null,
+  "bgm_mode": null,
+  "bgm_target_duration_s": null,
+  "bgm_seed_duration_s": null,
+  "bgm_loop_count": null,
+  "voices": [
+    {
+      "id": "01",
+      "path": "assets/voice/01.wav",
+      "duration_s": 4.736,
+      "words": [
+        {
+          "id": "w0",
+          "text": "One",
+          "start": 0.05,
+          "end": 0.28
+        },
+        {
+          "id": "w1",
+          "text": "film,",
+          "start": 0.43,
+          "end": 0.77
+        },
+        {
+          "id": "w2",
+          "text": "a",
+          "start": 0.95,
+          "end": 0.96
+        },
+        {
+          "id": "w3",
+          "text": "million",
+          "start": 0.96,
+          "end": 1.65
+        },
+        {
+          "id": "w4",
+          "text": "people,",
+          "start": 1.65,
+          "end": 2.39
+        },
+        {
+          "id": "w5",
+          "text": "all",
+          "start": 2.39,
+          "end": 2.53
+        },
+        {
+          "id": "w6",
+          "text": "pressing",
+          "start": 2.55,
+          "end": 2.99
+        },
+        {
+          "id": "w7",
+          "text": "play",
+          "start": 2.99,
+          "end": 3.28
+        },
+        {
+          "id": "w8",
+          "text": "inside",
+          "start": 3.28,
+          "end": 3.74
+        },
+        {
+          "id": "w9",
+          "text": "the",
+          "start": 3.79,
+          "end": 3.93
+        },
+        {
+          "id": "w10",
+          "text": "same",
+          "start": 3.93,
+          "end": 4.16
+        },
+        {
+          "id": "w11",
+          "text": "second.",
+          "start": 4.16,
+          "end": 4.64
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "path": "assets/voice/03.wav",
+      "duration_s": 8.896,
+      "words": [
+        {
+          "id": "w0",
+          "text": "Do",
+          "start": 0.07,
+          "end": 0.19
+        },
+        {
+          "id": "w1",
+          "text": "the",
+          "start": 0.21,
+          "end": 0.51
+        },
+        {
+          "id": "w2",
+          "text": "arithmetic.",
+          "start": 0.51,
+          "end": 1.6
+        },
+        {
+          "id": "w3",
+          "text": "One",
+          "start": 1.67,
+          "end": 1.82
+        },
+        {
+          "id": "w4",
+          "text": "ultra-high",
+          "start": 1.82,
+          "end": 2.55
+        },
+        {
+          "id": "w5",
+          "text": "definition",
+          "start": 2.55,
+          "end": 3.29
+        },
+        {
+          "id": "w6",
+          "text": "stream",
+          "start": 3.29,
+          "end": 3.76
+        },
+        {
+          "id": "w7",
+          "text": "is",
+          "start": 3.83,
+          "end": 3.92
+        },
+        {
+          "id": "w8",
+          "text": "about",
+          "start": 3.92,
+          "end": 4.32
+        },
+        {
+          "id": "w9",
+          "text": "15",
+          "start": 4.32,
+          "end": 4.74
+        },
+        {
+          "id": "w10",
+          "text": "megabits",
+          "start": 4.77,
+          "end": 5.41
+        },
+        {
+          "id": "w11",
+          "text": "per",
+          "start": 5.41,
+          "end": 5.65
+        },
+        {
+          "id": "w12",
+          "text": "second.",
+          "start": 5.65,
+          "end": 6.4
+        },
+        {
+          "id": "w13",
+          "text": "A",
+          "start": 6.46,
+          "end": 6.48
+        },
+        {
+          "id": "w14",
+          "text": "million",
+          "start": 6.48,
+          "end": 6.99
+        },
+        {
+          "id": "w15",
+          "text": "of",
+          "start": 7.1,
+          "end": 7.18
+        },
+        {
+          "id": "w16",
+          "text": "them",
+          "start": 7.19,
+          "end": 7.4
+        },
+        {
+          "id": "w17",
+          "text": "is",
+          "start": 7.52,
+          "end": 7.57
+        },
+        {
+          "id": "w18",
+          "text": "15",
+          "start": 8.02,
+          "end": 8.14
+        },
+        {
+          "id": "w19",
+          "text": "terabits.",
+          "start": 8.14,
+          "end": 9.04
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "path": "assets/voice/04.wav",
+      "duration_s": 6.272,
+      "words": [
+        {
+          "id": "w0",
+          "text": "so",
+          "start": 0.07,
+          "end": 0.19
+        },
+        {
+          "id": "w1",
+          "text": "the",
+          "start": 0.19,
+          "end": 0.47
+        },
+        {
+          "id": "w2",
+          "text": "film",
+          "start": 0.47,
+          "end": 0.84
+        },
+        {
+          "id": "w3",
+          "text": "is",
+          "start": 0.84,
+          "end": 1.03
+        },
+        {
+          "id": "w4",
+          "text": "never",
+          "start": 1.03,
+          "end": 1.32
+        },
+        {
+          "id": "w5",
+          "text": "sent.",
+          "start": 1.32,
+          "end": 1.97
+        },
+        {
+          "id": "w6",
+          "text": "It",
+          "start": 1.97,
+          "end": 2.03
+        },
+        {
+          "id": "w7",
+          "text": "is",
+          "start": 2.03,
+          "end": 2.16
+        },
+        {
+          "id": "w8",
+          "text": "cut",
+          "start": 2.16,
+          "end": 2.36
+        },
+        {
+          "id": "w9",
+          "text": "into",
+          "start": 2.36,
+          "end": 2.62
+        },
+        {
+          "id": "w10",
+          "text": "segments,",
+          "start": 2.62,
+          "end": 3.22
+        },
+        {
+          "id": "w11",
+          "text": "six",
+          "start": 3.3,
+          "end": 3.37
+        },
+        {
+          "id": "w12",
+          "text": "seconds",
+          "start": 3.85,
+          "end": 4.24
+        },
+        {
+          "id": "w13",
+          "text": "each,",
+          "start": 4.24,
+          "end": 4.64
+        },
+        {
+          "id": "w14",
+          "text": "and",
+          "start": 4.71,
+          "end": 4.84
+        },
+        {
+          "id": "w15",
+          "text": "those",
+          "start": 4.84,
+          "end": 5.18
+        },
+        {
+          "id": "w16",
+          "text": "are",
+          "start": 5.18,
+          "end": 5.38
+        },
+        {
+          "id": "w17",
+          "text": "what",
+          "start": 5.38,
+          "end": 5.65
+        },
+        {
+          "id": "w18",
+          "text": "travel.",
+          "start": 5.65,
+          "end": 6.11
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "path": "assets/voice/05.wav",
+      "duration_s": 6.997,
+      "words": [
+        {
+          "id": "w0",
+          "text": "encode",
+          "start": 0.12,
+          "end": 0.41
+        },
+        {
+          "id": "w1",
+          "text": "every",
+          "start": 0.41,
+          "end": 0.75
+        },
+        {
+          "id": "w2",
+          "text": "segment",
+          "start": 0.75,
+          "end": 1.23
+        },
+        {
+          "id": "w3",
+          "text": "more",
+          "start": 1.23,
+          "end": 1.5
+        },
+        {
+          "id": "w4",
+          "text": "than",
+          "start": 1.5,
+          "end": 1.77
+        },
+        {
+          "id": "w5",
+          "text": "once",
+          "start": 1.77,
+          "end": 2.07
+        },
+        {
+          "id": "w6",
+          "text": "at",
+          "start": 2.07,
+          "end": 2.22
+        },
+        {
+          "id": "w7",
+          "text": "different",
+          "start": 2.22,
+          "end": 2.87
+        },
+        {
+          "id": "w8",
+          "text": "bitch",
+          "start": 2.87,
+          "end": 3.2
+        },
+        {
+          "id": "w9",
+          "text": "rates.",
+          "start": 3.56,
+          "end": 3.6
+        },
+        {
+          "id": "w10",
+          "text": "Same",
+          "start": 3.72,
+          "end": 3.96
+        },
+        {
+          "id": "w11",
+          "text": "six",
+          "start": 3.96,
+          "end": 4.23
+        },
+        {
+          "id": "w12",
+          "text": "seconds",
+          "start": 4.23,
+          "end": 4.86
+        },
+        {
+          "id": "w13",
+          "text": "of",
+          "start": 4.86,
+          "end": 5.04
+        },
+        {
+          "id": "w14",
+          "text": "story,",
+          "start": 5.04,
+          "end": 5.67
+        },
+        {
+          "id": "w15",
+          "text": "three",
+          "start": 5.67,
+          "end": 5.96
+        },
+        {
+          "id": "w16",
+          "text": "different",
+          "start": 5.96,
+          "end": 6.47
+        },
+        {
+          "id": "w17",
+          "text": "weights.",
+          "start": 6.47,
+          "end": 6.88
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "path": "assets/voice/06.wav",
+      "duration_s": 7.851,
+      "words": [
+        {
+          "id": "w0",
+          "text": "Then",
+          "start": 0.06,
+          "end": 0.32
+        },
+        {
+          "id": "w1",
+          "text": "publish",
+          "start": 0.32,
+          "end": 0.89
+        },
+        {
+          "id": "w2",
+          "text": "one",
+          "start": 0.89,
+          "end": 1.12
+        },
+        {
+          "id": "w3",
+          "text": "text",
+          "start": 1.12,
+          "end": 1.45
+        },
+        {
+          "id": "w4",
+          "text": "file",
+          "start": 1.45,
+          "end": 1.77
+        },
+        {
+          "id": "w5",
+          "text": "that",
+          "start": 1.77,
+          "end": 2.09
+        },
+        {
+          "id": "w6",
+          "text": "lists",
+          "start": 2.09,
+          "end": 2.38
+        },
+        {
+          "id": "w7",
+          "text": "them.",
+          "start": 2.88,
+          "end": 2.9
+        },
+        {
+          "id": "w8",
+          "text": "That",
+          "start": 2.96,
+          "end": 3.18
+        },
+        {
+          "id": "w9",
+          "text": "playlist",
+          "start": 3.19,
+          "end": 3.77
+        },
+        {
+          "id": "w10",
+          "text": "is",
+          "start": 3.77,
+          "end": 3.9
+        },
+        {
+          "id": "w11",
+          "text": "everything",
+          "start": 3.9,
+          "end": 4.63
+        },
+        {
+          "id": "w12",
+          "text": "the",
+          "start": 4.63,
+          "end": 4.84
+        },
+        {
+          "id": "w13",
+          "text": "player",
+          "start": 4.84,
+          "end": 5.2
+        },
+        {
+          "id": "w14",
+          "text": "is",
+          "start": 5.24,
+          "end": 5.32
+        },
+        {
+          "id": "w15",
+          "text": "given.",
+          "start": 5.77,
+          "end": 5.97
+        },
+        {
+          "id": "w16",
+          "text": "It",
+          "start": 6.1,
+          "end": 6.18
+        },
+        {
+          "id": "w17",
+          "text": "works",
+          "start": 6.18,
+          "end": 6.55
+        },
+        {
+          "id": "w18",
+          "text": "out",
+          "start": 6.55,
+          "end": 6.77
+        },
+        {
+          "id": "w19",
+          "text": "the",
+          "start": 6.77,
+          "end": 6.97
+        },
+        {
+          "id": "w20",
+          "text": "rest",
+          "start": 7.01,
+          "end": 7.28
+        },
+        {
+          "id": "w21",
+          "text": "itself.",
+          "start": 7.28,
+          "end": 7.98
+        }
+      ]
+    },
+    {
+      "id": "07",
+      "path": "assets/voice/07.wav",
+      "duration_s": 8.085,
+      "words": [
+        {
+          "id": "w0",
+          "text": "Watch",
+          "start": 0.04,
+          "end": 0.47
+        },
+        {
+          "id": "w1",
+          "text": "the",
+          "start": 0.47,
+          "end": 0.75
+        },
+        {
+          "id": "w2",
+          "text": "buffer.",
+          "start": 0.75,
+          "end": 1.36
+        },
+        {
+          "id": "w3",
+          "text": "When",
+          "start": 1.43,
+          "end": 1.58
+        },
+        {
+          "id": "w4",
+          "text": "throughput",
+          "start": 1.67,
+          "end": 2.21
+        },
+        {
+          "id": "w5",
+          "text": "drops,",
+          "start": 2.21,
+          "end": 2.59
+        },
+        {
+          "id": "w6",
+          "text": "the",
+          "start": 2.63,
+          "end": 2.71
+        },
+        {
+          "id": "w7",
+          "text": "player",
+          "start": 2.71,
+          "end": 2.93
+        },
+        {
+          "id": "w8",
+          "text": "asks",
+          "start": 2.99,
+          "end": 3.36
+        },
+        {
+          "id": "w9",
+          "text": "for",
+          "start": 3.36,
+          "end": 3.52
+        },
+        {
+          "id": "w10",
+          "text": "a",
+          "start": 3.52,
+          "end": 3.6
+        },
+        {
+          "id": "w11",
+          "text": "smaller",
+          "start": 3.6,
+          "end": 4.05
+        },
+        {
+          "id": "w12",
+          "text": "rendition",
+          "start": 4.05,
+          "end": 4.64
+        },
+        {
+          "id": "w13",
+          "text": "next.",
+          "start": 4.64,
+          "end": 5.46
+        },
+        {
+          "id": "w14",
+          "text": "The",
+          "start": 5.52,
+          "end": 5.69
+        },
+        {
+          "id": "w15",
+          "text": "picture",
+          "start": 5.69,
+          "end": 6.21
+        },
+        {
+          "id": "w16",
+          "text": "softens.",
+          "start": 6.24,
+          "end": 7.03
+        },
+        {
+          "id": "w17",
+          "text": "It",
+          "start": 7.13,
+          "end": 7.17
+        },
+        {
+          "id": "w18",
+          "text": "never",
+          "start": 7.17,
+          "end": 7.48
+        },
+        {
+          "id": "w19",
+          "text": "stops.",
+          "start": 7.55,
+          "end": 8.02
+        }
+      ]
+    },
+    {
+      "id": "08",
+      "path": "assets/voice/08.wav",
+      "duration_s": 7.403,
+      "words": [
+        {
+          "id": "w0",
+          "text": "now",
+          "start": 0.05,
+          "end": 0.27
+        },
+        {
+          "id": "w1",
+          "text": "put",
+          "start": 0.27,
+          "end": 0.45
+        },
+        {
+          "id": "w2",
+          "text": "copies",
+          "start": 0.56,
+          "end": 1.08
+        },
+        {
+          "id": "w3",
+          "text": "near",
+          "start": 1.08,
+          "end": 1.42
+        },
+        {
+          "id": "w4",
+          "text": "people.",
+          "start": 1.5,
+          "end": 2.04
+        },
+        {
+          "id": "w5",
+          "text": "A",
+          "start": 2.08,
+          "end": 2.09
+        },
+        {
+          "id": "w6",
+          "text": "million",
+          "start": 2.09,
+          "end": 2.48
+        },
+        {
+          "id": "w7",
+          "text": "viewers",
+          "start": 2.48,
+          "end": 3.03
+        },
+        {
+          "id": "w8",
+          "text": "reach",
+          "start": 3.03,
+          "end": 3.42
+        },
+        {
+          "id": "w9",
+          "text": "a",
+          "start": 3.42,
+          "end": 3.5
+        },
+        {
+          "id": "w10",
+          "text": "nearby",
+          "start": 3.5,
+          "end": 4
+        },
+        {
+          "id": "w11",
+          "text": "cache.",
+          "start": 4,
+          "end": 5.04
+        },
+        {
+          "id": "w12",
+          "text": "The",
+          "start": 5.04,
+          "end": 5.08
+        },
+        {
+          "id": "w13",
+          "text": "origin",
+          "start": 5.08,
+          "end": 5.64
+        },
+        {
+          "id": "w14",
+          "text": "serves",
+          "start": 5.64,
+          "end": 6.08
+        },
+        {
+          "id": "w15",
+          "text": "that",
+          "start": 6.08,
+          "end": 6.28
+        },
+        {
+          "id": "w16",
+          "text": "segment",
+          "start": 6.33,
+          "end": 6.94
+        },
+        {
+          "id": "w17",
+          "text": "once.",
+          "start": 6.94,
+          "end": 7.36
+        }
+      ]
+    },
+    {
+      "id": "09",
+      "path": "assets/voice/09.wav",
+      "duration_s": 5.205,
+      "words": [
+        {
+          "id": "w0",
+          "text": "small",
+          "start": 0.06,
+          "end": 0.41
+        },
+        {
+          "id": "w1",
+          "text": "pieces,",
+          "start": 0.45,
+          "end": 1.12
+        },
+        {
+          "id": "w2",
+          "text": "several",
+          "start": 1.17,
+          "end": 1.63
+        },
+        {
+          "id": "w3",
+          "text": "sizes,",
+          "start": 1.63,
+          "end": 2.14
+        },
+        {
+          "id": "w4",
+          "text": "one",
+          "start": 2.14,
+          "end": 2.44
+        },
+        {
+          "id": "w5",
+          "text": "list,",
+          "start": 2.44,
+          "end": 2.98
+        },
+        {
+          "id": "w6",
+          "text": "cashed",
+          "start": 2.98,
+          "end": 3.4
+        },
+        {
+          "id": "w7",
+          "text": "close,",
+          "start": 3.4,
+          "end": 3.76
+        },
+        {
+          "id": "w8",
+          "text": "that",
+          "start": 3.82,
+          "end": 4.01
+        },
+        {
+          "id": "w9",
+          "text": "is",
+          "start": 4.01,
+          "end": 4.08
+        },
+        {
+          "id": "w10",
+          "text": "streaming",
+          "start": 4.16,
+          "end": 4.53
+        },
+        {
+          "id": "w11",
+          "text": "at",
+          "start": 4.72,
+          "end": 4.77
+        },
+        {
+          "id": "w12",
+          "text": "scale.",
+          "start": 4.92,
+          "end": 5.31
+        }
+      ]
+    }
+  ],
+  "sfx": [],
+  "total_duration_s": 55.445
+}

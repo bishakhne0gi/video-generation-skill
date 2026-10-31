@@ -1,0 +1,81 @@
+{
+  "_": "EP 21 — read replicas. The STATION STRIP register (references/station-strip.md) on EP 16's palette and design system for the third time in the run, because the CONSTRUCTION and the palette are the series. TWO THINGS ARE THIS EPISODE'S OWN. (1) THE FIELD — `WalField`, a new primitive in lib/gradient.tsx: slow horizontal streaks of light drifting left-to-right at mutually incommensurate speeds, which is literally the material of the episode. Edgeless, so one instrument runs under every station, and the ACT TWO COOL SHIFT is a property of the field rather than a second background: the same instrument drifts a few degrees colder and darker as the film turns, so the value journey is carried by hue as well as by brightness. (2) THE LAG RULER — one shared WAL position ruler that persists across every station, carrying a WRITE HEAD (the primary, at position N) and an APPLY HEAD (the replica, trailing at N minus k). The distance between the two heads IS the episode's argument, and every station either opens that gap or closes it. It is the protagonist, not a decoration. THIRD DEVICE, ANSWERING THE DIRECTOR'S NOTE THAT THE FILM MUST SHOW *WHERE* EACH MECHANISM HAPPENS: a persistent three-lane LOCATOR — APP / PRIMARY / REPLICA — mounted with the chip, where each station lights the lane its mechanism actually lives in. Fan-out lights PRIMARY. Streaming lights the wire between PRIMARY and REPLICA. The commit knob lights PRIMARY. The stale read lights APP-reading-REPLICA. Routing lights APP alone. That locator is why the film can carry eight different instruments without the viewer losing the topology. EVERY FIGURE ON SCREEN IS DOCUMENTED AND THE SOURCE IS CAPTIONED UNDER IT — PostgreSQL 17 documentation for `synchronous_commit` levels, `pg_stat_replication`'s write/flush/replay lag columns, `wal_receiver_status_interval`, `max_standby_streaming_delay` and `hot_standby_feedback`; AWS documentation for RDS `ReplicaLag` and Aurora's replica lag characteristics. NOTHING IS PRESENTED AS MEASURED ON THIS MACHINE — that was EP 20's device and this episode does not borrow it. Every figure must be verified against its source before it is drawn; see CREDITS.md for the checked list. THE EPISODE IS DELIBERATELY DISTINCT FROM EP 18 (CQRS) AND SAYS SO ON STATION 07: a replica is the same schema and the same rows replayed physically, where CQRS builds a different model on purpose. That contrast is series continuity, not filler.",
+  "series": "Ship It",
+  "episode": "EP 21",
+  "title": "Ask the Replica.",
+  "titleAccent": "It Answers From the Past.",
+  "subtitle": "A read replica is not a second copy of the truth. It is the truth as of a moment ago — and your job is deciding which reads can live in the past.",
+  "hook": "Reads multiply. Writes do not. And every replica answers from the past.",
+  "cta": "cosx",
+  "next": "Next: subagents, and the context you throw away on purpose",
+  "_theme": "EP 16's palette exactly. This episode's own signature is the FIELD (`WalField` — horizontal streaming light, not EP 20's mesh lobes and not EP 18's hard bands) and the LAG RULER, not a new colour. Indigo stays the single filled hue. The act-two cool shift is applied to the FIELD's stops and the act's ground value only; the ink, the accent and the type are untouched, because a palette that changes mid-film stops being a brand.",
+  "theme": "stripe-mesh",
+  "fps": 30,
+  "_voice": "Unchanged from EP 13–20 — same voice id, same model, same settings. Every line opens on an instruction verb.",
+  "voice": "nlyULslzTRhqlyv46oPj",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 2021,
+  "_music": "Same 84bpm grid as EP 13–20 so scene lengths snap identically across the run.",
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.15,
+    "open": 0.34,
+    "mood": "calm-focus",
+    "bpm": 84,
+    "startAt": 0
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "Nine lines, two acts. Act one is what a replica BUYS you and every line is an instruction to look at one part of the mechanism — the fan-out, what actually travels, the commit knob, the gap itself. Act two is what it COSTS you: the film breaks it on purpose at the dark station, then fixes it with a routing rule, then spends two lines saying what a replica is NOT. No line carries a number, deliberately — the figures live on screen with their sources beside them, where they can be read rather than heard.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Add a read replica. Reads multiply. Writes do not. And every replica answers from the past."
+    },
+    {
+      "scene": 2,
+      "text": "Watch the fan-out. One primary takes every write. The replicas take the reads, so only the read side scales."
+    },
+    {
+      "scene": 3,
+      "text": "Follow what actually travels. The replica never runs your query. It replays the write-ahead log."
+    },
+    {
+      "scene": 4,
+      "text": "Turn the commit knob. Asynchronous returns immediately. Remote apply waits for the replica… and your write pays for it."
+    },
+    {
+      "scene": 5,
+      "text": "Measure the gap. Replication lag is a distance in the log… push writes harder and it opens."
+    },
+    {
+      "scene": 6,
+      "text": "Now break it. Save the profile, reload the page… and the old row comes back."
+    },
+    {
+      "scene": 7,
+      "text": "Route by intent. Send a user's own reads to the primary for one lag window. Everything else goes to a replica."
+    },
+    {
+      "scene": 8,
+      "_recorded": "Scene 8 could not be re-recorded — the ElevenLabs quota ran out mid-session (10 credits left, 56 needed). This is the ORIGINAL line and it matches the audio on disk. It reads at 2.77 syll/s and `--check` flags it as dragging; the fix is not a shorter picture but a DENSER one, so station 07 carries the film's most information-rich instrument. Re-record it as \"Do not call this CQRS. A replica replays the same rows byte for byte. CQRS builds a different model on purpose.\" when quota resets, and every cut, camera key and cue re-times itself from vo-durations.json.",
+      "text": "Do not call this CQRS. Same schema, same rows, replayed byte for byte. CQRS builds a different model on purpose."
+    },
+    {
+      "scene": 9,
+      "text": "And never call it a backup. A dropped table replicates in milliseconds… the replica drops it too."
+    }
+  ],
+  "_shots": "None. The STATION STRIP register needs no Kling at all — EP15 through EP20 all shipped on graphics alone, and the director's note on this episode was explicitly for MORE and DEEPER motion graphics per station, which is spent on eight bespoke instruments rather than on footage.",
+  "shots": []
+}

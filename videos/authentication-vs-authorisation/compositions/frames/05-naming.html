@@ -1,0 +1,242 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --canvas: #f9f7f3; --bone: #f3f0e8; --card: #ffffff; --dark: #202020;
+      --hair: rgba(32,32,32,0.12); --primary: #ea2804;
+      --ink: #202020; --body: #3a3a3a; --charcoal: #575757; --mute: #646464; --ash: #8d8d8d;
+      --on-dark: #fcfcfc; --success: #2b9a66;
+    }
+    #f5-ground { position: absolute; inset: 0; background: var(--canvas); }
+    #f5-stage { position: absolute; inset: 0; }
+
+    #f5-kicker {
+      position: absolute; left: 96px; top: 104px;
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--charcoal);
+    }
+
+    /* two panels of equal weight either side of a single hairline. Flat plane — the
+       blueprint's 3D book-open tilt is dropped: this system has no perspective and no
+       shadow outside photography. */
+    .f5-panel {
+      position: absolute; top: 176px; width: 844px; height: 552px;
+      background: var(--card); border: 1px solid var(--hair); border-radius: 10px;
+    }
+    #f5-pL { left: 96px; }
+    #f5-pR { left: 980px; }
+    #f5-divide { position: absolute; left: 960px; top: 176px; width: 1px; height: 552px; background: var(--hair); }
+
+    .f5-code {
+      position: absolute; left: 0; top: 34px; width: 844px; text-align: center;
+      font-family: "JetBrains Mono", monospace; font-size: 92px; font-weight: 700;
+      letter-spacing: 0.02em; color: var(--ink);
+    }
+
+    /* ---- the flap board: each cell is a drum walking to its letter ----
+       Technique adopted from the registry's `split-flap-board`, rebuilt in this frame's
+       register: that block owns a full 1920x1080 near-black canvas, and dropping it into a
+       cream editorial frame would have meant re-skinning it into a different component.
+       The mechanism is the point, so the mechanism is what carried over. */
+    .f5-board { position: absolute; top: 150px; left: 0; width: 844px; display: flex; justify-content: center; gap: 5px; }
+    .f5-cell {
+      position: relative; width: 52px; height: 74px; overflow: hidden;
+      background: var(--bone); border-radius: 4px;
+    }
+    .f5-strip { position: absolute; left: 0; top: 0; width: 52px; }
+    .f5-glyph {
+      width: 52px; height: 74px; line-height: 74px; text-align: center;
+      font-family: "JetBrains Mono", monospace; font-size: 40px; font-weight: 700; color: var(--ink);
+    }
+
+    /* the annotation gesture — marker, connector and callout as ONE beat */
+    #f5-mark { position: absolute; left: 96px; top: 326px; width: 844px; height: 170px; pointer-events: none; }
+    #f5-note {
+      position: absolute; left: 130px; top: 442px; width: 600px;
+      font-family: "JetBrains Mono", monospace; font-size: 19px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); line-height: 1.45;
+    }
+
+    .f5-ref {
+      position: absolute; left: 0; top: 336px; width: 844px; text-align: center;
+    }
+    .f5-ref span {
+      display: inline-block; padding: 8px 20px; border-radius: 9999px;
+      background: var(--canvas); border: 1px solid var(--hair);
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute);
+    }
+    .f5-trans {
+      position: absolute; left: 56px; top: 400px; width: 732px; text-align: center;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 700;
+      font-size: 33px; line-height: 1.25; letter-spacing: -0.015em; color: var(--ink);
+    }
+
+    #f5-head {
+      position: absolute; left: 96px; top: 782px; width: 1730px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+      font-size: 62px; line-height: 1.0; letter-spacing: -0.025em; color: var(--ink);
+    }
+
+    #f5-chip {
+      position: absolute; right: 80px; top: 72px; display: flex; align-items: center; gap: 12px;
+      padding: 10px 22px; border-radius: 9999px;
+      background: var(--card); border: 1px solid var(--hair);
+      font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--charcoal);
+    }
+    #f5-chip i { width: 9px; height: 9px; border-radius: 9999px; background: var(--ash); display: block; }
+    #f5-chip u { text-decoration: none; font-size: 15px; font-weight: 700; letter-spacing: 0.14em; color: var(--mute); }
+    #f5-chip b { font-weight: 500; }
+
+    #f5-grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.05; mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.84' numOctaves='3' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    }
+  </style>
+
+  <div id="root" data-composition-id="05-naming" data-width="1920" data-height="1080">
+    <div id="f5-ground" class="clip" data-start="0" data-duration="11.8" data-track-index="0"></div>
+
+    <div id="f5-stage">
+      <div id="f5-kicker">04 / The two status codes &middot; RFC 9110</div>
+
+      <div class="f5-panel" id="f5-pL">
+        <div class="f5-code">401</div>
+        <div class="f5-board" id="f5-bL"></div>
+        <div class="f5-ref" id="f5-rL"><span>RFC 9110 &sect;15.5.2</span></div>
+        <div class="f5-trans" id="f5-tL">&ldquo;I don&rsquo;t know who you are.&rdquo;</div>
+      </div>
+
+      <div class="f5-panel" id="f5-pR">
+        <div class="f5-code">403</div>
+        <div class="f5-board" id="f5-bR"></div>
+        <div class="f5-ref" id="f5-rR"><span>RFC 9110 &sect;15.5.4</span></div>
+        <div class="f5-trans" id="f5-tR">&ldquo;I know exactly who you are.&rdquo;</div>
+      </div>
+
+      <div id="f5-divide"></div>
+
+      <svg id="f5-mark" viewBox="0 0 844 170" fill="none">
+        <path id="f5-strike" d="M 64 39 C 236 29, 516 48, 778 34" stroke="#ea2804" stroke-width="7" stroke-linecap="round" />
+        <path id="f5-conn" d="M 300 74 L 300 112" stroke="#ea2804" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <div id="f5-note">Misnamed &mdash; this is the authentication failure</div>
+
+      <div id="f5-head">Only one of these names is honest.</div>
+
+      <div id="f5-chip"><i></i><u>HTTP</u><b>401 / 403</b></div>
+      <div id="f5-grain"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      var CELL_H = 74;
+      var ALPHA = " ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+      // Build one drum per cell: a vertical strip that WALKS forward through the
+      // intervening letters of a fixed alphabet and lands on its target. Deterministic —
+      // the walk is derived from the letter's index, never from a random seed — and it
+      // seeks correctly because it is a plain y tween on a stepped ease.
+      function board(hostId, word) {
+        var host = document.getElementById(hostId);
+        var cells = [];
+        for (var i = 0; i < word.length; i++) {
+          var target = word[i];
+          var end = ALPHA.indexOf(target);
+          if (end < 0) end = 0;
+          // walk a fixed 9 flaps before landing, so every cell has the same mechanical
+          // travel and only its landing letter differs
+          var steps = 9;
+          var strip = document.createElement("div");
+          strip.className = "f5-strip";
+          for (var s = 0; s <= steps; s++) {
+            var idx = (end - (steps - s) + ALPHA.length * 2) % ALPHA.length;
+            var g = document.createElement("div");
+            g.className = "f5-glyph";
+            g.textContent = ALPHA[idx];
+            strip.appendChild(g);
+          }
+          var cell = document.createElement("div");
+          cell.className = "f5-cell";
+          cell.appendChild(strip);
+          host.appendChild(cell);
+          cells.push({ strip: strip, steps: steps });
+        }
+        return cells;
+      }
+
+      function runBoard(cells, at) {
+        cells.forEach(function (c, i) {
+          gsap.set(c.strip, { y: 0 });
+          tl.to(c.strip, {
+            y: -c.steps * CELL_H,
+            duration: 0.72,
+            ease: "steps(" + c.steps + ")",
+          }, at + i * 0.035);
+        });
+      }
+
+      var L = board("f5-bL", "UNAUTHORIZED");
+      var R = board("f5-bR", "FORBIDDEN");
+
+      gsap.set("#f5-rR, #f5-tR", { autoAlpha: 0 });
+      gsap.set("#f5-rL, #f5-tL, #f5-note", { autoAlpha: 0 });
+      gsap.set("#f5-strike, #f5-conn", { autoAlpha: 0 });
+      gsap.set("#f5-head", { autoAlpha: 0 });
+
+      // ---- SEAM 4 -> 5 ENTRY: cut-the-curve LEFT, matched to frame 04's exit.
+      tl.fromTo("#f5-stage", { x: 295 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+
+      // ---- Scene 1 (0.0–2.0s): the two panels settle in from opposite wings — equal
+      // weight, which is the blueprint's signature. Both hold only their code number.
+      tl.fromTo("#f5-pL", { x: -70 }, { x: 0, duration: 0.46, ease: "power3.out" }, 0);
+      tl.fromTo("#f5-pR", { x: 70 }, { x: 0, duration: 0.46, ease: "power3.out" }, 0);
+      tl.fromTo("#f5-divide", { scaleY: 0, transformOrigin: "top center" }, { scaleY: 1, duration: 0.5, ease: "power3.out" }, 0.4);
+      tl.fromTo("#f5-kicker", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.28 }, 0);
+      tl.fromTo("#f5-chip", { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 0.34, ease: "back.out(1.5)" }, 0.5);
+
+      // ---- Scene 2 (2.0–4.4s): the left board clatters to UNAUTHORIZED, then its citation.
+      runBoard(L, 2.0);
+      tl.fromTo("#f5-rL", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.32, ease: "power3.out" }, 3.1);
+
+      // ---- Scene 3 (4.4–6.6s): the gesture. Marker, connector and callout as ONE beat,
+      // landing on the narration's own correction. The marker is this frame's only orange.
+      tl.fromTo("#f5-strike",
+        { autoAlpha: 1, strokeDasharray: 760, strokeDashoffset: 760 },
+        { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 4.4);
+      tl.fromTo("#f5-conn",
+        { autoAlpha: 1, strokeDasharray: 60, strokeDashoffset: 60 },
+        { strokeDashoffset: 0, duration: 0.45, ease: "power2.out" }, 4.76);
+      tl.fromTo("#f5-note", { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out" }, 5.06);
+      tl.fromTo("#f5-tL", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 5.5);
+
+      // ---- Scene 4 (6.6–9.2s): the right side resolves on the same cascade. NO marker
+      // here — nothing is wrong with this name, and withholding the annotation is what
+      // makes the left one mean something.
+      runBoard(R, 6.6);
+      tl.fromTo("#f5-rR", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.32, ease: "power3.out" }, 7.7);
+      tl.fromTo("#f5-tR", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 8.1);
+
+      // ---- Scene 5 (9.2–11.8s): the headline lands, then HELD for the back 1.1s.
+      tl.fromTo("#f5-head", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 9.3);
+
+      // ---- SEAM 5 -> 6 : ZOOM-THROUGH (z +1) — deeper into the same thought, concept
+      // into implementation. Both sides GROW: this side pushes past camera and frame 06
+      // enters already large-and-growing. Sign-matched, per the Z rule.
+      tl.to("#f5-stage", { scale: 1.34, autoAlpha: 0, duration: 0.4, ease: "power3.in" }, 11.4);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["05-naming"] = tl;
+    })();
+  </script>
+</template>

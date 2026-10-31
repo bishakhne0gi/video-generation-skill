@@ -1,0 +1,119 @@
+{
+  "_": "EP 19 — Blue-green deployment, in depth. The STATION STRIP construction (references/station-strip.md) wearing the FERRARI EDITORIAL surface (references/ferrari-editorial.md) — near-black #181818 canvas that is never pure black, Rosso Corsa #da291c used scarcely, SHARP 0px corners on every surface (the opposite of EP13–18, all built on 12–20px radii), Inter 500 at -1% tracking as the documented FerrariSans substitute, display weight never bold, elevation by brightness step (#181818 → #303030) plus a 1px hairline and NO drop shadows. The act break is the system's own `livery-band` — a full-width Rosso Corsa band — instead of the white chapter slate EP16–18 use; three of them in the film is the entire red budget. Five Kling plates carry the depth the system demands: cold open, title, two subjectless ambient textures run under the graphics acts, and the end card. No morph bridges this episode. EVERY FIGURE IS SOURCED OR FRAMED AS ONE SYSTEM'S: blue-green is Humble and Farley, Continuous Delivery (2010), after Daniel Terhorst-North; expand/contract is Fowler and Sato's ParallelChange (2014); AWS ALB deregistration delay defaults to 300 seconds; Kubernetes terminationGracePeriodSeconds defaults to 30 seconds; a load balancer target-group swap moves traffic in seconds while DNS does not, because resolvers and client runtimes cache past the TTL. The per-system numbers on screen — a 2-hour window, 11,400 in-flight requests, a 4-minute bake, 2x infrastructure for 18 minutes — are labelled as this system's measurements, not industry facts.",
+  "series": "Ship It",
+  "episode": "EP 19",
+  "title": "Nothing Ships At",
+  "titleAccent": "Midnight.",
+  "subtitle": "Blue-green deployment: build the new stack beside the old one, then move the traffic.",
+  "hook": "The maintenance window was never necessary.",
+  "cta": "cosx",
+  "next": "Next: canary releases, and the one percent that tells you everything",
+  "_theme": "New palette: `ferrari`, straight out of the supplied design extract. The series continuity is the CONSTRUCTION, the voice and the cue set — never the colour. This is the darkest film in the playlist and the only one with sharp corners.",
+  "theme": "ferrari",
+  "fps": 30,
+  "_voice": "Unchanged from EP 13–18 — same voice id, same model, same settings. Every line opens on an instruction verb.",
+  "voice": "nlyULslzTRhqlyv46oPj",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1919,
+  "_music": "Same 84bpm grid as EP 13–18 so scene lengths snap identically across the run.",
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.15,
+    "open": 0.34,
+    "mood": "dark-tech",
+    "bpm": 84,
+    "startAt": 0
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "Eleven lines, three acts. Act one builds the second stack; act two moves the traffic and then makes you wait; act three is what it costs, ending on the database — the part of blue-green that is neither blue nor green and the reason the pattern is harder than the diagram.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Price the maintenance window. Two hours of downtime at two in the morning, and an engineer awake to watch it."
+    },
+    {
+      "scene": 2,
+      "text": "Build the second stack first. Two identical environments. One takes traffic, one waits."
+    },
+    {
+      "scene": 3,
+      "text": "Own the switch point. A load balancer flips in seconds. DNS keeps handing out the old answer."
+    },
+    {
+      "scene": 4,
+      "text": "Deploy into the idle one. Green takes the new build and warms its caches, touching nobody."
+    },
+    {
+      "scene": 5,
+      "text": "Test the thing you will ship. Green runs on real infrastructure… against real dependencies."
+    },
+    {
+      "scene": 6,
+      "text": "Now move the traffic. One target group swap, and every new request lands on green instead of blue."
+    },
+    {
+      "scene": 7,
+      "text": "Let the old stack finish. Requests already in flight on blue still need somewhere to land."
+    },
+    {
+      "scene": 8,
+      "text": "Watch three numbers. Error rate, tail latency, saturation. Four minutes of it, not forty seconds."
+    },
+    {
+      "scene": 9,
+      "text": "Keep blue running. Rollback is a switch you already own, not a deploy you have to build."
+    },
+    {
+      "scene": 10,
+      "text": "Now the hard part… The database is shared, so it is NEVER blue and never green."
+    },
+    {
+      "scene": 11,
+      "text": "Then pay for it. Two full environments at once, and state that belongs to neither."
+    }
+  ],
+  "_shots": "Five plates. The Ferrari system is explicit that full-bleed cinematic photography IS the depth treatment and that drop-shadow tiers are not used, so this is the first episode in the run where footage is a design requirement rather than a flourish. Subject is dark data-hall photography and subjectless macro texture — never cars, because borrowing a design register is fair and generating footage that reads as another company's marketing is not.",
+  "shots": [
+    {
+      "id": "ep19_open",
+      "seconds": 10,
+      "kind": "plate",
+      "use": "cold open — full-bleed under the maintenance-window figure"
+    },
+    {
+      "id": "ep19_title",
+      "seconds": 10,
+      "kind": "plate",
+      "use": "title card — two identical rows, one lit, one dark. The episode's argument, stated photographically before the narration reaches it"
+    },
+    {
+      "id": "ep19_tex1",
+      "seconds": 10,
+      "kind": "texture",
+      "use": "Ambient under act one — brushed metal, raking light, dust. Never resolves"
+    },
+    {
+      "id": "ep19_tex2",
+      "seconds": 10,
+      "kind": "texture",
+      "use": "Ambient under acts two and three — defocused fibre bokeh carrying the accent hue"
+    },
+    {
+      "id": "ep19_end",
+      "seconds": 10,
+      "kind": "plate",
+      "use": "end card — the aisle again, pushing in. Closes the film in the room it opened in"
+    }
+  ]
+}

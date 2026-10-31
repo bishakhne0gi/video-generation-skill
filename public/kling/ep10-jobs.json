@@ -1,0 +1,17 @@
+{
+  "_": "EP10 Kling MCP jobs. 12 text-to-video, 50 credits each, submitted under taskTraceId 019bd7c4-0a10-7c31-9f4e-3a1b2c5d6e70. Result URLs expire 24h after completion — download immediately into public/kling/<id>.mp4 and run `node kling.mjs manifest`.",
+  "jobs": {
+    "ep10_open": "AdaALTpMD__CAoqZPxbQsejOdOQ-dDrkDFyIoY2mEkJKomczw3_UbnMg28uMBJ3bBytksUD8",
+    "ep10_kitchen": "ASWxL_DB36gAUb0NDjP2FY1AvEGKQYBOQpKxV88skkq2w76Ofq3Er8LmPM7pRIUpGSV7zyGC",
+    "ep10_wok": "AVfYuRHcS0cnx0UlKbnxVSWV4tL0iq-X8VI2-JGW3gpwB6micB1gEetfeA6FS9qud2_YXw4H",
+    "ep10_bags": "Ad6LxwGx0vvwg1sybRKfch9hdKn0GFSM4A8yE_4Id4K-Tj1ndQKyyrJKmuC5rhAvb4l71z3d",
+    "ep10_rider": "ATV5QNHCmXhDBwI9f7xTdTxIu3fNF0cD8QIdVG0zURHQtSxpIk1-xLh412LZxd73ZKr1UpRl",
+    "ep10_crowd": "AesHfJITsFFiVkhkOex4E67SnS_T5HCY9NdkYEOBLm1LayuX3uL1wtT2km7eJrYU5IaVbJI1",
+    "ep10_fireworks": "AdcPoJyJzzqKTMqLOJNzmkAzbzwoqc6y2ag_5DaDIB1yHH_2Ns5tCuk5ro4xmhGMsbvHDdWm",
+    "ep10_opsroom": "AeIhvCporVYdZuxM4GVTvxB1tPZIai0E5luMWnUMVm-843n89ZPDrxED7GWkmbOnl4K8ZAhd",
+    "ep10_datacentre": "AWVMCkuRn9Dna7Pa9P2sOc5bn-g-zh_pPv8_lg4dWND2rBNNpKCEaDuNLMdcnZwUyGAk-ZIF",
+    "ep10_rack_dark": "AYmLVrMofrDONE92fIwfneG4ozq5V_xKI8rHNKPtjlEkPtpKhU-FqR-EJXV3CQGEUBSXqkyI",
+    "ep10_dawn": "AXjYcNJhlw4rAZozPhmEJC-E97NCby7fypQAAOmvQlwNUvZ3Nw3h0fwR1IYKvhym_ZEJRSc0",
+    "ep10_morning": "AZq_aQXFtVKFI9DUt8eM5_L3bDY0mzSYBkuMKlyJYZDB2JX4_SzzzDCR2I3rt8fGW_JpUFLv"
+  }
+}

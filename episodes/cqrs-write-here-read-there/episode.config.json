@@ -1,0 +1,80 @@
+{
+  "_": "EP 18 — CQRS. The STATION STRIP register (references/station-strip.md), wearing EP 16's palette and design system unchanged: `stripe-mesh`, white canvas, deep-navy ink #0D253D, ONE saturated hue (indigo #533AFD) that is a CTA and an accent and nothing else. What is NEW is the FIELD — the director supplied a stripe gradient (32deg, #FFFFFF → #78B8F9 → #5667FF → #4D2FF9) under fractalNoise grain at 0.210, overlay-blended, tiled at 120px. That is the `RibbonField` MACHINE this kit already ships with a different stop list, so the machine is kept exactly and the stops are taken verbatim from the supplied CSS; grain amount 42 reproduces the 0.210 opacity exactly ((42/100)*0.5). The supplied stops are azure/indigo and sit a few degrees from the brand's own #533AFD, so the field and the accent are one system rather than two. TERMINOLOGY AND ATTRIBUTION ARE SOURCED: CQRS was named by Greg Young in 2010 and is a separation of the MODEL, derived from Bertrand Meyer's Command-Query Separation in Object-Oriented Software Construction (1988), which separates METHODS; Young's own repeated correction is that CQRS is neither event sourcing nor eventual consistency nor a top-level architecture, and that most systems should not use it. THE FIGURES ARE ONE WORKED SYSTEM'S, NOT INDUSTRY FACTS, and the film frames them that way on screen — a single order-history screen: six tables in the join, p99 840 ms on the normalised read against 4 ms on the projected row; a projector consuming OrderPlaced/OrderPaid/OrderShipped/OrderCancelled; replica lag measured at 340 ms p50 and 1.4 s p99; a read model rebuilt by replaying 4,200,000 events. Nothing on screen is presented as a universal number.",
+  "series": "Ship It",
+  "episode": "EP 18",
+  "title": "Write Here.",
+  "titleAccent": "Read There.",
+  "subtitle": "CQRS splits one model in two, so each half only has to be good at one thing.",
+  "hook": "One table served both jobs. It was bad at both.",
+  "cta": "cosx",
+  "next": "Next: event sourcing, and the log you are not allowed to edit",
+  "_theme": "EP 16's palette exactly — the construction and the palette are the series, and this episode's own signature is the FIELD, not a new colour. Indigo stays the single filled hue; #78B8F9 and #4D2FF9 arrived with the supplied gradient and live ONLY inside it, never as a flat fill, exactly the way ruby and magenta are handled in stripe-mesh.",
+  "theme": "stripe-mesh",
+  "fps": 30,
+  "_voice": "Unchanged from EP 13–17 — same voice id, same model, same settings. Every line opens on an instruction verb.",
+  "voice": "nlyULslzTRhqlyv46oPj",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1818,
+  "_music": "Same 84bpm grid as EP 13–17 so scene lengths snap identically across the run.",
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.15,
+    "open": 0.34,
+    "mood": "calm-focus",
+    "bpm": 84,
+    "startAt": 0
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "Nine lines. Definition then consequence, one clause a sentence. Act one is the mechanism and every line is an instruction to build something; act two opens by making the viewer pay for it, and the last line refuses the pattern by default — which is Greg Young's own position and the honest end to a CQRS episode.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Count the joins behind one screen. Six tables, one query, and it runs on every single page load."
+    },
+    {
+      "scene": 2,
+      "text": "Split the model in two. Commands change state. Queries answer questions. The two never share a table."
+    },
+    {
+      "scene": 3,
+      "text": "Send an intent, not a row. A command is accepted or rejected, and it hands back almost nothing."
+    },
+    {
+      "scene": 4,
+      "text": "Shape the read side like the screen. One row, no joins… already answered before anybody asked."
+    },
+    {
+      "scene": 5,
+      "text": "Watch the projector do the work. It reads each event once, then upserts the row the screen needs."
+    },
+    {
+      "scene": 6,
+      "text": "Now pay for it. The write landed, the read has not… and your user just hit refresh."
+    },
+    {
+      "scene": 7,
+      "text": "Close that gap deliberately. Return the new state, or pin one user to the write side for a moment."
+    },
+    {
+      "scene": 8,
+      "text": "Treat the read model as disposable. Drop it, replay the log… and build it back from nothing."
+    },
+    {
+      "scene": 9,
+      "text": "Then refuse it by default. This is NOT event sourcing, and one model is usually the right answer."
+    }
+  ],
+  "_shots": "No Kling. The station-strip register carries a full episode on graphics alone; the supplied stripe field is the depth.",
+  "shots": []
+}

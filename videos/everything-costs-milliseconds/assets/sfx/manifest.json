@@ -1,0 +1,69 @@
+{
+  "register": "warm",
+  "cues": {
+    "tick": {
+      "file": "audio/sfx/tick.wav",
+      "seconds": 0.12
+    },
+    "click": {
+      "file": "audio/sfx/click.wav",
+      "seconds": 0.08
+    },
+    "key1": {
+      "file": "audio/sfx/key1.wav",
+      "seconds": 0.07
+    },
+    "key2": {
+      "file": "audio/sfx/key2.wav",
+      "seconds": 0.07
+    },
+    "key3": {
+      "file": "audio/sfx/key3.wav",
+      "seconds": 0.07
+    },
+    "key4": {
+      "file": "audio/sfx/key4.wav",
+      "seconds": 0.07
+    },
+    "notify": {
+      "file": "audio/sfx/notify.wav",
+      "seconds": 0.9
+    },
+    "success": {
+      "file": "audio/sfx/success.wav",
+      "seconds": 1.3
+    },
+    "error": {
+      "file": "audio/sfx/error.wav",
+      "seconds": 0.7
+    },
+    "whoosh": {
+      "file": "audio/sfx/whoosh.wav",
+      "seconds": 0.5
+    },
+    "swipe": {
+      "file": "audio/sfx/swipe.wav",
+      "seconds": 0.3
+    },
+    "thunk": {
+      "file": "audio/sfx/thunk.wav",
+      "seconds": 0.55
+    },
+    "sub": {
+      "file": "audio/sfx/sub.wav",
+      "seconds": 1.1
+    },
+    "riser": {
+      "file": "audio/sfx/riser.wav",
+      "seconds": 1.6
+    },
+    "blip": {
+      "file": "audio/sfx/blip.wav",
+      "seconds": 0.05
+    },
+    "latch": {
+      "file": "audio/sfx/latch.wav",
+      "seconds": 0.3
+    }
+  }
+}

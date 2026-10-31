@@ -1,0 +1,295 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --canvas: #f9f7f3; --bone: #f3f0e8; --card: #ffffff; --dark: #202020;
+      --hair: rgba(32,32,32,0.12); --hair2: rgba(32,32,32,0.22);
+      --primary: #ea2804; --glow: #ff6a3d;
+      --ink: #202020; --body: #3a3a3a; --charcoal: #575757; --mute: #646464; --ash: #8d8d8d;
+      --on-dark: #fcfcfc; --success: #2b9a66;
+    }
+    #f4-ground { position: absolute; inset: 0; background: var(--canvas); }
+    #f4-stage { position: absolute; inset: 0; }
+
+    /* the corridor photograph, held back as continuity with frame 01 — present, not washed out */
+    #f4-bg {
+      position: absolute; inset: 0; opacity: 0.62;
+      background: url("public/img/corridor.jpg") center/cover no-repeat;
+    }
+    #f4-bgwash { position: absolute; inset: 0; background: var(--canvas); opacity: 0.44; }
+
+    /* ---- one oversized strip; station pitch = 1920, so exactly ONE station is framed
+            at a time and no verdict ever bleeds in from a neighbour ---- */
+    #f4-strip { position: absolute; left: 0; top: 0; width: 7680px; height: 1080px; }
+    .f4-station { position: absolute; top: 0; width: 1920px; height: 1080px; }
+
+    /* the door is drawn, not photographed — it has to change state on cue */
+    .f4-door {
+      position: absolute; left: 150px; top: 186px; width: 322px; height: 606px;
+      background: #efece3; border: 1px solid rgba(32,32,32,0.34); border-radius: 10px 10px 0 0;
+      box-shadow: 0 8px 28px rgba(32,32,32,0.10);
+    }
+    .f4-panel { position: absolute; left: 34px; width: 254px; border: 1px solid rgba(32,32,32,0.26); border-radius: 4px; }
+    .f4-num {
+      position: absolute; left: 0; top: 40px; width: 322px; text-align: center;
+      font-family: "JetBrains Mono", monospace; font-size: 44px; font-weight: 700;
+      letter-spacing: 0.06em; color: var(--ink);
+    }
+    .f4-numsub {
+      position: absolute; left: 0; top: 96px; width: 322px; text-align: center;
+      font-family: "JetBrains Mono", monospace; font-size: 14px; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--mute);
+    }
+    .f4-handle {
+      position: absolute; right: 26px; top: 388px; width: 26px; height: 26px;
+      border-radius: 9999px; background: rgba(32,32,32,0.28);
+    }
+    /* the reader beside the door */
+    .f4-reader {
+      position: absolute; left: 664px; top: 384px; width: 62px; height: 98px;
+      background: #1b1a18; border-radius: 8px; box-shadow: 0 4px 14px rgba(32,32,32,0.22);
+    }
+    .f4-led { position: absolute; left: 25px; top: 18px; width: 12px; height: 12px; border-radius: 9999px; background: #6b6b6b; }
+    .f4-slot { position: absolute; left: 13px; top: 66px; width: 36px; height: 4px; border-radius: 9999px; background: rgba(252,252,252,0.32); }
+
+    /* what the lock actually evaluates — the real mechanism, filling the right half */
+    .f4-check {
+      position: absolute; left: 800px; top: 300px; width: 964px;
+      background: var(--card); border: 1px solid rgba(32,32,32,0.16); border-radius: 10px;
+      padding: 26px 30px 28px; box-shadow: 0 8px 24px rgba(32,32,32,0.08);
+    }
+    .f4-checkhd {
+      font-family: "JetBrains Mono", monospace; font-size: 15px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute);
+      padding-bottom: 16px; border-bottom: 1px solid var(--hair);
+    }
+    .f4-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 15px 0 13px; border-bottom: 1px solid var(--hair);
+      font-family: "JetBrains Mono", monospace; font-size: 21px; color: var(--body);
+    }
+    .f4-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .f4-row b { font-weight: 700; }
+    .f4-yes b { color: var(--success); }
+    .f4-no b { color: var(--ink); }
+    .f4-row em { font-style: normal; color: var(--mute); }
+
+    .f4-verdict {
+      position: absolute; left: 800px; top: 200px; padding: 12px 30px; border-radius: 9999px;
+      font-family: "JetBrains Mono", monospace; font-size: 26px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap;
+    }
+    .f4-open { background: var(--success); color: #ffffff; }
+    .f4-deny { background: var(--primary); color: #ffffff; }
+
+    /* the keycard — the carrier that travels the whole strip. It taps toward the reader
+       and stops SHORT of it, so the LED it is triggering stays visible. */
+    #f4-card {
+      position: absolute; top: 402px; left: 0; width: 148px; height: 94px; border-radius: 8px;
+      background: var(--dark); box-shadow: 0 8px 24px rgba(32,32,32,0.2);
+    }
+    #f4-card span {
+      position: absolute; left: 13px; bottom: 11px;
+      font-family: "JetBrains Mono", monospace; font-size: 13px; letter-spacing: 0.06em; color: rgba(252,252,252,0.72);
+    }
+    #f4-card i { position: absolute; right: 13px; top: 13px; width: 32px; height: 22px; border-radius: 3px; background: rgba(252,252,252,0.30); }
+
+    #f4-kicker {
+      position: absolute; left: 96px; top: 104px;
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--charcoal);
+    }
+    #f4-pay {
+      position: absolute; left: 96px; top: 824px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+      font-size: 74px; line-height: 1.0; letter-spacing: -0.025em; color: var(--ink);
+      white-space: nowrap;
+    }
+    #f4-pay em { font-style: normal; color: var(--primary); }
+
+    #f4-chip {
+      position: absolute; right: 80px; top: 72px; display: flex; align-items: center; gap: 12px;
+      padding: 10px 22px; border-radius: 9999px;
+      background: var(--card); border: 1px solid var(--hair);
+      font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--charcoal);
+    }
+    #f4-chip i { width: 9px; height: 9px; border-radius: 9999px; background: #2b9a66; display: block; }
+    #f4-chip u { text-decoration: none; font-size: 15px; font-weight: 700; letter-spacing: 0.14em; color: var(--mute); }
+    #f4-slotbox { position: relative; display: block; width: 74px; height: 28px; }
+    #f4-slotbox b { position: absolute; left: 0; top: 0; font-weight: 500; }
+    #f4-slotbox .s0 { color: var(--charcoal); }
+    #f4-slotbox .s1 { color: var(--primary); font-weight: 700; }
+
+    #f4-grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.05; mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    }
+  </style>
+
+  <div id="root" data-composition-id="04-lock" data-width="1920" data-height="1080">
+    <div id="f4-ground" class="clip" data-start="0" data-duration="11.6" data-track-index="0">
+      <div id="f4-bg"></div>
+      <div id="f4-bgwash"></div>
+    </div>
+
+    <div id="f4-stage">
+      <div id="f4-strip">
+        <div class="f4-station" id="f4-s1" style="left: 0px;">
+          <div class="f4-door">
+            <div class="f4-num">412</div><div class="f4-numsub">your room</div>
+            <div class="f4-panel" style="top: 150px; height: 196px;"></div>
+            <div class="f4-panel" style="top: 372px; height: 196px;"></div>
+            <div class="f4-handle"></div>
+          </div>
+          <div class="f4-reader"><div class="f4-led"></div><div class="f4-slot"></div></div>
+          <div class="f4-verdict f4-open">Open</div>
+          <div class="f4-check">
+            <div class="f4-checkhd">Lock 412 &middot; what it asks</div>
+            <div class="f4-row f4-yes"><span>Is this card real?</span><b>never asked</b></div>
+            <div class="f4-row f4-yes"><span>Is 4A&middot;9F&middot;22&middot;E1 on door 412's list?</span><b>yes</b></div>
+          </div>
+        </div>
+
+        <div class="f4-station" id="f4-s2" style="left: 1920px;">
+          <div class="f4-door">
+            <div class="f4-num">GYM</div><div class="f4-numsub">shared</div>
+            <div class="f4-panel" style="top: 150px; height: 196px;"></div>
+            <div class="f4-panel" style="top: 372px; height: 196px;"></div>
+            <div class="f4-handle"></div>
+          </div>
+          <div class="f4-reader"><div class="f4-led"></div><div class="f4-slot"></div></div>
+          <div class="f4-verdict f4-open">Open</div>
+          <div class="f4-check">
+            <div class="f4-checkhd">Lock GYM &middot; what it asks</div>
+            <div class="f4-row f4-yes"><span>Is 4A&middot;9F&middot;22&middot;E1 on the gym's list?</span><b>yes</b></div>
+            <div class="f4-row"><span>Same card. Different list.</span><em>every door keeps its own</em></div>
+          </div>
+        </div>
+
+        <div class="f4-station" id="f4-s3" style="left: 3840px;">
+          <div class="f4-door">
+            <div class="f4-num">413</div><div class="f4-numsub">not your room</div>
+            <div class="f4-panel" style="top: 150px; height: 196px;"></div>
+            <div class="f4-panel" style="top: 372px; height: 196px;"></div>
+            <div class="f4-handle"></div>
+          </div>
+          <div class="f4-reader"><div class="f4-led"></div><div class="f4-slot"></div></div>
+          <div class="f4-verdict f4-deny">Denied</div>
+          <div class="f4-check">
+            <div class="f4-checkhd">Lock 413 &middot; what it asks</div>
+            <div class="f4-row f4-yes"><span>Card 4A&middot;9F&middot;22&middot;E1 &mdash; valid, issued 20s ago</span><b>still true</b></div>
+            <div class="f4-row f4-no"><span>Is it on door 413's list?</span><b>no</b></div>
+          </div>
+        </div>
+
+        <div class="f4-station" id="f4-s4" style="left: 5760px;">
+          <div class="f4-door">
+            <div class="f4-num">MGR</div><div class="f4-numsub">staff only</div>
+            <div class="f4-panel" style="top: 150px; height: 196px;"></div>
+            <div class="f4-panel" style="top: 372px; height: 196px;"></div>
+            <div class="f4-handle"></div>
+          </div>
+          <div class="f4-reader"><div class="f4-led"></div><div class="f4-slot"></div></div>
+          <div class="f4-verdict f4-deny">Denied</div>
+          <div class="f4-check">
+            <div class="f4-checkhd">Lock MGR &middot; what it asks</div>
+            <div class="f4-row f4-no"><span>Is it on the manager office's list?</span><b>no</b></div>
+            <div class="f4-row"><span>Nobody re-checked the passport.</span><em>that was the desk's job</em></div>
+          </div>
+        </div>
+
+        <div id="f4-card"><i></i><span>4A&middot;9F&middot;22&middot;E1</span></div>
+      </div>
+
+      <div id="f4-kicker">03 / Every door, every time &middot; AuthZ</div>
+      <div id="f4-pay">Valid card. <em>Wrong door.</em></div>
+      <div id="f4-chip"><i></i><u>HTTP</u><span id="f4-slotbox"><b class="s0">200</b><b class="s1">403</b></span></div>
+      <div id="f4-grain"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // Verdicts and the second row of each readout are withheld; the doors, readers and
+      // the first question are pre-placed. The strip is the world; only the camera travels.
+      gsap.set(".f4-verdict", { autoAlpha: 0 });
+      gsap.set(".f4-check", { autoAlpha: 0 });
+      gsap.set("#f4-slotbox .s1", { autoAlpha: 0 });
+      gsap.set("#f4-pay", { autoAlpha: 0 });
+
+      // station pitch is 1920, so the camera x for station i is simply -i * 1920.
+      // The card rests just left of each station's reader (reader at slot+512).
+      var PITCH = 1920;
+      var cam = function (i) { return -i * PITCH; };
+      var cardAt = function (i) { return i * PITCH + 490; };
+      gsap.set("#f4-card", { x: cardAt(0) - 250 });
+
+      // ---- SEAM 3 -> 4 ENTRY: INVERSE ZOOM (z -1) = ARRIVAL. Frame 03 exited SHRINKING
+      // (1 -> 0.74), so this side shares that sign: it enters LARGE and shrinks to rest.
+      // A grow-from-small entry here would mirror the vector — the commonest way this
+      // seam gets built wrong.
+      tl.fromTo("#f4-stage", { scale: 1.42, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#f4-kicker", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.36 }, 0.3);
+
+      // ---- Scene 1 (0.0–2.2s): station one. The camera SETTLES rather than pushing, so
+      // the Z-vector and the lateral travel never fight.
+      tl.fromTo("#f4-strip", { x: cam(0) + 110 }, { x: cam(0), duration: 0.74, ease: "power3.out" }, 0);
+      tl.to("#f4-card", { x: cardAt(0), duration: 0.46, ease: "power2.inOut" }, 0.66);
+      tl.to("#f4-s1 .f4-led", { backgroundColor: "#2b9a66", duration: 0.2 }, 1.1);
+      tl.fromTo("#f4-s1 .f4-verdict", { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: 0.34, ease: "power3.out" }, 1.12);
+      tl.fromTo("#f4-s1 .f4-check", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out" }, 1.36);
+
+      // ---- Scene 2 (2.2–4.0s): travel LEFT to the gym. Same card, same result, paid off
+      // faster — the shape earns its pace by repeating.
+      tl.to("#f4-strip", { x: cam(1), duration: 0.86, ease: "power2.inOut" }, 2.2);
+      tl.to("#f4-card", { x: cardAt(1), duration: 0.86, ease: "power2.inOut" }, 2.2);
+      tl.to("#f4-s2 .f4-led", { backgroundColor: "#2b9a66", duration: 0.2 }, 3.18);
+      tl.fromTo("#f4-s2 .f4-verdict", { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: 0.3, ease: "power3.out" }, 3.2);
+      tl.fromTo("#f4-s2 .f4-check", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 3.4);
+
+      // ---- Scene 3 (4.0–6.4s): travel to 413. The card touches, the reader goes amber —
+      // and then the frame WAITS. 0.7s of scheduled stillness: the dramatic comma.
+      tl.to("#f4-strip", { x: cam(2), duration: 0.9, ease: "power2.inOut" }, 4.0);
+      tl.to("#f4-card", { x: cardAt(2), duration: 0.9, ease: "power2.inOut" }, 4.0);
+      tl.to("#f4-s3 .f4-led", { backgroundColor: "#d99a2b", duration: 0.22 }, 5.0);
+      // 5.22 -> 5.92 : nothing moves at all.
+
+      // ---- Scene 4 (6.4–8.6s): the refusal lands, and the status flips on the SAME frame
+      // as its cause.
+      tl.to("#f4-s3 .f4-led", { backgroundColor: "#ea2804", duration: 0.18 }, 5.94);
+      tl.fromTo("#f4-s3 .f4-verdict", { autoAlpha: 0, scale: 0.84 }, { autoAlpha: 1, scale: 1, duration: 0.36, ease: "back.out(1.7)" }, 5.94);
+      tl.set("#f4-slotbox .s0", { autoAlpha: 0 }, 5.94);
+      tl.set("#f4-slotbox .s1", { autoAlpha: 1 }, 5.94);
+      tl.to("#f4-chip i", { backgroundColor: "#ea2804", duration: 0.22 }, 5.94);
+      // the card is not the problem, and the readout says so in its own chrome
+      tl.fromTo("#f4-s3 .f4-check", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out" }, 6.24);
+
+      // ---- Scene 5 (8.6–11.6s): one more leg to the manager's office — same card, same
+      // answer — then the payoff line lands and the frame holds.
+      tl.to("#f4-strip", { x: cam(3), duration: 0.88, ease: "power2.inOut" }, 7.5);
+      tl.to("#f4-card", { x: cardAt(3), duration: 0.88, ease: "power2.inOut" }, 7.5);
+      tl.to("#f4-s4 .f4-led", { backgroundColor: "#ea2804", duration: 0.2 }, 8.46);
+      tl.fromTo("#f4-s4 .f4-verdict", { autoAlpha: 0, scale: 0.84 }, { autoAlpha: 1, scale: 1, duration: 0.32, ease: "back.out(1.6)" }, 8.48);
+      tl.fromTo("#f4-s4 .f4-check", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.34, ease: "power3.out" }, 8.7);
+
+      tl.fromTo("#f4-pay", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.54, ease: "power3.out" }, 9.34);
+      // then locked and still. No drift.
+
+      // ---- SEAM 4 -> 5 : cut-the-curve LEFT (back to the current).
+      tl.to("#f4-stage", { x: -232, duration: 0.34, ease: "power4.in" }, 11.26);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["04-lock"] = tl;
+    })();
+  </script>
+</template>

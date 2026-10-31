@@ -1,0 +1,265 @@
+<template>
+  <style>
+@font-face{font-family:"Fraktur";src:url("assets/fonts/Fraktur-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Anton";src:url("assets/fonts/Anton-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Oswald";src:url("assets/fonts/Oswald-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-900.woff2") format("woff2");font-weight:900;font-style:normal;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-700i.woff2") format("woff2");font-weight:700;font-style:italic;font-display:block}
+@font-face{font-family:"Bodoni";src:url("assets/fonts/Bodoni-900.woff2") format("woff2");font-weight:900;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400i.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --news:#E3DDCE; --news2:#D3CBB8; --scrap:#F2EDE1; --plate:#141210;
+  --ink:#171310; --ink2:#4E4638; --stop:#C1272D; --stopt:#A81E24;
+  background:var(--news); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the .clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* The field OVER-SCANS. A frame whose exit shrinks (the reserved Z-back) would
+   otherwise show the stage edge for the length of the cut. -18% covers the largest
+   travel in a 1920-wide frame and costs nothing on the frames that never shrink. */
+.field{position:absolute;inset:-18%}
+
+/* ---- THE PAGE: newsprint is a HALFTONE, not a flat fill --------------------
+   A 4px dot screen in press black at low alpha. Static, always: a halftone that
+   moves is a moire and it will wreck the encode. */
+.screen{position:absolute;inset:-18%;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px, rgba(23,19,16,.115) 0.85px, transparent 0.9px);
+  background-size:4px 4px}
+/* the press never lays ink perfectly evenly */
+.grain{position:absolute;inset:-18%;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle at 2px 3px, rgba(23,19,16,.08) 1px, transparent 1.1px);
+  background-size:11px 9px}
+
+/* ---- TYPE: eight families, one job each ---------------------------------- */
+.mast{font-family:"Fraktur",serif;font-weight:400;line-height:.95;color:var(--ink)}
+.head{font-family:"Anton",sans-serif;font-weight:400;line-height:.88;
+  letter-spacing:-.005em;text-transform:uppercase;color:var(--ink)}
+.head2{font-family:"Oswald",sans-serif;font-weight:700;line-height:.94;
+  letter-spacing:.005em;text-transform:uppercase;color:var(--ink)}
+.quote{font-family:"Playfair",Georgia,serif;font-weight:900;line-height:1.10;color:var(--ink)}
+.qital{font-family:"Playfair",Georgia,serif;font-weight:700;font-style:italic;line-height:1.14}
+/* Bodoni Moda is loaded at optical size 96 — a DISPLAY cut. Below about 80px its
+   hairline stems vanish in the render and N becomes a bare diagonal, 1 a bare stem.
+   .fig is for BIG figures only; anything smaller uses .head2 (Oswald). Verified by
+   measuring the render, not by looking at the font in a browser. */
+.fig{font-family:"Bodoni",serif;font-weight:900;line-height:.86;color:var(--ink)}
+.body{font-family:"PTSerif",Georgia,serif;font-weight:400;line-height:1.30;color:var(--ink)}
+.bodyb{font-family:"PTSerif",Georgia,serif;font-weight:700;line-height:1.28}
+.bodyi{font-family:"PTSerif",Georgia,serif;font-style:italic;line-height:1.30}
+.mono{font-family:"Courier",monospace;font-weight:400;color:var(--ink)}
+.monob{font-family:"Courier",monospace;font-weight:700}
+.slug{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.20em;
+  text-transform:uppercase;font-size:20px;color:var(--ink2)}
+.red{color:var(--stopt)}      /* red as a LETTER — the only red allowed to be type */
+.faint{color:var(--ink2)}
+.rev{color:var(--scrap)}      /* reversed out of the black plate */
+.rev .faint{color:#A79E8D}
+.rev .slug{color:#A79E8D}
+
+/* ---- RULES: press furniture. Never a glyph. ------------------------------ */
+.rule{position:absolute;background:var(--ink);height:3px}
+.hair{position:absolute;background:var(--ink2);height:1px;opacity:.55}
+.rrule{position:absolute;background:var(--stop);height:5px}
+.revrule{position:absolute;background:var(--scrap);height:3px}
+
+/* ---- A CUTTING ----------------------------------------------------------
+   Four layers, and all four are required. The drop-shadow lives on a SIBLING,
+   not in box-shadow: box-shadow follows the border box, so on a clip-path shape
+   it draws a rectangle behind a torn edge — the single loudest tell in the register. */
+.cutw{position:absolute}                                   /* the slap wrapper */
+.cutsh{position:absolute;inset:0;background:rgba(23,19,16,.34);filter:blur(7px)}
+.cutfib{position:absolute;inset:0;background:#FFFCF4}      /* the torn fibre lip */
+.cutface{position:absolute;inset:0;background:var(--scrap);overflow:hidden}
+.cutbody{position:absolute;inset:0}
+
+/* ---- MISREGISTRATION -----------------------------------------------------
+   The one "effect" in the film, and it is a real press artifact: the spot plate lands
+   a hair off the black one. Carried as a TEXT-SHADOW on the headline itself, never as
+   a duplicated element — a second copy of the words in the same place is two text
+   blocks the layout gate is right to reject, and it doubles what a contrast checker
+   has to reason about. One impression, one fringe. */
+
+/* ---- THE STAMP ---------------------------------------------------------- */
+/* on the black plate the stamp turns CREAM: red type on plate measures 3.20:1 and
+   this register does not put red type on black. */
+.stampw{border-color:var(--scrap)!important;color:var(--scrap)!important}
+.stamp{position:absolute;border:4px solid var(--stop);color:var(--stopt);
+  font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:.10em;
+  text-transform:uppercase;opacity:.88;display:flex;align-items:center;
+  justify-content:center;white-space:nowrap}
+
+/* ---- THE PEN: red strokes drawn on the page. Never a glyph. -------------- */
+/* z-index 5 is load-bearing: a cutting is z-index 2, so a pen with auto z-index
+   draws UNDERNEATH the very thing it is marking and is invisible in the render. */
+.pen{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;overflow:visible;z-index:5}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--stop);stroke-linecap:round;
+  stroke-linejoin:round}
+.penk path,.penk line,.penk polyline{stroke:var(--ink)}
+.penw path,.penw line,.penw polyline{stroke:var(--scrap)}
+
+  </style>
+
+  <div id="root" data-composition-id="14-codes" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="field" data-layout-allow-overflow style="background:var(--news)"></div><div class="screen" data-layout-allow-overflow ></div><div class="grain" data-layout-allow-overflow></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-kick" class="slug" style="position:absolute;left:120px;top:110px;color:var(--stopt)">2015 &middot; THE ENUM</div>
+      <div id="s-rule" class="rrule" style="left:120px;top:146px;width:132px;transform-origin:0% 50%"></div>
+      <div id="s-head" class="head" style="position:absolute;left:120px;top:186px;width:1300px;font-size:84px;z-index:1;text-shadow:3px 2px 0 rgba(193,39,45,.42)">SEVENTEEN WAYS<br>FOR A CALL TO END</div>
+      <div id="s-deck" class="body" style="position:absolute;left:122px;top:371.20000000000005px;width:1320px;font-size:31px">A local function returns, or it throws. A remote call has to enumerate its failures in advance.</div>
+
+      <div id="f14-c0" style="position:absolute;left:150px;top:466px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">0</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">OK</div>
+        </div><div id="f14-c1" style="position:absolute;left:496px;top:466px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">1</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">CANCELLED</div>
+        </div><div id="f14-c2" style="position:absolute;left:842px;top:466px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">2</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">UNKNOWN</div>
+        </div><div id="f14-c3" style="position:absolute;left:150px;top:550px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">3</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">INVALID_ARGUMENT</div>
+        </div><div id="f14-c4" style="position:absolute;left:496px;top:550px;width:336px;height:74px;
+          border:2px solid var(--stop);background:var(--scrap)">
+          <div class="head2 red" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">4</div>
+          <div class="mono red" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">DEADLINE_EXCEEDED</div>
+        </div><div id="f14-c5" style="position:absolute;left:842px;top:550px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">5</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">NOT_FOUND</div>
+        </div><div id="f14-c6" style="position:absolute;left:150px;top:634px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">6</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">ALREADY_EXISTS</div>
+        </div><div id="f14-c7" style="position:absolute;left:496px;top:634px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">7</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">PERMISSION_DENIED</div>
+        </div><div id="f14-c8" style="position:absolute;left:842px;top:634px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">8</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:17px;font-weight:700;letter-spacing:-.01em">RESOURCE_EXHAUSTED</div>
+        </div><div id="f14-c9" style="position:absolute;left:150px;top:718px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">9</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:17px;font-weight:700;letter-spacing:-.01em">FAILED_PRECONDITION</div>
+        </div><div id="f14-c10" style="position:absolute;left:496px;top:718px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">10</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">ABORTED</div>
+        </div><div id="f14-c11" style="position:absolute;left:842px;top:718px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">11</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">OUT_OF_RANGE</div>
+        </div><div id="f14-c12" style="position:absolute;left:150px;top:802px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">12</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">UNIMPLEMENTED</div>
+        </div><div id="f14-c13" style="position:absolute;left:496px;top:802px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">13</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">INTERNAL</div>
+        </div><div id="f14-c14" style="position:absolute;left:842px;top:802px;width:336px;height:74px;
+          border:2px solid var(--stop);background:var(--scrap)">
+          <div class="head2 red" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">14</div>
+          <div class="mono red" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">UNAVAILABLE</div>
+        </div><div id="f14-c15" style="position:absolute;left:150px;top:886px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">15</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">DATA_LOSS</div>
+        </div><div id="f14-c16" style="position:absolute;left:496px;top:886px;width:336px;height:74px;
+          border:2px solid rgba(78,70,56,.42);background:transparent">
+          <div class="head2 faint" style="position:absolute;left:14px;top:20px;font-size:34px;width:56px;text-align:right">16</div>
+          <div class="mono" style="position:absolute;left:84px;top:26px;font-size:19px;font-weight:700;letter-spacing:-.01em">UNAUTHENTICATED</div>
+        </div>
+
+      <div id="f14-hl" class="slug" style="position:absolute;left:1226px;top:466px;font-size:16px;color:var(--stopt)">THE TWO CONFESSIONS</div>
+      <div id="f14-hr" class="rrule" style="left:1226px;top:494px;width:548px;transform-origin:0% 50%"></div>
+
+      <div id="f14-a" style="position:absolute;left:1226px;top:518px;width:552px">
+        <div class="mono red" style="font-size:27px;font-weight:700">UNAVAILABLE &middot; 14</div>
+        <div class="quote" style="margin-top:12px;font-size:26px">&ldquo;Use <span class="red">UNAVAILABLE</span> if the client can retry just the failing call.&rdquo;</div>
+      </div>
+
+      <div id="f14-b" style="position:absolute;left:1226px;top:700px;width:552px">
+        <div class="mono red" style="font-size:27px;font-weight:700">DEADLINE_EXCEEDED &middot; 4</div>
+        <div class="quote" style="margin-top:12px;font-size:26px">&ldquo;this error may be returned <span class="red">even if the operation has completed successfully</span>.&rdquo;</div>
+      </div>
+
+      <div id="f14-att" class="slug" style="position:absolute;left:1226px;top:918px;font-size:15px">GRPC/GRPC &middot; DOC/STATUSCODES.MD &middot; VERBATIM</div>
+
+      <div id="f14-tie" class="bodyi" style="position:absolute;left:150px;top:960px;width:1030px;font-size:24px;color:var(--ink2)">
+        This is 1994's partial failure, written down as an enum: the caller is told it does not know, and told what to do about it.</div>
+      <svg id="f14-ok-svg" class="pen " viewBox="0 0 1920 1080"><path id="f14-ok" d="M475.5,472.2 L484.6,475.2 L492.2,478.5 L498.2,482.1 L502.4,485.8 L505.0,489.6 L505.9,493.4 L505.6,497.2 L504.1,501.0 L501.8,504.6 L498.8,508.2 L495.4,511.7 L491.6,515.1 L487.5,518.5 L483.0,521.8 L477.9,525.1 L472.1,528.3 L465.6,531.4 L458.2,534.4 L449.8,537.3 L440.6,539.9 L430.5,542.3 L419.6,544.5 L408.1,546.5 L396.1,548.2 L383.7,549.7 L370.9,551.0 L357.8,552.2 L344.4,553.1 L330.7,553.8 L316.8,554.3 L302.7,554.4 L288.5,554.3 L274.4,553.8 L260.6,552.8 L247.3,551.5 L234.7,549.7 L223.0,547.5 L212.3,545.1 L202.6,542.3 L194.0,539.4 L186.3,536.4 L179.4,533.3 L172.9,530.2 L166.8,527.1 L160.9,524.0 L155.2,520.9 L149.5,517.7 L144.1,514.5 L139.2,511.1 L134.9,507.7 L131.6,504.0 L129.5,500.3 L128.9,496.5 L129.8,492.8 L132.4,489.0 L136.5,485.4 L142.1,481.9 L148.9,478.5 L156.8,475.4 L165.5,472.4 L175.0,469.7 L185.1,467.1 L195.7,464.7 L206.7,462.5 L218.3,460.5 L230.3,458.7 L242.7,457.1 L255.6,455.9 L268.8,454.9 L282.3,454.3 L295.8,454.0 L309.3,454.1 L322.7,454.4 L335.8,454.9 L348.7,455.7 L361.4,456.6 L374.0,457.6 L386.4,458.7 L398.9,459.9 L411.4,461.2 L423.9,462.6 L436.3,464.3 L448.4,466.2 L460.0,468.4 L470.8,470.9 L480.5,473.8 L488.9,477.0 L495.6,480.4 L500.6,484.0 L504.0,487.8 L505.7,491.6 L505.9,495.5 L504.9,499.2 L502.9,502.9 L500.3,506.5 L497.1,510.1 L493.5,513.5 L489.5,516.9 L485.2,520.2 L480.3,523.5" stroke-width="5"/></svg>
+      <svg id="f14-ring-svg" class="pen " viewBox="0 0 1920 1080"><path id="f14-ring" d="M1240.5,689.9 L1786.2,691.5 L1785.9,877.6 L1216.5,875.9 L1214.9,688.5 L1278.5,684.5" stroke-width="4"/></svg>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at FULL opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+
+      // SEAM CARRIER — the kicker and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.42, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-head", { y: 15 }, { y: 0, duration: 0.50, ease: "power3.out" }, 0);
+      tl.fromTo("#s-deck", { autoAlpha: 0, y: 17 }, { autoAlpha: 1, y: 0, duration: 0.50, ease: "power3.out" }, 0.30);
+      // anime.js owns this arrival: a grid stagger from the centre outwards. Seeded
+      // nothing here, so it is deterministic by construction.
+      var g14 = ["#f14-c0","#f14-c1","#f14-c2","#f14-c3","#f14-c4","#f14-c5","#f14-c6","#f14-c7","#f14-c8","#f14-c9","#f14-c10","#f14-c11","#f14-c12","#f14-c13","#f14-c14","#f14-c15","#f14-c16"].map(function (s) { return document.querySelector(s); });
+      g14.forEach(function (e) { gsap.set(e, { autoAlpha: 0 }); });
+      var A14 = anime.animate(g14, {
+        opacity: [0, 1], scale: [1.22, 1], duration: 130, ease: anime.steps(3),
+        autoplay: false, delay: anime.stagger(64, { grid: [3, 6], from: "center" }) });
+      tl.set(g14, { autoAlpha: 1 }, 0.88);
+      var P_A14 = { p: 0 };
+      tl.to(P_A14, { p: 1, duration: 1.30, ease: "none", onUpdate: function () { A14.seek(P_A14.p * A14.duration); } }, 0.88);
+
+      gsap.set("#f14-hl", { autoAlpha: 0 });
+      gsap.set("#f14-hr", { scaleX: 0 });
+      tl.to("#f14-hl", { autoAlpha: 1, duration: 0.26 }, 2.90);
+      tl.to("#f14-hr", { scaleX: 1, duration: 0.44, ease: "power3.out" }, 2.98);
+      gsap.set("#f14-a", { autoAlpha: 0, y: 16 });
+      tl.to("#f14-a", { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 3.90);
+      gsap.set("#f14-b", { autoAlpha: 0, y: 16 });
+      tl.to("#f14-b", { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 6.10);
+      var pen_f14ring_d = anime.svg.createDrawable("#f14-ring");
+      var pen_f14ring = anime.animate(pen_f14ring_d, { draw: ["0 0", "0 1"], duration: 780, ease: anime.steps(12), autoplay: false });
+      var P_pen_f14ring = { p: 0 };
+      tl.to(P_pen_f14ring, { p: 1, duration: 0.78, ease: "none", onUpdate: function () { pen_f14ring.seek(P_pen_f14ring.p * pen_f14ring.duration); } }, 7.00);
+      gsap.set("#f14-att", { autoAlpha: 0 });
+      tl.to("#f14-att", { autoAlpha: 1, duration: 0.28 }, 7.86);
+      gsap.set("#f14-tie", { autoAlpha: 0, y: 14 });
+      // seventeen codes; the pen rings the only one that is not a failure
+      var pen_f14ok_d = anime.svg.createDrawable("#f14-ok");
+      var pen_f14ok = anime.animate(pen_f14ok_d, { draw: ["0 0", "0 1"], duration: 900, ease: anime.steps(14), autoplay: false });
+      var P_pen_f14ok = { p: 0 };
+      tl.to(P_pen_f14ok, { p: 1, duration: 0.90, ease: "none", onUpdate: function () { pen_f14ok.seek(P_pen_f14ok.p * pen_f14ok.duration); } }, 10.30);
+      tl.to("#f14-tie", { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 11.90);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 13.41);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["14-codes"] = tl;
+    })();
+  </script>
+</template>

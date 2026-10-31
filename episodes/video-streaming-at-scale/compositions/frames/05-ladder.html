@@ -1,0 +1,222 @@
+<template>
+  <style>
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-900.woff2") format("woff2"); font-weight: 900; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --paper: #F4EBD9; --paper-warm: #FBF6EA; --cloud: #FDFBF4;
+      --ink: #3B2F2A; --ink-soft: #6B5A4E;
+      --sky: #7FB4DC; --sky-deep: #2E5F8A;
+      --meadow: #7FA653; --meadow-deep: #3F6B34;
+      --terracotta: #C4552F; --terracotta-lit: #EE8557; --terracotta-ink: #9E4324;
+      --night: #1E2A38; --night-mute: #A8BACB;
+    }
+
+    /* the continuity object — one real segment from the film's own manifest, pinned
+       bottom-left. The id never moves; only the state word changes. */
+    .seg-pill {
+      position: absolute; left: 96px; bottom: 74px;
+      display: flex; align-items: center; gap: 16px;
+      padding: 13px 26px; border-radius: 999px;
+      background: var(--paper-warm); box-shadow: 0 10px 30px rgba(59,47,42,0.22);
+      font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--ink);
+    }
+    .seg-pill b { font-weight: 700; }
+    .seg-pill i { display: block; width: 1px; height: 20px; background: rgba(59,47,42,0.22); }
+    .seg-state { position: relative; display: inline-block; width: 186px; height: 24px; }
+    .seg-state span {
+      position: absolute; left: 0; top: 0; white-space: nowrap;
+      font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      font-size: 15px; line-height: 24px; color: var(--terracotta-ink);
+    }
+
+    .grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.055; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='170'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='170' height='170' filter='url(%23n)'/></svg>");
+    }
+
+    #f5-wind { position: absolute; inset: -18%; }
+    #f5-plate { position: absolute; inset: 0; background: url("public/img/meadow-road.jpg") center/cover no-repeat; }
+    #f5-wash { position: absolute; inset: -18%; background: var(--paper); opacity: 0.88; }
+
+    #f5-stage { position: absolute; inset: 0; }
+
+    #f5-card {
+      position: absolute; left: 172px; top: 132px; width: 1576px; height: 780px;
+      border-radius: 14px; background: var(--paper-warm);
+      border: 1px solid rgba(59,47,42,0.12);
+      box-shadow: 0 26px 64px rgba(59,47,42,0.16);
+    }
+
+    #f5-label {
+      position: absolute; left: 68px; top: 52px;
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 700;
+      font-size: 17px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    #f5-head {
+      position: absolute; left: 66px; top: 90px;
+      font-family: "Zen Maru Gothic", sans-serif; font-weight: 700;
+      font-size: 74px; line-height: 1.05; letter-spacing: -0.01em; color: var(--ink);
+    }
+
+    /* three rungs. Every row is the same six seconds; only the weight differs, which is
+       why the bar length is the argument and the numbers are the evidence. */
+    .f5-row { position: absolute; left: 66px; width: 1444px; height: 128px; }
+    #f5-r0 { top: 236px; }
+    #f5-r1 { top: 392px; }
+    #f5-r2 { top: 548px; }
+
+    .f5-name {
+      position: absolute; left: 0; top: 12px; width: 210px;
+      font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 44px;
+      color: var(--ink); font-variant-numeric: tabular-nums;
+    }
+    .f5-meta {
+      position: absolute; left: 0; top: 68px; width: 300px;
+      font-family: "JetBrains Mono", monospace; font-weight: 400; font-size: 19px;
+      color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap;
+    }
+    /* the track is a fixed-width rail; the fill inside it grows with scaleX from the left,
+       because `width` is not animatable. */
+    .f5-track {
+      position: absolute; left: 320px; top: 22px; width: 900px; height: 58px;
+      border-radius: 10px; background: rgba(59,47,42,0.08);
+    }
+    .f5-fill {
+      position: absolute; left: 0; top: 0; height: 58px; border-radius: 10px;
+      transform-origin: 0% 50%;
+    }
+    #f5-f0 { width: 900px; background: var(--sky-deep); }
+    #f5-f1 { width: 434px; background: var(--meadow-deep); }
+    #f5-f2 { width: 217px; background: var(--meadow); }
+
+    .f5-size {
+      position: absolute; left: 1252px; top: 30px; width: 190px; text-align: right;
+      font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 32px;
+      color: var(--ink); font-variant-numeric: tabular-nums;
+    }
+    /* the identical-duration chip — the point of the frame, at the end of every row */
+    .f5-chip {
+      position: absolute; left: 1252px; top: 76px; width: 190px; text-align: center;
+      padding: 5px 0; border-radius: 999px;
+      background: rgba(196,85,47,0.13);
+      font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 17px;
+      color: var(--terracotta-ink); font-variant-numeric: tabular-nums;
+    }
+
+    /* the sweep: one vertical rule crossing all three rows, proving the durations line up */
+    #f5-sweep {
+      position: absolute; left: 66px; top: 220px; width: 2px; height: 470px;
+      background: var(--terracotta); opacity: 0.55;
+    }
+
+    #f5-cap {
+      position: absolute; left: 66px; top: 700px;
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 400;
+      font-size: 21px; color: var(--ink-soft);
+    }
+  </style>
+
+  <div id="root" data-composition-id="05-ladder" data-width="1920" data-height="1080">
+    <div id="f5-clip" class="clip" data-start="0" data-duration="11.5" data-track-index="0" data-layout-allow-overflow>
+      <div id="f5-stage">
+        <div id="f5-wind"><div id="f5-plate"></div></div>
+        <div id="f5-wash"></div>
+
+        <div id="f5-card">
+          <div id="f5-label">the same six seconds</div>
+          <div id="f5-head">Encoded more than once.</div>
+
+          <div class="f5-row" id="f5-r0">
+            <div class="f5-name">1080p</div>
+            <div class="f5-meta">5.80 Mbps &middot; 1920&times;1080</div>
+            <div class="f5-track"><div class="f5-fill" id="f5-f0"></div></div>
+            <div class="f5-size" id="f5-s0">0.00 MB</div>
+            <div class="f5-chip">6.006s</div>
+          </div>
+          <div class="f5-row" id="f5-r1">
+            <div class="f5-name">720p</div>
+            <div class="f5-meta">2.80 Mbps &middot; 1280&times;720</div>
+            <div class="f5-track"><div class="f5-fill" id="f5-f1"></div></div>
+            <div class="f5-size" id="f5-s1">0.00 MB</div>
+            <div class="f5-chip">6.006s</div>
+          </div>
+          <div class="f5-row" id="f5-r2">
+            <div class="f5-name">480p</div>
+            <div class="f5-meta">1.40 Mbps &middot; 854&times;480</div>
+            <div class="f5-track"><div class="f5-fill" id="f5-f2"></div></div>
+            <div class="f5-size" id="f5-s2">0.00 MB</div>
+            <div class="f5-chip">6.006s</div>
+          </div>
+
+          <div id="f5-sweep"></div>
+          <div id="f5-cap">same content, same duration, three bitrates &mdash; the ladder the player chooses from</div>
+        </div>
+
+        <div class="seg-pill" id="f5-pill">
+          <b>seg-00412.m4s</b><i></i>
+          <span class="seg-state"><span>listed</span></span>
+        </div>
+
+        <div class="grain"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      gsap.set([".f5-fill"], { scaleX: 0 });
+      gsap.set([".f5-chip", "#f5-sweep", "#f5-cap"], { autoAlpha: 0 });
+
+      // ---- SEAM 4 -> 5 ENTRY: cut-the-curve LEFT. Frame 04 exited at -238 on power4.in;
+      // this enters from +302 on power4.out. The card + its heading are the carrier and
+      // are at full opacity from t=0.
+      tl.fromTo("#f5-card", { x: 302 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      tl.fromTo("#f5-wind", { xPercent: 0.8 }, { xPercent: -0.7, duration: 11.5, ease: "none" }, 0);
+
+      // Scene 2 (1.8-5.4s): three rungs resolve top to bottom, 140ms apart.
+      tl.fromTo(["#f5-r0", "#f5-r1", "#f5-r2"], { autoAlpha: 0, y: 24 },
+                { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out", stagger: 0.46 }, 1.2);
+
+      // Scene 3 (5.4-8.4s): the bars grow. Length before number: the eye reads three
+      // different weights a full second before it reads three different figures.
+      // each rung's bar and its byte count are the SAME event — the encoder finishing that
+      // rendition — so they run together, and the three are spread across 3.6s so the beat
+      // keeps resolving instead of assembling and then waiting.
+      [["#f5-f0","#f5-s0",4.35,3.0],["#f5-f1","#f5-s1",2.10,4.2],["#f5-f2","#f5-s2",1.05,5.4]]
+        .forEach(function (r) {
+          tl.to(r[0], { scaleX: 1, duration: 1.5, ease: "power2.out" }, r[3]);
+          var c = { v: 0 }, el = document.querySelector(r[1]);
+          tl.to(c, { v: r[2], duration: 1.5, ease: "power2.out",
+                     onUpdate: function () { el.textContent = c.v.toFixed(2) + " MB"; } }, r[3]);
+        });
+
+      // Scene 4 (8.4-11.5s): the sweep crosses all three rows and each gains its duration
+      // chip — the durations are identical, only the weight differs. That IS the ladder.
+      tl.set("#f5-sweep", { autoAlpha: 0.55 }, 7.6);
+      tl.fromTo("#f5-sweep", { x: 0 }, { x: 1386, duration: 1.4, ease: "power2.inOut" }, 7.6);
+      tl.to(".f5-chip", { autoAlpha: 1, duration: 0.3, ease: "power2.out", stagger: 0.12 }, 8.5);
+      tl.to("#f5-sweep", { autoAlpha: 0, duration: 0.3 }, 9.05);
+      tl.to("#f5-cap", { autoAlpha: 1, duration: 0.4, ease: "power2.out" }, 9.5);
+
+      // ---- SEAM 5 -> 6: ZOOM-THROUGH (z +1). The second reserved vector, spent once:
+      // deeper into the SAME thought — the ladder becomes the text file that describes it.
+      // This side pushes IN (scale up); frame 6 enters from above 1.0 and settles, so both
+      // halves share the scale-velocity sign.
+      tl.to("#f5-stage", { scale: 1.16, autoAlpha: 0, duration: 0.36, ease: "power4.in" }, 11.14);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["05-ladder"] = tl;
+    })();
+  </script>
+</template>

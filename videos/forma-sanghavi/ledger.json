@@ -1,0 +1,232 @@
+{
+  "fps": 30,
+  "seams": [
+    {
+      "id": "open→title",
+      "cut": 7.5,
+      "technique": "zin",
+      "exit": {
+        "selector": "#stg0",
+        "axis": "z",
+        "dir": 1
+      },
+      "entry": {
+        "selector": "#stg1",
+        "axis": "z",
+        "dir": 1,
+        "scanRoot": "#stg1"
+      }
+    },
+    {
+      "id": "title→ask",
+      "cut": 11.591,
+      "technique": "lift",
+      "exit": {
+        "selector": "#stg1",
+        "axis": "y",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg2",
+        "axis": "y",
+        "dir": -1
+      }
+    },
+    {
+      "id": "ask→tie",
+      "cut": 21.818,
+      "technique": "across",
+      "exit": {
+        "selector": "#stg2",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg3",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "tie→spec",
+      "cut": 31.364,
+      "technique": "across",
+      "exit": {
+        "selector": "#stg3",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg4",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "spec→rank",
+      "cut": 39.545,
+      "technique": "across",
+      "exit": {
+        "selector": "#stg4",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg5",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "rank→base",
+      "cut": 47.727,
+      "technique": "lift",
+      "exit": {
+        "selector": "#stg5",
+        "axis": "y",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg6",
+        "axis": "y",
+        "dir": -1
+      }
+    },
+    {
+      "id": "base→plan",
+      "cut": 56.591,
+      "technique": "across",
+      "exit": {
+        "selector": "#stg6",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg7",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "plan→sheet",
+      "cut": 66.818,
+      "technique": "across",
+      "exit": {
+        "selector": "#stg7",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg8",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "sheet→stl",
+      "cut": 76.364,
+      "technique": "lift",
+      "exit": {
+        "selector": "#stg8",
+        "axis": "y",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg9",
+        "axis": "y",
+        "dir": -1
+      }
+    },
+    {
+      "id": "stl→found",
+      "cut": 85.909,
+      "technique": "across",
+      "exit": {
+        "selector": "#stg9",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg10",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "found→sole",
+      "cut": 96.136,
+      "technique": "lift",
+      "exit": {
+        "selector": "#stg10",
+        "axis": "y",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg11",
+        "axis": "y",
+        "dir": -1
+      }
+    },
+    {
+      "id": "sole→hit",
+      "cut": 105.682,
+      "technique": "across",
+      "exit": {
+        "selector": "#stg11",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg12",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "hit→why",
+      "cut": 115.227,
+      "technique": "zback",
+      "exit": {
+        "selector": "#stg12",
+        "axis": "z",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg13",
+        "axis": "z",
+        "dir": -1,
+        "scanRoot": "#stg13"
+      }
+    },
+    {
+      "id": "why→rest",
+      "cut": 124.091,
+      "technique": "lift",
+      "exit": {
+        "selector": "#stg13",
+        "axis": "y",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg14",
+        "axis": "y",
+        "dir": -1
+      }
+    },
+    {
+      "id": "rest→end",
+      "cut": 132.273,
+      "technique": "up",
+      "exit": {
+        "selector": "#stg14",
+        "axis": "y",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#stg15",
+        "axis": "y",
+        "dir": -1
+      }
+    }
+  ]
+}

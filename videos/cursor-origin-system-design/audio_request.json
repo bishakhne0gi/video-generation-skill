@@ -1,0 +1,20 @@
+{
+  "provider": "auto",
+  "speed": 1,
+  "lines": [
+    { "id": "01", "text": "Seventeenth of August. Thirteen forty U T C. GitHub starts returning errors, and it does not stop for seven and a half hours." },
+    { "id": "03", "text": "That same day, Cursor shipped Origin. Git hosting inside the editor. Browse the repository, open the pull request, review it, merge it, without leaving." },
+    { "id": "04", "text": "But look at how it starts. Your GitHub repository syncs in. GitHub stays the source of truth. Pushes route back to it, and both sides update in real time." },
+    { "id": "05", "text": "Name that shape. Two systems accepting writes, one of them holding authority. Every replicated system you have ever run has this exact problem." },
+    { "id": "06", "text": "Now break it. The authority is returning one request in five as an error. Your mirror has three choices. Refuse the write, queue it, or diverge." },
+    { "id": "07", "text": "Here is the line that matters. Commits are content addressed, so any two copies merge themselves. Pull requests, comments and checks are not. That state lives in one database, and there is only one." },
+    { "id": "08", "text": "Now the reason to rebuild any of this. A diff is a rendering, made for your eyes. An agent needs the merge state as data. That is the whole bet." },
+    { "id": "09", "text": "Mirror the content. Name the authority. Decide in advance what happens when it goes dark. Next episode, subagents." }
+  ],
+  "bgm": {
+    "mode": "retrieve",
+    "query": "tense-modern-electronic-pulse-restrained",
+    "blob": "A GitHub alternative launched as a mirror with GitHub as the source of truth, on the day GitHub went down for seven and a half hours. Commits merge; pull requests do not.",
+    "arc": "The status page going amber → Title → What Origin is → The mirror with a designated primary → Naming the shape → The primary fails → The real boundary: content vs metadata → Why agent-first → Takeaway"
+  }
+}

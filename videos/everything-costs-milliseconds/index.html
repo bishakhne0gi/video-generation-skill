@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      html,body{width:1920px;height:1080px;overflow:hidden;background:#091413}
+      /* opaque stage-ground: guards the white flash at every seam on a dark film */
+      #root{position:relative;width:1920px;height:1080px;overflow:hidden;background:#091413}
+      .scene{position:absolute;inset:0;width:100%;height:100%}
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="188.571" data-width="1920" data-height="1080">
+      <div id="el-01-open" class="scene" data-composition-id="01-open" data-composition-src="compositions/frames/01-open.html" data-start="0.000" data-duration="10.000" data-track-index="1"></div>
+      <audio id="au-01-open" src="assets/voice/01.wav" data-start="0.000" data-duration="7.790" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-02-title" class="scene" data-composition-id="02-title" data-composition-src="compositions/frames/02-title.html" data-start="10.000" data-duration="5.000" data-track-index="1"></div>
+
+      <div id="el-03-dist" class="scene" data-composition-id="03-dist" data-composition-src="compositions/frames/03-dist.html" data-start="15.000" data-duration="11.429" data-track-index="1"></div>
+      <audio id="au-03-dist" src="assets/voice/02.wav" data-start="15.000" data-duration="9.300" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-04-lcp" class="scene" data-composition-id="04-lcp" data-composition-src="compositions/frames/04-lcp.html" data-start="26.429" data-duration="11.429" data-track-index="1"></div>
+      <audio id="au-04-lcp" src="assets/voice/03.wav" data-start="26.429" data-duration="8.750" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-05-cls" class="scene" data-composition-id="05-cls" data-composition-src="compositions/frames/05-cls.html" data-start="37.858" data-duration="12.143" data-track-index="1"></div>
+      <audio id="au-05-cls" src="assets/voice/04.wav" data-start="37.858" data-duration="9.450" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-06-inp" class="scene" data-composition-id="06-inp" data-composition-src="compositions/frames/06-inp.html" data-start="50.001" data-duration="11.429" data-track-index="1"></div>
+      <audio id="au-06-inp" src="assets/voice/05.wav" data-start="50.001" data-duration="8.510" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-07-path" class="scene" data-composition-id="07-path" data-composition-src="compositions/frames/07-path.html" data-start="61.430" data-duration="10.714" data-track-index="1"></div>
+      <audio id="au-07-path" src="assets/voice/06.wav" data-start="61.430" data-duration="8.110" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-08-fonts" class="scene" data-composition-id="08-fonts" data-composition-src="compositions/frames/08-fonts.html" data-start="72.144" data-duration="10.714" data-track-index="1"></div>
+      <audio id="au-08-fonts" src="assets/voice/07.wav" data-start="72.144" data-duration="8.470" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-09-images" class="scene" data-composition-id="09-images" data-composition-src="compositions/frames/09-images.html" data-start="82.858" data-duration="10.714" data-track-index="1"></div>
+      <audio id="au-09-images" src="assets/voice/08.wav" data-start="82.858" data-duration="8.730" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-10-bundle" class="scene" data-composition-id="10-bundle" data-composition-src="compositions/frames/10-bundle.html" data-start="93.572" data-duration="10.000" data-track-index="1"></div>
+      <audio id="au-10-bundle" src="assets/voice/09.wav" data-start="93.572" data-duration="7.450" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-11-render" class="scene" data-composition-id="11-render" data-composition-src="compositions/frames/11-render.html" data-start="103.572" data-duration="10.000" data-track-index="1"></div>
+      <audio id="au-11-render" src="assets/voice/10.wav" data-start="103.572" data-duration="7.960" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-12-hydrate" class="scene" data-composition-id="12-hydrate" data-composition-src="compositions/frames/12-hydrate.html" data-start="113.572" data-duration="10.714" data-track-index="1"></div>
+      <audio id="au-12-hydrate" src="assets/voice/11.wav" data-start="113.572" data-duration="8.550" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-13-thread" class="scene" data-composition-id="13-thread" data-composition-src="compositions/frames/13-thread.html" data-start="124.286" data-duration="10.714" data-track-index="1"></div>
+      <audio id="au-13-thread" src="assets/voice/12.wav" data-start="124.286" data-duration="8.060" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-14-paint" class="scene" data-composition-id="14-paint" data-composition-src="compositions/frames/14-paint.html" data-start="135.000" data-duration="11.429" data-track-index="1"></div>
+      <audio id="au-14-paint" src="assets/voice/13.wav" data-start="135.000" data-duration="9.220" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-15-cache" class="scene" data-composition-id="15-cache" data-composition-src="compositions/frames/15-cache.html" data-start="146.429" data-duration="10.714" data-track-index="1"></div>
+      <audio id="au-15-cache" src="assets/voice/14.wav" data-start="146.429" data-duration="8.510" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-16-third" class="scene" data-composition-id="16-third" data-composition-src="compositions/frames/16-third.html" data-start="157.143" data-duration="10.714" data-track-index="1"></div>
+      <audio id="au-16-third" src="assets/voice/15.wav" data-start="157.143" data-duration="8.060" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-17-field" class="scene" data-composition-id="17-field" data-composition-src="compositions/frames/17-field.html" data-start="167.857" data-duration="10.000" data-track-index="1"></div>
+      <audio id="au-17-field" src="assets/voice/16.wav" data-start="167.857" data-duration="7.400" data-track-index="10" data-volume="1"></audio>
+
+      <div id="el-18-end" class="scene" data-composition-id="18-end" data-composition-src="compositions/frames/18-end.html" data-start="177.857" data-duration="10.714" data-track-index="1"></div>
+      <audio id="au-18-end" src="assets/voice/17.wav" data-start="177.857" data-duration="6.680" data-track-index="10" data-volume="1"></audio>
+      <div id="el-chip" class="scene" data-composition-id="00-chip" data-composition-src="compositions/frames/00-chip.html" data-start="0" data-duration="188.571" data-track-index="4"></div>
+      <audio id="au-bed" src="assets/audio/bed.mp3" data-start="0" data-duration="188.571" data-track-index="11" data-volume="1"></audio>
+
+      <audio id="cue-0-tick" src="assets/sfx/tick.wav" data-start="0.240" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-1-tick" src="assets/sfx/tick.wav" data-start="0.330" data-duration="0.120" data-track-index="21" data-volume="0.22"></audio>
+      <audio id="cue-2-tick" src="assets/sfx/tick.wav" data-start="0.420" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-3-tick" src="assets/sfx/tick.wav" data-start="0.510" data-duration="0.120" data-track-index="21" data-volume="0.22"></audio>
+      <audio id="cue-4-tick" src="assets/sfx/tick.wav" data-start="0.600" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-5-latch" src="assets/sfx/latch.wav" data-start="1.420" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-6-latch" src="assets/sfx/latch.wav" data-start="3.100" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-7-notify" src="assets/sfx/notify.wav" data-start="3.700" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-8-click" src="assets/sfx/click.wav" data-start="4.800" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-9-click" src="assets/sfx/click.wav" data-start="5.420" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-10-click" src="assets/sfx/click.wav" data-start="6.040" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-11-click" src="assets/sfx/click.wav" data-start="6.660" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-12-click" src="assets/sfx/click.wav" data-start="7.420" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-13-success" src="assets/sfx/success.wav" data-start="7.620" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-14-whoosh" src="assets/sfx/whoosh.wav" data-start="9.840" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-15-thunk" src="assets/sfx/thunk.wav" data-start="10.520" data-duration="0.550" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-16-latch" src="assets/sfx/latch.wav" data-start="10.860" data-duration="0.300" data-track-index="21" data-volume="0.3"></audio>
+      <audio id="cue-17-whoosh" src="assets/sfx/whoosh.wav" data-start="14.840" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-18-tick" src="assets/sfx/tick.wav" data-start="17.300" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-19-tick" src="assets/sfx/tick.wav" data-start="18.200" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-20-swipe" src="assets/sfx/swipe.wav" data-start="19.300" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-21-notify" src="assets/sfx/notify.wav" data-start="20.300" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-22-tick" src="assets/sfx/tick.wav" data-start="21.300" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-23-tick" src="assets/sfx/tick.wav" data-start="22.080" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-24-tick" src="assets/sfx/tick.wav" data-start="22.860" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-25-tick" src="assets/sfx/tick.wav" data-start="23.640" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-26-latch" src="assets/sfx/latch.wav" data-start="24.420" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-27-whoosh" src="assets/sfx/whoosh.wav" data-start="26.269" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-28-tick" src="assets/sfx/tick.wav" data-start="27.729" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-29-latch" src="assets/sfx/latch.wav" data-start="28.149" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-30-swipe" src="assets/sfx/swipe.wav" data-start="29.729" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-31-notify" src="assets/sfx/notify.wav" data-start="30.589" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-32-latch" src="assets/sfx/latch.wav" data-start="32.729" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-33-swipe" src="assets/sfx/swipe.wav" data-start="33.329" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-34-success" src="assets/sfx/success.wav" data-start="34.929" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-35-whoosh" src="assets/sfx/whoosh.wav" data-start="37.698" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-36-tick" src="assets/sfx/tick.wav" data-start="38.578" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-37-thunk" src="assets/sfx/thunk.wav" data-start="41.058" data-duration="0.550" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-38-click" src="assets/sfx/click.wav" data-start="41.278" data-duration="0.080" data-track-index="21" data-volume="0.3"></audio>
+      <audio id="cue-39-notify" src="assets/sfx/notify.wav" data-start="42.158" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-40-latch" src="assets/sfx/latch.wav" data-start="44.258" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-41-thunk" src="assets/sfx/thunk.wav" data-start="44.758" data-duration="0.550" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-42-click" src="assets/sfx/click.wav" data-start="46.758" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-43-success" src="assets/sfx/success.wav" data-start="46.958" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-44-whoosh" src="assets/sfx/whoosh.wav" data-start="49.841" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-45-click" src="assets/sfx/click.wav" data-start="51.401" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-46-blip" src="assets/sfx/blip.wav" data-start="53.941" data-duration="0.050" data-track-index="20" data-volume="0.26"></audio>
+      <audio id="cue-47-notify" src="assets/sfx/notify.wav" data-start="54.101" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-48-tick" src="assets/sfx/tick.wav" data-start="55.001" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-49-tick" src="assets/sfx/tick.wav" data-start="55.521" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-50-tick" src="assets/sfx/tick.wav" data-start="56.041" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-51-latch" src="assets/sfx/latch.wav" data-start="56.901" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-52-click" src="assets/sfx/click.wav" data-start="57.301" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-53-success" src="assets/sfx/success.wav" data-start="57.521" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-54-riser" src="assets/sfx/riser.wav" data-start="60.130" data-duration="1.600" data-track-index="20" data-volume="0.32"></audio>
+      <audio id="cue-55-thunk" src="assets/sfx/thunk.wav" data-start="61.490" data-duration="0.550" data-track-index="21" data-volume="0.4"></audio>
+      <audio id="cue-56-tick" src="assets/sfx/tick.wav" data-start="62.330" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-57-tick" src="assets/sfx/tick.wav" data-start="62.710" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-58-tick" src="assets/sfx/tick.wav" data-start="63.170" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-59-tick" src="assets/sfx/tick.wav" data-start="63.590" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-60-latch" src="assets/sfx/latch.wav" data-start="64.850" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-61-notify" src="assets/sfx/notify.wav" data-start="66.730" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-62-latch" src="assets/sfx/latch.wav" data-start="67.730" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-63-tick" src="assets/sfx/tick.wav" data-start="68.030" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-64-tick" src="assets/sfx/tick.wav" data-start="68.130" data-duration="0.120" data-track-index="21" data-volume="0.22"></audio>
+      <audio id="cue-65-tick" src="assets/sfx/tick.wav" data-start="68.230" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-66-tick" src="assets/sfx/tick.wav" data-start="68.330" data-duration="0.120" data-track-index="21" data-volume="0.22"></audio>
+      <audio id="cue-67-success" src="assets/sfx/success.wav" data-start="69.330" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-68-whoosh" src="assets/sfx/whoosh.wav" data-start="71.984" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-69-key1" src="assets/sfx/key1.wav" data-start="72.644" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cue-70-key2" src="assets/sfx/key2.wav" data-start="72.804" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cue-71-key3" src="assets/sfx/key3.wav" data-start="72.964" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cue-72-key4" src="assets/sfx/key4.wav" data-start="73.124" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cue-73-key1" src="assets/sfx/key1.wav" data-start="73.284" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cue-74-tick" src="assets/sfx/tick.wav" data-start="73.444" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-75-tick" src="assets/sfx/tick.wav" data-start="74.544" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-76-latch" src="assets/sfx/latch.wav" data-start="75.644" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-77-notify" src="assets/sfx/notify.wav" data-start="76.844" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-78-latch" src="assets/sfx/latch.wav" data-start="78.244" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-79-error" src="assets/sfx/error.wav" data-start="79.844" data-duration="0.700" data-track-index="20" data-volume="0.32"></audio>
+      <audio id="cue-80-success" src="assets/sfx/success.wav" data-start="80.504" data-duration="1.300" data-track-index="21" data-volume="0.4"></audio>
+      <audio id="cue-81-whoosh" src="assets/sfx/whoosh.wav" data-start="82.698" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-82-tick" src="assets/sfx/tick.wav" data-start="83.758" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-83-tick" src="assets/sfx/tick.wav" data-start="84.218" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-84-latch" src="assets/sfx/latch.wav" data-start="84.678" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-85-swipe" src="assets/sfx/swipe.wav" data-start="86.458" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-86-key1" src="assets/sfx/key1.wav" data-start="87.478" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cue-87-key2" src="assets/sfx/key2.wav" data-start="87.778" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cue-88-key3" src="assets/sfx/key3.wav" data-start="88.078" data-duration="0.070" data-track-index="20" data-volume="0.2"></audio>
+      <audio id="cue-89-latch" src="assets/sfx/latch.wav" data-start="89.158" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-90-tick" src="assets/sfx/tick.wav" data-start="89.458" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-91-tick" src="assets/sfx/tick.wav" data-start="90.198" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-92-tick" src="assets/sfx/tick.wav" data-start="90.938" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-93-success" src="assets/sfx/success.wav" data-start="91.678" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-94-whoosh" src="assets/sfx/whoosh.wav" data-start="93.412" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-95-thunk" src="assets/sfx/thunk.wav" data-start="95.172" data-duration="0.550" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-96-tick" src="assets/sfx/tick.wav" data-start="96.872" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-97-tick" src="assets/sfx/tick.wav" data-start="97.272" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-98-tick" src="assets/sfx/tick.wav" data-start="97.672" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-99-tick" src="assets/sfx/tick.wav" data-start="98.072" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-100-notify" src="assets/sfx/notify.wav" data-start="98.872" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-101-latch" src="assets/sfx/latch.wav" data-start="99.672" data-duration="0.300" data-track-index="21" data-volume="0.3"></audio>
+      <audio id="cue-102-thunk" src="assets/sfx/thunk.wav" data-start="100.072" data-duration="0.550" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-103-success" src="assets/sfx/success.wav" data-start="101.972" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-104-riser" src="assets/sfx/riser.wav" data-start="102.272" data-duration="1.600" data-track-index="21" data-volume="0.32"></audio>
+      <audio id="cue-105-thunk" src="assets/sfx/thunk.wav" data-start="103.632" data-duration="0.550" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-106-tick" src="assets/sfx/tick.wav" data-start="104.372" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-107-tick" src="assets/sfx/tick.wav" data-start="104.992" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-108-tick" src="assets/sfx/tick.wav" data-start="105.612" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-109-latch" src="assets/sfx/latch.wav" data-start="106.232" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-110-notify" src="assets/sfx/notify.wav" data-start="107.472" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-111-swipe" src="assets/sfx/swipe.wav" data-start="108.172" data-duration="0.300" data-track-index="21" data-volume="0.3"></audio>
+      <audio id="cue-112-latch" src="assets/sfx/latch.wav" data-start="110.172" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-113-notify" src="assets/sfx/notify.wav" data-start="111.522" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-114-whoosh" src="assets/sfx/whoosh.wav" data-start="113.412" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-115-tick" src="assets/sfx/tick.wav" data-start="114.272" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-116-blip" src="assets/sfx/blip.wav" data-start="115.372" data-duration="0.050" data-track-index="20" data-volume="0.26"></audio>
+      <audio id="cue-117-success" src="assets/sfx/success.wav" data-start="119.092" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-118-notify" src="assets/sfx/notify.wav" data-start="119.172" data-duration="0.900" data-track-index="21" data-volume="0.34"></audio>
+      <audio id="cue-119-latch" src="assets/sfx/latch.wav" data-start="119.872" data-duration="0.300" data-track-index="22" data-volume="0.3"></audio>
+      <audio id="cue-120-blip" src="assets/sfx/blip.wav" data-start="120.872" data-duration="0.050" data-track-index="20" data-volume="0.26"></audio>
+      <audio id="cue-121-blip" src="assets/sfx/blip.wav" data-start="121.172" data-duration="0.050" data-track-index="20" data-volume="0.26"></audio>
+      <audio id="cue-122-blip" src="assets/sfx/blip.wav" data-start="121.472" data-duration="0.050" data-track-index="20" data-volume="0.26"></audio>
+      <audio id="cue-123-success" src="assets/sfx/success.wav" data-start="121.772" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-124-whoosh" src="assets/sfx/whoosh.wav" data-start="124.126" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-125-latch" src="assets/sfx/latch.wav" data-start="125.306" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-126-error" src="assets/sfx/error.wav" data-start="126.306" data-duration="0.700" data-track-index="20" data-volume="0.32"></audio>
+      <audio id="cue-127-tick" src="assets/sfx/tick.wav" data-start="127.686" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-128-tick" src="assets/sfx/tick.wav" data-start="127.986" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-129-tick" src="assets/sfx/tick.wav" data-start="128.286" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-130-success" src="assets/sfx/success.wav" data-start="129.186" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-131-tick" src="assets/sfx/tick.wav" data-start="130.386" data-duration="0.120" data-track-index="21" data-volume="0.22"></audio>
+      <audio id="cue-132-click" src="assets/sfx/click.wav" data-start="131.286" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-133-click" src="assets/sfx/click.wav" data-start="132.226" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-134-click" src="assets/sfx/click.wav" data-start="133.166" data-duration="0.080" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-135-success" src="assets/sfx/success.wav" data-start="133.186" data-duration="1.300" data-track-index="21" data-volume="0.4"></audio>
+      <audio id="cue-136-whoosh" src="assets/sfx/whoosh.wav" data-start="134.840" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-137-tick" src="assets/sfx/tick.wav" data-start="135.240" data-duration="0.120" data-track-index="21" data-volume="0.22"></audio>
+      <audio id="cue-138-tick" src="assets/sfx/tick.wav" data-start="135.440" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-139-tick" src="assets/sfx/tick.wav" data-start="135.640" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-140-tick" src="assets/sfx/tick.wav" data-start="135.840" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-141-blip" src="assets/sfx/blip.wav" data-start="137.100" data-duration="0.050" data-track-index="20" data-volume="0.26"></audio>
+      <audio id="cue-142-blip" src="assets/sfx/blip.wav" data-start="137.720" data-duration="0.050" data-track-index="20" data-volume="0.26"></audio>
+      <audio id="cue-143-blip" src="assets/sfx/blip.wav" data-start="138.340" data-duration="0.050" data-track-index="20" data-volume="0.26"></audio>
+      <audio id="cue-144-latch" src="assets/sfx/latch.wav" data-start="140.400" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-145-tick" src="assets/sfx/tick.wav" data-start="141.200" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-146-tick" src="assets/sfx/tick.wav" data-start="141.860" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-147-tick" src="assets/sfx/tick.wav" data-start="142.520" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-148-success" src="assets/sfx/success.wav" data-start="143.180" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-149-riser" src="assets/sfx/riser.wav" data-start="145.129" data-duration="1.600" data-track-index="20" data-volume="0.32"></audio>
+      <audio id="cue-150-thunk" src="assets/sfx/thunk.wav" data-start="146.489" data-duration="0.550" data-track-index="21" data-volume="0.4"></audio>
+      <audio id="cue-151-tick" src="assets/sfx/tick.wav" data-start="146.829" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-152-thunk" src="assets/sfx/thunk.wav" data-start="148.429" data-duration="0.550" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-153-latch" src="assets/sfx/latch.wav" data-start="149.329" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-154-success" src="assets/sfx/success.wav" data-start="150.829" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-155-latch" src="assets/sfx/latch.wav" data-start="152.529" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-156-thunk" src="assets/sfx/thunk.wav" data-start="153.029" data-duration="0.550" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-157-thunk" src="assets/sfx/thunk.wav" data-start="154.009" data-duration="0.550" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-158-success" src="assets/sfx/success.wav" data-start="154.989" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-159-whoosh" src="assets/sfx/whoosh.wav" data-start="156.983" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-160-tick" src="assets/sfx/tick.wav" data-start="157.863" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-161-tick" src="assets/sfx/tick.wav" data-start="158.263" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-162-tick" src="assets/sfx/tick.wav" data-start="158.663" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-163-tick" src="assets/sfx/tick.wav" data-start="159.063" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-164-tick" src="assets/sfx/tick.wav" data-start="159.463" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-165-notify" src="assets/sfx/notify.wav" data-start="160.343" data-duration="0.900" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-166-swipe" src="assets/sfx/swipe.wav" data-start="161.343" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-167-latch" src="assets/sfx/latch.wav" data-start="162.743" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-168-swipe" src="assets/sfx/swipe.wav" data-start="163.443" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-169-swipe" src="assets/sfx/swipe.wav" data-start="164.263" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-170-swipe" src="assets/sfx/swipe.wav" data-start="165.083" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-171-success" src="assets/sfx/success.wav" data-start="165.903" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-172-whoosh" src="assets/sfx/whoosh.wav" data-start="167.697" data-duration="0.500" data-track-index="20" data-volume="0.34"></audio>
+      <audio id="cue-173-tick" src="assets/sfx/tick.wav" data-start="168.457" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-174-tick" src="assets/sfx/tick.wav" data-start="168.917" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-175-tick" src="assets/sfx/tick.wav" data-start="169.377" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-176-tick" src="assets/sfx/tick.wav" data-start="169.837" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-177-tick" src="assets/sfx/tick.wav" data-start="170.297" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-178-latch" src="assets/sfx/latch.wav" data-start="170.757" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-179-error" src="assets/sfx/error.wav" data-start="172.557" data-duration="0.700" data-track-index="20" data-volume="0.32"></audio>
+      <audio id="cue-180-latch" src="assets/sfx/latch.wav" data-start="174.457" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+      <audio id="cue-181-blip" src="assets/sfx/blip.wav" data-start="175.157" data-duration="0.050" data-track-index="20" data-volume="0.26"></audio>
+      <audio id="cue-182-success" src="assets/sfx/success.wav" data-start="175.257" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-183-sub" src="assets/sfx/sub.wav" data-start="177.617" data-duration="1.100" data-track-index="20" data-volume="0.36"></audio>
+      <audio id="cue-184-thunk" src="assets/sfx/thunk.wav" data-start="178.037" data-duration="0.550" data-track-index="21" data-volume="0.4"></audio>
+      <audio id="cue-185-latch" src="assets/sfx/latch.wav" data-start="178.257" data-duration="0.300" data-track-index="22" data-volume="0.3"></audio>
+      <audio id="cue-186-tick" src="assets/sfx/tick.wav" data-start="179.957" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-187-success" src="assets/sfx/success.wav" data-start="180.157" data-duration="1.300" data-track-index="20" data-volume="0.4"></audio>
+      <audio id="cue-188-tick" src="assets/sfx/tick.wav" data-start="180.437" data-duration="0.120" data-track-index="21" data-volume="0.22"></audio>
+      <audio id="cue-189-tick" src="assets/sfx/tick.wav" data-start="180.917" data-duration="0.120" data-track-index="21" data-volume="0.22"></audio>
+      <audio id="cue-190-tick" src="assets/sfx/tick.wav" data-start="181.397" data-duration="0.120" data-track-index="21" data-volume="0.22"></audio>
+      <audio id="cue-191-tick" src="assets/sfx/tick.wav" data-start="181.877" data-duration="0.120" data-track-index="20" data-volume="0.22"></audio>
+      <audio id="cue-192-latch" src="assets/sfx/latch.wav" data-start="182.657" data-duration="0.300" data-track-index="20" data-volume="0.3"></audio>
+    </div>
+    <script>
+      // The root carries no animation of its own — every move lives in a frame — but the
+      // contract still requires main to register a timeline.
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

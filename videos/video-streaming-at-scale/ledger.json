@@ -1,0 +1,127 @@
+{
+  "fps": 30,
+  "seams": [
+    {
+      "id": "valley\u2192title",
+      "cut": 9.0,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f1-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f2-l1",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "title\u2192arithmetic",
+      "cut": 14.5,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f2-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f3-card",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "arithmetic\u2192segments",
+      "cut": 26.0,
+      "technique": "inverse zoom \u2014 ARRIVAL, the thesis lands: the film is never sent",
+      "exit": {
+        "selector": "#f3-stage",
+        "axis": "z",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f4-stage",
+        "axis": "z",
+        "dir": -1,
+        "scanRoot": "#f4-stage"
+      }
+    },
+    {
+      "id": "segments\u2192ladder",
+      "cut": 38.0,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f4-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f5-card",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "ladder\u2192manifest",
+      "cut": 49.5,
+      "technique": "zoom-through \u2014 deeper into the same thought: the ladder becomes the text that describes it",
+      "exit": {
+        "selector": "#f5-stage",
+        "axis": "z",
+        "dir": 1
+      },
+      "entry": {
+        "selector": "#f6-stage",
+        "axis": "z",
+        "dir": 1,
+        "scanRoot": "#f6-stage"
+      }
+    },
+    {
+      "id": "manifest\u2192road",
+      "cut": 62.0,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f6-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f7-stage",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "road\u2192edge",
+      "cut": 74.5,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": {
+        "selector": "#f7-stage",
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f8-stage",
+        "axis": "x",
+        "dir": -1
+      }
+    },
+    {
+      "id": "edge\u2192takeaway",
+      "cut": 86.5,
+      "technique": "cut UP \u2014 elevation into the conclusion",
+      "exit": {
+        "selector": "#f8-stage",
+        "axis": "y",
+        "dir": -1
+      },
+      "entry": {
+        "selector": "#f9-stage",
+        "axis": "y",
+        "dir": -1
+      }
+    }
+  ]
+}

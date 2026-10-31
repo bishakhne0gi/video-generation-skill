@@ -1,0 +1,159 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Bricolage"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Jakarta"; src: url("assets/fonts/Jakarta-var.woff2") format("woff2"); font-weight: 200 800; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --void: #16102B; --void-2: #241748;
+      --ink: #FFFFFF; --ink-soft: #C9BEE8; --ink-mute: #9E8FC4;
+      --coral: #FF7A6B; --amber: #FFC24B; --mint: #5FE0B0; --lilac: #B48BFF; --sky: #6FC7FF;
+      --clay-ink: #16102B; --coral-lit: #FFB2A6; --lilac-lit: #D2B8FF;
+      background: var(--void);
+      font-family: "Jakarta", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .clay { position: absolute; }
+    .glass {
+      position: absolute;
+      background: rgba(22,16,43,0.76);
+      -webkit-backdrop-filter: blur(30px) saturate(150%);
+      backdrop-filter: blur(30px) saturate(150%);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 30px;
+      box-shadow: 0 22px 58px rgba(0,0,0,0.40);
+    }
+    .wplate { background: #FFFFFF; border-radius: 14px; display: flex; align-items: center;
+      justify-content: center; box-shadow: 0 10px 26px rgba(0,0,0,0.34); }
+
+
+    /* the masses sit where frame 04 left them — that is what a zoom-through means. They
+       are oversized and bled well past the frame so the 0.80 entry scale never exposes an
+       edge: at 0.80 the stage covers only 1536px of the 1920 unless the content overruns. */
+    #f5-stage { position: absolute; inset: 0; }
+    #f5-bleed { position: absolute; left: -320px; top: -320px; right: -320px; bottom: -320px;
+      background: var(--void); }
+    #f5-mass-a { left: 172px; top: 268px; width: 476px; height: 476px; border-radius: 190px; background: var(--amber);
+      box-shadow: inset 18px 20px 38px rgba(255,255,255,0.55), inset -20px -22px 44px rgba(0,0,0,0.22), 0 36px 82px rgba(0,0,0,0.44); }
+    #f5-mass-b { left: 1272px; top: 268px; width: 476px; height: 476px; border-radius: 190px; background: var(--lilac);
+      box-shadow: inset 18px 20px 38px rgba(255,255,255,0.55), inset -20px -22px 44px rgba(0,0,0,0.22), 0 36px 82px rgba(0,0,0,0.44); }
+
+    .f5-plate { position: absolute; width: 340px; height: 96px; border-radius: 26px;
+      display: flex; align-items: center; justify-content: center; }
+    #f5-pa { left: 240px; top: 456px; }
+    #f5-pb { left: 1340px; top: 456px; }
+    .f5-word { position: absolute; font-family: "Bricolage", sans-serif; font-weight: 800;
+      font-size: 46px; letter-spacing: -0.02em; color: var(--ink); }
+    .f5-role { position: absolute; font-family: "JetBrains Mono", monospace; font-weight: 700;
+      font-size: 42px; letter-spacing: 0.10em; }
+    #f5-role-a { color: var(--amber); }
+    #f5-role-b { color: var(--lilac-lit); }
+    .f5-wm { position: absolute; top: 470px; width: 26px; height: 26px; border-radius: 13px;
+      background: var(--sky); box-shadow: inset 4px 4px 8px rgba(255,255,255,0.55), inset -4px -4px 9px rgba(0,0,0,0.22); }
+    #f5-writes { position: absolute; left: 668px; top: 400px; width: 584px; text-align: center;
+      font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 24px;
+      letter-spacing: 0.14em; color: var(--sky); }
+
+    #f5-line { left: 468px; top: 646px; width: 984px; padding: 32px 42px; border-radius: 28px; text-align: center; }
+    #f5-line-t { font-family: "Bricolage", sans-serif; font-weight: 800; font-size: 62px;
+      letter-spacing: -0.03em; color: var(--ink); }
+
+    #f5-ex { position: absolute; left: 260px; top: 848px; width: 1400px; display: flex; gap: 26px; justify-content: center; }
+    /* position:relative is load-bearing — .glass sets position:absolute, which takes the
+       chips out of the flex row and stacks all three on the same point */
+    .f5-chip { position: relative; padding: 20px 30px; border-radius: 26px;
+      font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 25px;
+      letter-spacing: 0.04em; color: var(--ink); }
+
+    .pill { left: 96px; top: 926px; height: 82px; padding: 0 36px; border-radius: 41px;
+      display: flex; align-items: center; gap: 22px; }
+    .pill-id { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 27px;
+      letter-spacing: 0.02em; color: var(--ink); }
+    .pill-sep { width: 7px; height: 7px; border-radius: 4px; background: var(--ink-mute); }
+    .pill-state { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 27px;
+      letter-spacing: 0.10em; color: var(--coral-lit); }
+  </style>
+
+  <div id="root" data-composition-id="05-shape" data-width="1920" data-height="1080">
+    <div id="f5-clip" class="clip" data-start="0" data-duration="11.0" data-track-index="0" data-layout-allow-overflow>
+      <div id="f5-stage">
+        <div id="f5-bleed"></div>
+        <div id="f5-mass-a" class="clay"></div>
+        <div id="f5-mass-b" class="clay"></div>
+
+        <div id="f5-pa" class="f5-plate glass">
+          <div class="f5-word" id="f5-word-a">GITHUB</div>
+          <div class="f5-role" id="f5-role-a">PRIMARY</div>
+        </div>
+        <div id="f5-pb" class="f5-plate glass">
+          <div class="f5-word" id="f5-word-b">ORIGIN</div>
+          <div class="f5-role" id="f5-role-b">REPLICA</div>
+        </div>
+        <div id="f5-writes">BOTH ACCEPT WRITES</div>
+
+        <div id="f5-line" class="glass">
+          <div id="f5-line-t">Two writers. One authority.</div>
+        </div>
+
+        <div id="f5-ex">
+          <div class="f5-chip glass">Postgres + read replica</div>
+          <div class="f5-chip glass">Kafka MirrorMaker</div>
+          <div class="f5-chip glass">multi-region cache</div>
+        </div>
+
+        <div id="f5-pill" class="glass pill">
+          <div class="pill-id">origin/pr-118</div>
+          <div class="pill-sep"></div>
+          <div class="pill-state">mirrored</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // ---- SEAM 4 -> 5 ENTRY: ZOOM-THROUGH (z +1). Frame 04 exited GROWING to 1.22, so
+      // this enters from BELOW 1.0 and grows to it. Same sign of scale velocity on both
+      // halves — the whole point of the Z rule.
+      tl.fromTo("#f5-stage", { scale: 0.80 }, { scale: 1, duration: 0.46, ease: "power4.out" }, 0);
+
+      // Scene 2 (0.5-3.0s): the masses have not moved — that is what a zoom-through means.
+      // Their name plates cross-fade from the product name to the role it is playing.
+      gsap.set(["#f5-role-a", "#f5-role-b"], { autoAlpha: 0 });
+      tl.to("#f5-word-a", { autoAlpha: 0, y: -18, duration: 0.34, ease: "power2.in" }, 1.30);
+      tl.fromTo("#f5-role-a", { y: 20 }, { autoAlpha: 1, y: 0, duration: 0.42, ease: "power3.out" }, 1.56);
+      tl.to("#f5-word-b", { autoAlpha: 0, y: -18, duration: 0.34, ease: "power2.in" }, 1.62);
+      tl.fromTo("#f5-role-b", { y: 20 }, { autoAlpha: 1, y: 0, duration: 0.42, ease: "power3.out" }, 1.88);
+      tl.fromTo("#f5-writes", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.46, ease: "power2.out" }, 2.24);
+
+      // Scene 3 (3.0-6.4s): three systems the audience has already run.
+      tl.fromTo(document.querySelectorAll(".f5-chip"), { autoAlpha: 0, y: 26 },
+                { autoAlpha: 1, y: 0, duration: 0.48, ease: "power3.out", stagger: 0.16 }, 3.00);
+
+      // Scene 4 (4.6-9.2s): the teaching line.
+      tl.fromTo("#f5-line", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.58, ease: "power3.out" }, 4.60);
+      tl.fromTo("#f5-pill", { autoAlpha: 0, x: -34 }, { autoAlpha: 1, x: 0, duration: 0.50, ease: "power3.out" }, 6.30);
+
+      // Scene 5 (2.4s onward): writes ARRIVING, alternately, at both masses — the running
+      // system that carries the back half of the beat. "Both accept writes" was a caption;
+      // this is the thing the caption describes.
+      var stage = document.querySelector("#f5-stage");
+      for (var w = 0; w < 12; w++) {
+        var m = document.createElement("div"); m.className = "f5-wm"; stage.appendChild(m);
+        var toLeft = w % 2 === 0;
+        tl.fromTo(m, { x: toLeft ? 1010 : 910, autoAlpha: 0 },
+                     { x: toLeft ? 560 : 1360, autoAlpha: 1, duration: 1.15, ease: "power1.inOut", repeat: 5, repeatDelay: 0.45 },
+                  2.40 + (w / 12) * 1.6);
+      }
+
+      // ---- SEAM 5 -> 6: cut-the-curve LEFT (the current).
+      tl.to("#f5-stage", { x: -238, duration: 0.34, ease: "power4.in" }, 10.66);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["05-shape"] = tl;
+    })();
+  </script>
+</template>

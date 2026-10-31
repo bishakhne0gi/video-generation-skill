@@ -1,0 +1,222 @@
+<template>
+  <style>
+.lego-base{background-color:#1a1c22}
+/* The studs read as a dot screen at film scale, so the plate uses the OTHER
+   half of the motif: the bricks themselves, in running bond, staggered course
+   to course. Boxes, not dots — and far quieter at the same opacity. */
+.lego-studs{
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%2260%22%20viewBox%3D%220%200%20120%2060%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%221%22%20opacity%3D%220.5%22%3E%3Crect%20x%3D%220.5%22%20y%3D%220.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3Crect%20x%3D%2260.5%22%20y%3D%220.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3Crect%20x%3D%22-29.5%22%20y%3D%2230.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3Crect%20x%3D%2230.5%22%20y%3D%2230.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3Crect%20x%3D%2290.5%22%20y%3D%2230.5%22%20width%3D%2259%22%20height%3D%2229%22%20rx%3D%223%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  background-size:120px 60px}
+.lego-vignette{
+  background:
+    linear-gradient(to bottom, transparent 55%, rgba(26,28,34,0.6) 75%, #1a1c22 90%, #161516 100%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(0,0,0,0.3) 100%)}
+
+@font-face{font-family:Geist;src:url("assets/fonts/Geist-400.woff2")format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:Geist;src:url("assets/fonts/Geist-500.woff2")format("woff2");font-weight:500;font-display:block}
+@font-face{font-family:Geist;src:url("assets/fonts/Geist-600.woff2")format("woff2");font-weight:600;font-display:block}
+@font-face{font-family:GeistMono;src:url("assets/fonts/GeistMono-400.woff2")format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:GeistMono;src:url("assets/fonts/GeistMono-500.woff2")format("woff2");font-weight:500;font-display:block}
+@font-face{font-family:AuxMono;src:url("assets/fonts/AuxMono-Regular.ttf")format("truetype");font-weight:400;font-display:block}
+
+*{margin:0;padding:0;box-sizing:border-box}
+#root{width:1920px;height:1080px;overflow:hidden;background:#161516;
+  font-family:Geist,-apple-system,sans-serif;color:#FFFFFF;
+  letter-spacing:-0.011em;-webkit-font-smoothing:antialiased}
+
+/* ---- grounds -------------------------------------------------------------
+   Every ground over-scans by 18%: a frame whose seam enters from below 1.0
+   would otherwise expose the stage edge. */
+.ground{position:absolute;inset:-18%}
+.g-void  {background:#0D0D0D}
+.g-app   {background:#161516}
+.g-canvas{background:#1E1E1E}
+.g-bloom {background:#161516}
+
+/* The two ambient blobs, straight out of DESIGN.md — 70vw top-right and
+   50vw bottom-left, at the documented alphas. They are the brand's own
+   atmosphere, not a gradient I picked. */
+.blob{position:absolute;border-radius:50%;filter:blur(10px)}
+.blob-a{width:1340px;height:1340px;top:-380px;right:-260px;
+  background:radial-gradient(circle,rgba(13,148,136,0.14) 0%,rgba(20,184,166,0.07) 45%,transparent 70%)}
+.blob-b{width:960px;height:960px;bottom:-190px;left:-130px;
+  background:radial-gradient(circle,rgba(8,145,178,0.10) 0%,rgba(13,148,136,0.05) 45%,transparent 70%)}
+.blob-hot{opacity:2.1}
+
+/* Grain must MOVE. A static tile renders identical noise on all 3,200 frames,
+   which reads as dirt on the lens rather than as film. This one is 3x
+   oversized and translated by the timeline. */
+.grain{position:absolute;left:-640px;top:-360px;width:3200px;height:1800px;
+  opacity:0.055;pointer-events:none;mix-blend-mode:overlay;
+  background-image:url("assets/plates/noise.png");background-repeat:repeat}
+
+.vig{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 78% 70% at 50% 46%,transparent 40%,rgba(0,0,0,0.55) 100%)}
+
+/* ---- type ---------------------------------------------------------------- */
+.stage{position:absolute;inset:0}
+.inner{position:absolute;inset:0}
+
+.hdr{font-weight:500;font-size:86px;line-height:1.06;letter-spacing:-0.025em;color:#FFFFFF}
+.hdr-xl{font-weight:500;font-size:132px;line-height:1.02;letter-spacing:-0.028em}
+.lead{font-size:27px;line-height:1.56;color:rgba(255,255,255,0.62);max-width:760px;letter-spacing:-0.008em}
+.grad{background:linear-gradient(135deg,#0D9488 0%,#14B8A6 60%,#0891B2 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* AuxMono is the product's own UI micro-face — it is what makes a VectorDrop
+   screen recognisable at a glance, so every chip and label in the film uses it. */
+.tag{font-family:AuxMono,GeistMono,monospace;font-size:15px;letter-spacing:0.19em;
+  text-transform:uppercase;color:rgba(255,255,255,0.62)}
+.tag-teal{color:#2DD4BF}
+.mono{font-family:GeistMono,monospace;font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
+.rule{height:1px;background:rgba(255,255,255,0.08);transform-origin:left center}
+
+/* ---- product surfaces ----------------------------------------------------
+   One black and a 1px hairline for every panel in the film. Nothing carries a
+   coloured edge: colour belongs to the content, never to a container. */
+.panel{background:#131313;border:1px solid rgba(255,255,255,0.08);border-radius:16px}
+.panel-deep{background:#0D0D0D;border:1px solid rgba(255,255,255,0.08);border-radius:16px}
+.win{background:#0D0D0D;border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden}
+.winbar{height:46px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;
+  padding:0 16px;gap:8px;background:rgba(255,255,255,0.015)}
+.dot{width:11px;height:11px;border-radius:50%}
+.chip{display:inline-flex;align-items:center;gap:9px;padding:8px 15px;border-radius:8px;
+  border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);
+  font-family:AuxMono,monospace;font-size:14px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.62)}
+.chip-on{border-color:rgba(20,184,166,0.30);background:rgba(20,184,166,0.07);color:#2DD4BF}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:22px;padding:13px 30px;
+  background:#fff;color:#000;font-family:AuxMono,monospace;font-size:15px;
+  letter-spacing:0.03em;text-transform:uppercase}
+.btn-ghost{background:transparent;color:rgba(255,255,255,0.62);border:1px dashed rgba(255,255,255,0.22)}
+
+/* The oversized macOS cursor. It is the film's only actor, so it is 2.4x life
+   size — at 1:1 a pointer is invisible at this distance. */
+.cursor{position:absolute;width:56px;height:56px;pointer-events:none;z-index:90;
+  filter:drop-shadow(0 3px 7px rgba(0,0,0,0.62))}
+</style>
+  <div id="root" data-composition-id="02-fall" data-start="0" data-width="1920" data-height="1080">
+    <div class="ground g-void"></div>
+    <div class="blob blob-a"></div>
+    <div class="blob blob-b"></div>
+    <div id="grain" class="grain"></div>
+    <div class="vig"></div>
+    <div id="stage" class="stage"><div class="inner">
+
+      <div class="tag" id="s-tag" style="position:absolute;left:132px;top:150px">RASTER</div>
+      <div class="rule" id="s-rule" style="position:absolute;left:132px;top:182px;width:250px"></div>
+      <div class="hdr" id="s-hdr" style="position:absolute;left:132px;top:222px;font-size:104px"><span class="grad" style="display:inline-block;padding-bottom:0.06em">It falls<br/>apart.</span></div>
+
+      <div style="position:absolute;left:132px;top:512px">
+        <div id="px1" class="mono" style="position:relative;display:inline-block;
+      font-size:50px;line-height:1.14;letter-spacing:-0.01em;white-space:nowrap;color:#FFFFFF">
+<span data-c="0" style="opacity:0">1</span><span data-c="1" style="opacity:0">&nbsp;</span><span data-c="2" style="opacity:0">p</span><span data-c="3" style="opacity:0">x</span><span data-c="4" style="opacity:0">&nbsp;</span><span data-c="5" style="opacity:0">=</span><span data-c="6" style="opacity:0">&nbsp;</span><span data-c="7" style="opacity:0">1</span><span data-c="8" style="opacity:0">&nbsp;</span><span data-c="9" style="opacity:0">c</span><span data-c="10" style="opacity:0">o</span><span data-c="11" style="opacity:0">l</span><span data-c="12" style="opacity:0">o</span><span data-c="13" style="opacity:0">u</span><span data-c="14" style="opacity:0">r</span>
+      <span id="px1-caret" style="position:absolute;left:0;top:8px;
+        width:25px;height:45px;
+        background:#2DD4BF;opacity:0"></span>
+    </div>
+      </div>
+
+      <div id="chips" style="position:absolute;left:132px;top:626px;display:flex;gap:12px;opacity:0">
+        <div class="chip chip-on mono" style="letter-spacing:0.04em"><span id="hexr" style="position:relative;display:inline-block;font-variant-numeric:tabular-nums">
+      <span class="mono" aria-hidden="true" style="visibility:hidden;white-space:pre">#8F8E97</span>
+      <span class="mono" data-k="0" style="position:absolute;left:0;right:0;top:0;text-align:inherit;white-space:pre;opacity:1">#8F8E97</span>
+      <span class="mono" data-k="1" style="position:absolute;left:0;right:0;top:0;text-align:inherit;white-space:pre;opacity:0">#A58C8C</span>
+      <span class="mono" data-k="2" style="position:absolute;left:0;right:0;top:0;text-align:inherit;white-space:pre;opacity:0">#BA8E87</span>
+      <span class="mono" data-k="3" style="position:absolute;left:0;right:0;top:0;text-align:inherit;white-space:pre;opacity:0">#E0A97A</span>
+    </span></div>
+        <div class="chip">no curve to follow</div>
+      </div>
+
+      <div id="px" style="position:absolute;left:962px;top:148px;width:800px;height:800px;overflow:hidden;border:1px solid rgba(255,255,255,0.08)">
+        <img src="assets/plates/source.jpg" width="3200" height="3200"
+             style="display:block;position:absolute;left:-1320px;top:-1190px;image-rendering:pixelated"/>
+        <div id="grid" style="position:absolute;inset:0;opacity:0;
+             background-image:linear-gradient(to right,rgba(255,255,255,0.16) 1px,transparent 1px),
+                              linear-gradient(to bottom,rgba(255,255,255,0.16) 1px,transparent 1px);
+             background-size:40px 40px"></div>
+        <div id="cell" style="position:absolute;left:360px;top:400px;width:40px;height:40px;
+             border:2px solid #2DD4BF;opacity:0"></div>
+        <span id="pc0" style="position:absolute;left:-1px;top:-1px;
+          width:40px;height:40px;border-left:2px solid #2DD4BF;border-top:2px solid #2DD4BF;opacity:0"></span>
+        <span id="pc1" style="position:absolute;right:-1px;top:-1px;
+          width:40px;height:40px;border-right:2px solid #2DD4BF;border-top:2px solid #2DD4BF;opacity:0"></span>
+        <span id="pc2" style="position:absolute;left:-1px;bottom:-1px;
+          width:40px;height:40px;border-left:2px solid #2DD4BF;border-bottom:2px solid #2DD4BF;opacity:0"></span>
+        <span id="pc3" style="position:absolute;right:-1px;bottom:-1px;
+          width:40px;height:40px;border-right:2px solid #2DD4BF;border-bottom:2px solid #2DD4BF;opacity:0"></span>
+      </div>
+    </div></div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function(){
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#stage", { scale: 0.80 }, { scale: 1, duration: 0.46, ease: "power4.out" }, 0);
+      tl.fromTo("#grain", { x: 0, y: 0 },
+        { x: -128, y: -72, duration: 7.50, ease: "none" }, 0);
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 18 }, { y: 0, duration: 0.58, ease: "power3.out" }, 0);
+      tl.fromTo("#px", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.44, ease: "power2.out" }, 0);
+      tl.fromTo("#px img", { scale: 1, x: 0, y: 0 }, { scale: 1.40, x: -70, y: 40, duration: 6.30, ease: "power1.inOut" }, 0.95);
+      tl.fromTo("#pc0", { autoAlpha: 0, scale: 0.5 }, { autoAlpha: 1, scale: 1, duration: 0.40, ease: "back.out(2.2)" }, 0.34);
+      tl.fromTo("#pc1", { autoAlpha: 0, scale: 0.5 }, { autoAlpha: 1, scale: 1, duration: 0.40, ease: "back.out(2.2)" }, 0.42);
+      tl.fromTo("#pc2", { autoAlpha: 0, scale: 0.5 }, { autoAlpha: 1, scale: 1, duration: 0.40, ease: "back.out(2.2)" }, 0.50);
+      tl.fromTo("#pc3", { autoAlpha: 0, scale: 0.5 }, { autoAlpha: 1, scale: 1, duration: 0.40, ease: "back.out(2.2)" }, 0.58);
+      tl.set("#px1-caret", { autoAlpha: 1, x: 0 }, 0.920);
+      tl.set("#px1 [data-c='0']", { autoAlpha: 1 }, 0.920);
+      tl.set("#px1-caret", { x: 30.0 }, 0.920);
+      tl.set("#px1 [data-c='1']", { autoAlpha: 1 }, 0.979);
+      tl.set("#px1-caret", { x: 60.0 }, 0.979);
+      tl.set("#px1 [data-c='2']", { autoAlpha: 1 }, 1.038);
+      tl.set("#px1-caret", { x: 90.0 }, 1.038);
+      tl.set("#px1 [data-c='3']", { autoAlpha: 1 }, 1.096);
+      tl.set("#px1-caret", { x: 120.0 }, 1.096);
+      tl.set("#px1 [data-c='4']", { autoAlpha: 1 }, 1.155);
+      tl.set("#px1-caret", { x: 150.0 }, 1.155);
+      tl.set("#px1 [data-c='5']", { autoAlpha: 1 }, 1.214);
+      tl.set("#px1-caret", { x: 180.0 }, 1.214);
+      tl.set("#px1 [data-c='6']", { autoAlpha: 1 }, 1.273);
+      tl.set("#px1-caret", { x: 210.0 }, 1.273);
+      tl.set("#px1 [data-c='7']", { autoAlpha: 1 }, 1.332);
+      tl.set("#px1-caret", { x: 240.0 }, 1.332);
+      tl.set("#px1 [data-c='8']", { autoAlpha: 1 }, 1.391);
+      tl.set("#px1-caret", { x: 270.0 }, 1.391);
+      tl.set("#px1 [data-c='9']", { autoAlpha: 1 }, 1.449);
+      tl.set("#px1-caret", { x: 300.0 }, 1.449);
+      tl.set("#px1 [data-c='10']", { autoAlpha: 1 }, 1.508);
+      tl.set("#px1-caret", { x: 330.0 }, 1.508);
+      tl.set("#px1 [data-c='11']", { autoAlpha: 1 }, 1.567);
+      tl.set("#px1-caret", { x: 360.0 }, 1.567);
+      tl.set("#px1 [data-c='12']", { autoAlpha: 1 }, 1.626);
+      tl.set("#px1-caret", { x: 390.0 }, 1.626);
+      tl.set("#px1 [data-c='13']", { autoAlpha: 1 }, 1.685);
+      tl.set("#px1-caret", { x: 420.0 }, 1.685);
+      tl.set("#px1 [data-c='14']", { autoAlpha: 1 }, 1.744);
+      tl.set("#px1-caret", { x: 450.0 }, 1.744);
+      tl.set("#px1-caret", { autoAlpha: 0 }, 1.962);
+      tl.set("#px1-caret", { autoAlpha: 1 }, 2.262);
+      tl.set("#px1-caret", { autoAlpha: 0 }, 2.562);
+      tl.set("#px1-caret", { autoAlpha: 1 }, 2.862);
+      tl.set("#px1-caret", { autoAlpha: 0 }, 3.302);
+
+      tl.to("#grid", { autoAlpha: 1, duration: 0.60, ease: "power2.out" }, 1.95);
+      tl.to("#cell", { autoAlpha: 1, duration: 0.26, ease: "power2.out" }, 2.60);
+      tl.to("#chips", { autoAlpha: 1, y: 0, duration: 0.48, ease: "power3.out" }, 2.85);
+      // the marker keeps walking the grid to the end of the beat
+      tl.to("#cell", { x: 120, y: -80, duration: 0.72, ease: "power2.inOut" }, 3.35);
+      tl.to("#cell", { x: 40,  y: 40,  duration: 0.72, ease: "power2.inOut" }, 4.35);
+      tl.to("#cell", { x: 160, y: 0,   duration: 0.72, ease: "power2.inOut" }, 5.35);
+      tl.to("#cell", { x: 80,  y: -120, duration: 0.72, ease: "power2.inOut" }, 6.30);
+      tl.set("#hexr [data-k='0']", { autoAlpha: 0 }, 4.550);
+      tl.set("#hexr [data-k='1']", { autoAlpha: 1 }, 4.550);
+      tl.set("#hexr [data-k='1']", { autoAlpha: 0 }, 5.750);
+      tl.set("#hexr [data-k='2']", { autoAlpha: 1 }, 5.750);
+      tl.set("#hexr [data-k='2']", { autoAlpha: 0 }, 6.950);
+      tl.set("#hexr [data-k='3']", { autoAlpha: 1 }, 6.950);
+
+
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 7.160);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["02-fall"] = tl;
+    })();
+  </script>
+</template>

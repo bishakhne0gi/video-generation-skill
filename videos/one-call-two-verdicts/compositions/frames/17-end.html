@@ -1,0 +1,216 @@
+<template>
+  <style>
+@font-face{font-family:"Fraktur";src:url("assets/fonts/Fraktur-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Anton";src:url("assets/fonts/Anton-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Oswald";src:url("assets/fonts/Oswald-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-900.woff2") format("woff2");font-weight:900;font-style:normal;font-display:block}
+@font-face{font-family:"Playfair";src:url("assets/fonts/Playfair-700i.woff2") format("woff2");font-weight:700;font-style:italic;font-display:block}
+@font-face{font-family:"Bodoni";src:url("assets/fonts/Bodoni-900.woff2") format("woff2");font-weight:900;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-700.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"PTSerif";src:url("assets/fonts/PTSerif-400i.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Courier";src:url("assets/fonts/Courier-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --news:#E3DDCE; --news2:#D3CBB8; --scrap:#F2EDE1; --plate:#141210;
+  --ink:#171310; --ink2:#4E4638; --stop:#C1272D; --stopt:#A81E24;
+  background:var(--news); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the .clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* The field OVER-SCANS. A frame whose exit shrinks (the reserved Z-back) would
+   otherwise show the stage edge for the length of the cut. -18% covers the largest
+   travel in a 1920-wide frame and costs nothing on the frames that never shrink. */
+.field{position:absolute;inset:-18%}
+
+/* ---- THE PAGE: newsprint is a HALFTONE, not a flat fill --------------------
+   A 4px dot screen in press black at low alpha. Static, always: a halftone that
+   moves is a moire and it will wreck the encode. */
+.screen{position:absolute;inset:-18%;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px, rgba(23,19,16,.115) 0.85px, transparent 0.9px);
+  background-size:4px 4px}
+/* the press never lays ink perfectly evenly */
+.grain{position:absolute;inset:-18%;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle at 2px 3px, rgba(23,19,16,.08) 1px, transparent 1.1px);
+  background-size:11px 9px}
+
+/* ---- TYPE: eight families, one job each ---------------------------------- */
+.mast{font-family:"Fraktur",serif;font-weight:400;line-height:.95;color:var(--ink)}
+.head{font-family:"Anton",sans-serif;font-weight:400;line-height:.88;
+  letter-spacing:-.005em;text-transform:uppercase;color:var(--ink)}
+.head2{font-family:"Oswald",sans-serif;font-weight:700;line-height:.94;
+  letter-spacing:.005em;text-transform:uppercase;color:var(--ink)}
+.quote{font-family:"Playfair",Georgia,serif;font-weight:900;line-height:1.10;color:var(--ink)}
+.qital{font-family:"Playfair",Georgia,serif;font-weight:700;font-style:italic;line-height:1.14}
+/* Bodoni Moda is loaded at optical size 96 — a DISPLAY cut. Below about 80px its
+   hairline stems vanish in the render and N becomes a bare diagonal, 1 a bare stem.
+   .fig is for BIG figures only; anything smaller uses .head2 (Oswald). Verified by
+   measuring the render, not by looking at the font in a browser. */
+.fig{font-family:"Bodoni",serif;font-weight:900;line-height:.86;color:var(--ink)}
+.body{font-family:"PTSerif",Georgia,serif;font-weight:400;line-height:1.30;color:var(--ink)}
+.bodyb{font-family:"PTSerif",Georgia,serif;font-weight:700;line-height:1.28}
+.bodyi{font-family:"PTSerif",Georgia,serif;font-style:italic;line-height:1.30}
+.mono{font-family:"Courier",monospace;font-weight:400;color:var(--ink)}
+.monob{font-family:"Courier",monospace;font-weight:700}
+.slug{font-family:"Archivo",sans-serif;font-weight:700;letter-spacing:.20em;
+  text-transform:uppercase;font-size:20px;color:var(--ink2)}
+.red{color:var(--stopt)}      /* red as a LETTER — the only red allowed to be type */
+.faint{color:var(--ink2)}
+.rev{color:var(--scrap)}      /* reversed out of the black plate */
+.rev .faint{color:#A79E8D}
+.rev .slug{color:#A79E8D}
+
+/* ---- RULES: press furniture. Never a glyph. ------------------------------ */
+.rule{position:absolute;background:var(--ink);height:3px}
+.hair{position:absolute;background:var(--ink2);height:1px;opacity:.55}
+.rrule{position:absolute;background:var(--stop);height:5px}
+.revrule{position:absolute;background:var(--scrap);height:3px}
+
+/* ---- A CUTTING ----------------------------------------------------------
+   Four layers, and all four are required. The drop-shadow lives on a SIBLING,
+   not in box-shadow: box-shadow follows the border box, so on a clip-path shape
+   it draws a rectangle behind a torn edge — the single loudest tell in the register. */
+.cutw{position:absolute}                                   /* the slap wrapper */
+.cutsh{position:absolute;inset:0;background:rgba(23,19,16,.34);filter:blur(7px)}
+.cutfib{position:absolute;inset:0;background:#FFFCF4}      /* the torn fibre lip */
+.cutface{position:absolute;inset:0;background:var(--scrap);overflow:hidden}
+.cutbody{position:absolute;inset:0}
+
+/* ---- MISREGISTRATION -----------------------------------------------------
+   The one "effect" in the film, and it is a real press artifact: the spot plate lands
+   a hair off the black one. Carried as a TEXT-SHADOW on the headline itself, never as
+   a duplicated element — a second copy of the words in the same place is two text
+   blocks the layout gate is right to reject, and it doubles what a contrast checker
+   has to reason about. One impression, one fringe. */
+
+/* ---- THE STAMP ---------------------------------------------------------- */
+/* on the black plate the stamp turns CREAM: red type on plate measures 3.20:1 and
+   this register does not put red type on black. */
+.stampw{border-color:var(--scrap)!important;color:var(--scrap)!important}
+.stamp{position:absolute;border:4px solid var(--stop);color:var(--stopt);
+  font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:.10em;
+  text-transform:uppercase;opacity:.88;display:flex;align-items:center;
+  justify-content:center;white-space:nowrap}
+
+/* ---- THE PEN: red strokes drawn on the page. Never a glyph. -------------- */
+/* z-index 5 is load-bearing: a cutting is z-index 2, so a pen with auto z-index
+   draws UNDERNEATH the very thing it is marking and is invisible in the render. */
+.pen{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;overflow:visible;z-index:5}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--stop);stroke-linecap:round;
+  stroke-linejoin:round}
+.penk path,.penk line,.penk polyline{stroke:var(--ink)}
+.penw path,.penw line,.penw polyline{stroke:var(--scrap)}
+
+  </style>
+
+  <div id="root" data-composition-id="17-end" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="field" data-layout-allow-overflow style="background:var(--stop)"></div><div class="screen" data-layout-allow-overflow  style="background-image:radial-gradient(circle at 1px 1px, rgba(242,237,225,.10) 0.85px, transparent 0.9px)"></div><div class="grain" data-layout-allow-overflow></div>
+    <div id="stage" class="stage"><div class="inner rev">
+      <div id="f17-kick" class="slug" style="position:absolute;left:150px;top:120px;font-size:22px;letter-spacing:.34em;color:var(--scrap)">WHAT TO DO ON MONDAY</div>
+      <div id="f17-kr" class="revrule" style="left:150px;top:160px;width:1620px;height:2px;transform-origin:0% 50%"></div>
+
+      
+      <div id="f17-r0">
+        <div class="head2" style="position:absolute;left:150px;top:212px;font-size:52px;color:#F6D6D7">01</div>
+        <div class="head" style="position:absolute;left:266px;top:206px;font-size:60px;color:var(--scrap)">SET A DEADLINE ON EVERY CALL</div>
+        <div class="body" style="position:absolute;left:270px;top:276px;width:880px;font-size:25px;color:#F6D6D7">If <span class='mono'>grpc-timeout</span> is omitted, the spec says a server should assume an infinite one.</div>
+        <div class="revrule" style="left:150px;top:340px;width:1000px;height:1px;opacity:.42"></div>
+      </div>
+      <div id="f17-r1">
+        <div class="head2" style="position:absolute;left:150px;top:388px;font-size:52px;color:#F6D6D7">02</div>
+        <div class="head" style="position:absolute;left:266px;top:382px;font-size:60px;color:var(--scrap)">TREAT UNAVAILABLE AS UNKNOWN</div>
+        <div class="body" style="position:absolute;left:270px;top:452px;width:880px;font-size:25px;color:#F6D6D7">The link may have died. The server may have finished the work. Nineteen ninety-four says you cannot tell.</div>
+        <div class="revrule" style="left:150px;top:516px;width:1000px;height:1px;opacity:.42"></div>
+      </div>
+      <div id="f17-r2">
+        <div class="head2" style="position:absolute;left:150px;top:564px;font-size:52px;color:#F6D6D7">03</div>
+        <div class="head" style="position:absolute;left:266px;top:558px;font-size:60px;color:var(--scrap)">REACH FOR CONNECT IN A BROWSER</div>
+        <div class="body" style="position:absolute;left:270px;top:628px;width:880px;font-size:25px;color:#F6D6D7">Wire-compatible with gRPC, speaks HTTP/1.1 through <span class='mono'>fetch</span>, and needs no proxy.</div>
+        <div class="revrule" style="left:150px;top:692px;width:1000px;height:1px;opacity:.42"></div>
+      </div>
+
+      <div id="f17-src" style="position:absolute;left:1214px;top:206px;width:556px">
+        <div class="slug" style="font-size:14px;letter-spacing:.24em;color:var(--scrap)">EVERYTHING QUOTED IN THIS FILM</div>
+        <div class="revrule" style="position:relative;margin-top:9px;width:556px;height:1px;opacity:.5"></div>
+        <div class="body" style="margin-top:13px;font-size:19px;line-height:1.62;color:#F6D6D7">
+          Birrell &amp; Nelson, <span class="bodyi">Implementing Remote Procedure Calls</span>, ACM&nbsp;TOCS&nbsp;2(1), Feb&nbsp;1984<br>
+          Waldo, Wyant, Wollrath &amp; Kendall, <span class="bodyi">A Note on Distributed Computing</span>, SMLI&nbsp;TR-94-29, Nov&nbsp;1994<br>
+          <span class="mono" style="font-size:17px">grpc/grpc</span> &mdash; PROTOCOL-HTTP2.md, PROTOCOL-WEB.md, statuscodes.md<br>
+          <span class="mono" style="font-size:17px">grpc.io</span> &mdash; Core concepts, Design principles</div>
+      </div>
+      
+      <div id="f17-card" class="cutw" style="left:1180px;top:756px;width:590px;height:200px;z-index:2;transform:rotate(1.6deg)">
+        <div id="f17-card-sh"  class="cutsh"  style="clip-path:polygon(0.0px -2.1px,73.8px -2.5px,147.5px -1.2px,221.3px -0.6px,295.0px -1.5px,368.8px -0.8px,442.5px 2.5px,516.3px 2.5px,589.5px 0.0px,590.1px 66.7px,587.7px 133.3px,590.0px 200.6px,516.3px 198.8px,442.5px 199.2px,368.8px 202.0px,295.0px 202.5px,221.3px 199.9px,147.5px 199.7px,73.8px 198.9px,-2.2px 200.0px,-0.2px 133.3px,-1.0px 66.7px)"></div>
+        <div id="f17-card-fib" class="cutfib" style="left:-2.5px;top:-2.5px;right:-2.5px;bottom:-2.5px;clip-path:polygon(0.0px -0.8px,74.4px 2.5px,148.8px 2.5px,223.1px 0.5px,297.5px -0.1px,371.9px 2.3px,446.3px -0.6px,520.6px 1.2px,594.2px 0.0px,597.0px 68.3px,597.5px 136.7px,595.0px 204.9px,520.6px 204.7px,446.3px 203.9px,371.9px 207.2px,297.5px 205.2px,223.1px 206.0px,148.8px 206.0px,74.4px 206.3px,-1.0px 205.0px,0.4px 136.7px,-1.2px 68.3px)"></div>
+        <div id="f17-card-fc"  class="cutface" style="background:var(--scrap);clip-path:polygon(0.0px -2.1px,73.8px -2.5px,147.5px -1.2px,221.3px -0.6px,295.0px -1.5px,368.8px -0.8px,442.5px 2.5px,516.3px 2.5px,589.5px 0.0px,590.1px 66.7px,587.7px 133.3px,590.0px 200.6px,516.3px 198.8px,442.5px 199.2px,368.8px 202.0px,295.0px 202.5px,221.3px 199.9px,147.5px 199.7px,73.8px 198.9px,-2.2px 200.0px,-0.2px 133.3px,-1.0px 66.7px)">
+          <div class="cutbody" style="padding:0px">
+          <div class="slug" style="position:absolute;left:30px;top:24px;font-size:14px">NEXT</div>
+          <div class="hair" style="left:30px;top:50px;width:530px"></div>
+          <div class="head" style="position:absolute;left:30px;top:64px;font-size:44px">EPISODE 29</div>
+          <div class="head" style="position:absolute;left:30px;top:114px;font-size:56px;color:var(--stopt);white-space:nowrap">SUBAGENTS</div></div>
+        </div>
+      </div>
+
+      <div id="f17-sign" class="head" style="position:absolute;left:150px;top:790px;font-size:76px;color:var(--scrap);line-height:.92">SHIP IT<br>EPISODE 28</div>
+      <div id="f17-t" class="qital" style="position:absolute;left:150px;top:952px;width:960px;font-size:31px;color:#F6D6D7">One call, two verdicts &mdash; and forty-two years of arguing about which one is true.</div>
+      <svg id="f17-u-svg" class="pen penw" viewBox="0 0 1920 1080"><path id="f17-u" d="M146,946 Q402.5,949.3 716,944.5" stroke-width="4"/></svg>
+      <svg id="f17-ring-svg" class="pen " viewBox="0 0 1920 1080"><path id="f17-ring" d="M1545.1,873.2 L1555.6,875.6 L1565.4,878.3 L1574.1,881.1 L1581.5,884.2 L1587.2,887.5 L1591.2,891.0 L1593.2,894.5 L1593.4,898.1 L1591.8,901.6 L1588.6,905.0 L1584.1,908.4 L1578.7,911.6 L1572.4,914.7 L1565.6,917.7 L1558.4,920.5 L1550.8,923.3 L1542.7,926.0 L1534.2,928.6 L1525.1,931.1 L1515.3,933.5 L1504.9,935.7 L1493.6,937.7 L1481.7,939.5 L1469.2,941.0 L1456.2,942.4 L1442.8,943.4 L1429.1,944.3 L1415.1,944.9 L1401.0,945.4 L1386.8,945.7 L1372.4,945.8 L1357.8,945.8 L1343.2,945.6 L1328.5,945.1 L1313.9,944.3 L1299.6,943.2 L1285.8,941.8 L1272.8,940.0 L1260.9,937.8 L1250.2,935.3 L1240.8,932.6 L1232.9,929.6 L1226.4,926.4 L1221.1,923.2 L1216.8,920.0 L1213.4,916.8 L1210.4,913.6 L1207.8,910.4 L1205.4,907.3 L1203.2,904.1 L1201.2,900.9 L1199.6,897.7 L1198.6,894.4 L1198.6,891.0 L1199.6,887.6 L1202.0,884.2 L1205.9,880.9 L1211.3,877.7 L1218.1,874.6 L1226.3,871.7 L1235.7,869.0 L1246.1,866.5 L1257.3,864.3 L1269.2,862.2 L1281.6,860.4 L1294.4,858.7 L1307.7,857.2 L1321.3,856.0 L1335.2,855.0 L1349.5,854.2 L1364.0,853.7 L1378.6,853.6 L1393.1,853.8 L1407.4,854.3 L1421.4,855.1 L1434.9,856.2 L1447.9,857.6 L1460.3,859.1 L1472.3,860.7 L1484.0,862.5 L1495.4,864.2 L1506.6,866.1 L1517.8,868.0 L1529.0,870.0 L1540.0,872.1 L1550.7,874.5 L1560.9,877.0 L1570.1,879.8 L1578.2,882.7 L1584.7,886.0 L1589.6,889.3 L1592.5,892.8 L1593.5,896.4 L1592.7,899.9 L1590.3,903.4 L1586.4,906.8 L1581.3,910.1 L1575.4,913.3 L1568.9,916.3 L1561.9,919.2" stroke-width="5"/></svg>
+      <svg id="f17-arr-svg" class="pen " viewBox="0 0 1920 1080"><path id="f17-arr" d="M1120,986 Q1196.2,931.3 1290,934 M1269.7,942.4 L1290,934 L1270.2,924.5" stroke-width="5"/></svg>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // SEAM ENTRY — ACT BREAK lift. The page is turned up and over.
+      tl.fromTo("#stage", { y: 372 }, { y: 0, duration: 0.62, ease: "power4.out" }, 0);
+      tl.fromTo("#stage", { scale: 0.86 }, { scale: 1, duration: 0.78, ease: "power2.out" }, 0);
+      // SEAM CARRIER — the kicker rides the cut at full opacity rather than fading up.
+      tl.fromTo("#f17-kick", { y: 14 }, { y: 0, duration: 0.50, ease: "power3.out" }, 0);
+      gsap.set("#f17-kr", { scaleX: 0 });
+      tl.to("#f17-kr", { scaleX: 1, duration: 0.52, ease: "power3.out" }, 0.16);
+      gsap.set("#f17-r0", { autoAlpha: 0, y: 20 });
+      tl.to("#f17-r0", { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 0.90);
+      gsap.set("#f17-r1", { autoAlpha: 0, y: 20 });
+      tl.to("#f17-r1", { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 2.26);
+      gsap.set("#f17-r2", { autoAlpha: 0, y: 20 });
+      tl.to("#f17-r2", { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 3.62);
+      gsap.set("#f17-src", { autoAlpha: 0, y: 14 });
+      tl.to("#f17-src", { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 4.60);
+      gsap.set("#f17-sign", { autoAlpha: 0, y: 22 });
+      tl.to("#f17-sign", { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 5.30);
+      gsap.set("#f17-card", { autoAlpha: 0 });
+      tl.set("#f17-card", { autoAlpha: 1 }, 6.40);
+      gsap.set("#f17-card", { rotation: 10.89, scale: 1.13, y: -34 });
+      tl.fromTo("#f17-card", { rotation: 10.89, scale: 1.13, y: -34 }, { rotation: 1.6, scale: 1, y: 0, duration: 0.16, ease: "steps(3)" }, 6.40);
+      gsap.set("#f17-card-sh", { y: 9, scale: 1.07 });
+      tl.fromTo("#f17-card-sh", { y: 9, scale: 1.07 }, { y: 4, scale: 1, duration: 0.16, ease: "steps(3)" }, 6.433);
+      gsap.set("#f17-t", { autoAlpha: 0, y: 14 });
+      tl.to("#f17-t", { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 7.60);
+      var pen_f17u_d = anime.svg.createDrawable("#f17-u");
+      var pen_f17u = anime.animate(pen_f17u_d, { draw: ["0 0", "0 1"], duration: 620, ease: anime.steps(9), autoplay: false });
+      var P_pen_f17u = { p: 0 };
+      tl.to(P_pen_f17u, { p: 1, duration: 0.62, ease: "none", onUpdate: function () { pen_f17u.seek(P_pen_f17u.p * pen_f17u.duration); } }, 8.60);
+      // the promise, circled on camera for the third episode running
+      var pen_f17ring_d = anime.svg.createDrawable("#f17-ring");
+      var pen_f17ring = anime.animate(pen_f17ring_d, { draw: ["0 0", "0 1"], duration: 840, ease: anime.steps(13), autoplay: false });
+      var P_pen_f17ring = { p: 0 };
+      tl.to(P_pen_f17ring, { p: 1, duration: 0.84, ease: "none", onUpdate: function () { pen_f17ring.seek(P_pen_f17ring.p * pen_f17ring.duration); } }, 9.90);
+      var pen_f17arr_d = anime.svg.createDrawable("#f17-arr");
+      var pen_f17arr = anime.animate(pen_f17arr_d, { draw: ["0 0", "0 1"], duration: 540, ease: anime.steps(8), autoplay: false });
+      var P_pen_f17arr = { p: 0 };
+      tl.to(P_pen_f17arr, { p: 1, duration: 0.54, ease: "none", onUpdate: function () { pen_f17arr.seek(P_pen_f17arr.p * pen_f17arr.duration); } }, 11.20);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["17-end"] = tl;
+    })();
+  </script>
+</template>

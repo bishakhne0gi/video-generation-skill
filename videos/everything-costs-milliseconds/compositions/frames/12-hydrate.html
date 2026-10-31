@@ -1,0 +1,184 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Instrument";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --void:#091413; --forest:#285A48; --emerald:#408A71; --emerald-lit:#6FD0AA;
+  --mint:#B0E4CC; --brass:#E8A13C; --ink:#091413;
+  background:var(--void); font-family:"Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* ---- the field: one plate per act, dimmed, never absent ---- */
+.plate{position:absolute;inset:0;background-size:cover;background-position:center}
+.scrim{position:absolute;inset:0}
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+
+/* ---- MATERIAL: bezel -> face -> glass. All lighting static. ---- */
+.bezel{position:absolute;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;background-position:center;
+  box-shadow:inset 2px 2px 5px rgba(255,236,196,.55), inset -3px -3px 7px rgba(0,0,0,.62),
+             0 18px 44px rgba(0,0,0,.62), 0 2px 0 rgba(255,236,196,.14)}
+.face{position:absolute;background:
+   radial-gradient(120% 120% at 32% 22%, #2E6551 0%, #16302A 46%, #091413 100%);
+  box-shadow:inset 0 8px 26px rgba(0,0,0,.66), inset 0 -2px 0 rgba(255,255,255,.05)}
+/* .glasscap is the DOME photograph and belongs to ROUND instruments only. Laid over a
+   rectangular case it reads as a dark ellipse floating on the content. Flat covers get
+   .glassflat: a sheen, not a photograph. */
+.glasscap{position:absolute;pointer-events:none;
+  background-image:url("assets/plates/glass.jpg");background-size:cover;background-position:center;
+  mix-blend-mode:screen;opacity:.20}
+.glassflat{position:absolute;pointer-events:none;background:
+  linear-gradient(176deg, rgba(176,228,204,.09) 0%, rgba(176,228,204,.02) 18%,
+                  rgba(255,255,255,0) 46%, rgba(9,20,19,.16) 100%);
+  box-shadow:inset 0 1px 0 rgba(176,228,204,.20)}
+.spec{position:absolute;pointer-events:none;background:
+  linear-gradient(107deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.07) 46%,
+                  rgba(255,255,255,.02) 53%, rgba(255,255,255,0) 62%)}
+.leather{background-image:url("assets/plates/leather.jpg");background-size:cover;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.55)}
+
+/* the needle — the film's signature. transform-origin at the pivot. */
+.needle{position:absolute;transform-origin:50% 100%;
+  background:linear-gradient(180deg,var(--mint) 0%, #7FC4A6 62%, #33604F 100%);
+  box-shadow:0 0 12px rgba(176,228,204,.36), 0 2px 5px rgba(0,0,0,.6);border-radius:2px}
+.needle.hot{background:linear-gradient(180deg,var(--brass) 0%, #C07C22 70%, #4A3210 100%);
+  box-shadow:0 0 16px rgba(232,161,60,.44), 0 2px 5px rgba(0,0,0,.6)}
+.hub{position:absolute;border-radius:50%;background-image:url("assets/plates/brass.jpg");
+  background-size:cover;box-shadow:inset 1px 1px 3px rgba(255,236,196,.6),
+  inset -2px -2px 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.7)}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:125%;letter-spacing:-.04em;color:var(--mint);line-height:.94}
+.lead{font-weight:400;color:var(--mint);opacity:.86;line-height:1.28}
+.mono{font-family:"JBMono",monospace;color:var(--emerald-lit)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  color:var(--emerald-lit);font-size:21px}
+.hot{color:var(--brass)}
+.chipmint{background:var(--mint);color:var(--ink);font-family:"JBMono",monospace;
+  font-weight:700;border-radius:5px;display:inline-block}
+/* one black + a hairline for every surface. no coloured edges, ever. */
+.panel{position:absolute;background:#0B100F;border:1px solid rgba(176,228,204,.14);
+  border-radius:10px;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.rule{position:absolute;background:var(--emerald);height:2px}
+
+  </style>
+
+  <div id="root" data-composition-id="12-hydrate" data-start="0" data-width="1920" data-height="1080">
+
+    <div class="plate" style="background-image:url('assets/plates/inspection.jpg');opacity:0.26"></div>
+  <div class="scrim" style="background:radial-gradient(80% 92% at 52% 34%, rgba(9,20,19,.24) 0%, rgba(9,20,19,.80) 60%, rgba(9,20,19,.94) 100%)"></div>
+    <div id="stage" class="stage"><div class="inner">
+      
+      <div id="s-tag" class="tag" style="position:absolute;left:118px;top:112px">10 · HYDRATION</div>
+      <div id="s-rule" class="rule" style="left:118px;top:150px;width:96px;transform-origin:0% 50%"></div>
+      <div id="s-hdr" class="hdr" style="position:absolute;left:118px;top:176px;width:1180px;font-size:82px">Painted is not<br>the same as alive.</div>
+      <div id="s-lead" class="lead" style="position:absolute;left:120px;top:372px;width:840px;font-size:31px">The server sent finished HTML. The client then rebuilds the entire component tree to attach behaviour &mdash; and until it finishes, nothing answers.</div>
+
+      <div id="h-tree" style="position:absolute;left:1006px;top:392px;width:812px;height:392px"></div>
+      <div id="h-scan" style="position:absolute;left:1006px;top:392px;width:6px;height:392px;
+        background:linear-gradient(180deg,rgba(232,161,60,0),var(--brass),rgba(232,161,60,0));
+        box-shadow:0 0 22px rgba(232,161,60,.6)"></div>
+
+      <div id="h-page" class="panel" style="left:158px;top:582px;width:660px;height:300px"></div>
+      <div id="h-pagein" style="position:absolute;left:186px;top:610px;width:604px;height:244px"></div>
+      <div id="h-state" style="position:absolute;left:186px;top:816px;width:604px">
+        <span id="h-dead" class="chipmint" style="background:rgba(232,161,60,.9);font-size:16px;padding:7px 14px">NOT INTERACTIVE</span>
+        <span id="h-live" class="chipmint" style="font-size:16px;padding:7px 14px;position:absolute;left:0;top:0">INTERACTIVE</span></div>
+
+      <div id="h-clock" style="position:absolute;left:1006px;top:816px;width:812px;display:flex;justify-content:space-between">
+        <div><div class="mono" style="font-size:16px;letter-spacing:.15em;opacity:.6">PAINTED</div>
+             <div class="mono" style="font-size:36px;font-weight:700;line-height:1.18;color:var(--mint)">0.9s</div></div>
+        <div style="text-align:right"><div class="mono hot" style="font-size:16px;letter-spacing:.15em;opacity:.85">INTERACTIVE</div>
+             <div class="mono hot" style="font-size:36px;font-weight:700;line-height:1.18">3.4s</div></div></div>
+      <div id="h-isl" style="position:absolute;left:158px;top:930px;width:1300px">
+        <div class="mono" style="font-size:19px;color:var(--emerald-lit)">
+          ship <span style="color:var(--mint);font-weight:700">islands</span> &mdash;
+          hydrate the three components that actually do something, and leave the other thirty-nine as HTML</div></div>
+      <div id="h-tti" style="position:relative;position:absolute;left:1660px;top:848px;width:160px;text-align:right;height:48px;font-family:'JBMono',monospace;font-size:36px;font-weight:700;line-height:1.18;color:var(--mint)"><span id="h-tti-0" style="position:absolute;left:0;top:0;white-space:nowrap">3.4s</span><span id="h-tti-1" style="position:absolute;left:0;top:0;white-space:nowrap">2.6s</span><span id="h-tti-2" style="position:absolute;left:0;top:0;white-space:nowrap">1.7s</span><span id="h-tti-3" style="position:absolute;left:0;top:0;white-space:nowrap">0.8s</span></div>
+    </div></div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // SEAM ENTRY — across, cut-the-curve LEFT. Enters mid-flight at full opacity:
+      // the gate measures MOTION, so a frame that fades up still enters visibly blank.
+      tl.fromTo("#stage", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      // SEAM CARRIER — the box tag and the headline are at FULL opacity from frame zero
+      // and ride the cut in on the stage. They are never faded up: the seam gate measures
+      // MOTION, so a station whose content fades in at 0.1s passes the gate while visibly
+      // entering on an empty frame. Only the rule and the lead line are staged.
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.50, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 14 }, { y: 0, duration: 0.52, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.30000000000000004);
+      // the painted page: complete, and completely inert.
+      tl.fromTo("#h-page", { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.52, ease: "power3.out" }, 0.10);
+      var pg = document.querySelector("#h-pagein"), PW = [604, 540, 588, 470, 604, 396];
+      for (var i = 0; i < 6; i++) {
+        var r = document.createElement("div");
+        r.style.cssText = "position:absolute;left:0;top:" + (i*32) + "px;width:" + PW[i] +
+          "px;height:16px;border-radius:8px;background:rgba(176,228,204,.14)";
+        pg.appendChild(r);
+        tl.fromTo(r, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.22 }, 0.30 + i*0.05);
+      }
+      gsap.set("#h-live", { autoAlpha: 0 });
+      tl.fromTo("#h-dead", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.34 }, 0.70);
+      // the tree — 42 components, laid out as a real hierarchy, all of it cold.
+      var tw = document.querySelector("#h-tree"), nodes = [];
+      var LEVELS = [1, 3, 7, 12, 19];
+      for (var L = 0; L < LEVELS.length; L++) {
+        for (var k = 0; k < LEVELS[L]; k++) {
+          var n = document.createElement("div"), gapx = 812 / (LEVELS[L] + 1);
+          n.style.cssText = "position:absolute;left:" + (gapx*(k+1) - 11) + "px;top:" + (L*84) +
+            "px;width:22px;height:22px;border-radius:5px;background:rgba(11,16,15,.9);" +
+            "border:1px solid rgba(176,228,204,.30)";
+          tw.appendChild(n); nodes.push({ el: n, L: L });
+        }
+      }
+      tl.fromTo("#h-tree", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.50 }, 0.44);
+      // the scan sweeps the tree top to bottom and each node LIGHTS as it is reached.
+      // This is the sustained motion of the beat and it is the mechanism, not decoration.
+      tl.fromTo("#h-scan", { autoAlpha: 0, x: 0 }, { autoAlpha: 1, duration: 0.24 }, 1.70);
+      tl.to("#h-scan", { x: 806, duration: 3.60, ease: "none" }, 1.80);
+      tl.to("#h-scan", { autoAlpha: 0, duration: 0.30 }, 5.40);
+      for (var j = 0; j < nodes.length; j++) {
+        var frac = (parseFloat(nodes[j].el.style.left) + 11) / 812;
+        tl.to(nodes[j].el, { backgroundColor: "rgba(176,228,204,0.92)", duration: 0.22, ease: "power2.out" }, 1.80 + frac*3.60);
+      }
+      // only when the last node is attached does the page become a page.
+      tl.to("#h-dead", { autoAlpha: 0, duration: 0.26 }, 5.46);
+      tl.to("#h-live", { autoAlpha: 1, duration: 0.30, ease: "power3.out" }, 5.52);
+      tl.fromTo("#h-clock", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power3.out" }, 5.60);
+      // THE FIX — the tree is re-run as islands: three nodes light, the rest stay cold,
+      // and the whole sweep is over in a fraction of the time it just took.
+      tl.fromTo("#h-isl", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 6.30);
+      for (var c2 = 0; c2 < nodes.length; c2++)
+        tl.to(nodes[c2].el, { backgroundColor: "rgba(11,16,15,0.9)", duration: 0.30, ease: "power2.out" }, 6.70);
+      var islands = [nodes[4], nodes[13], nodes[27]];
+      for (var s2 = 0; s2 < islands.length; s2++) {
+        tl.to(islands[s2].el, { backgroundColor: "rgba(176,228,204,0.92)", duration: 0.26, ease: "back.out(2)" }, 7.30 + s2*0.30);
+        tl.to(islands[s2].el, { scale: 1.55, duration: 0.30, ease: "back.out(2.2)" }, 7.30 + s2*0.30);
+      }
+      tl.set("#h-clock", { autoAlpha: 0 }, 7.10);
+      for (var _r = 0; _r < 4; _r++) gsap.set("#h-tti-" + _r, { autoAlpha: 0 });
+      tl.set("#h-tti-0", { autoAlpha: 1 }, 7.10);
+      tl.set("#h-tti-1", { autoAlpha: 1 }, 7.62);
+      tl.set("#h-tti-0", { autoAlpha: 0 }, 7.62);
+      tl.set("#h-tti-2", { autoAlpha: 1 }, 8.14);
+      tl.set("#h-tti-1", { autoAlpha: 0 }, 8.14);
+      tl.set("#h-tti-3", { autoAlpha: 1 }, 8.66);
+      tl.set("#h-tti-2", { autoAlpha: 0 }, 8.66);
+      // SEAM EXIT — across, travelling LEFT out of frame at matched velocity.
+      tl.to("#stage", { x: -236, duration: 0.34, ease: "power4.in" }, 10.37);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["12-hydrate"] = tl;
+    })();
+  </script>
+</template>

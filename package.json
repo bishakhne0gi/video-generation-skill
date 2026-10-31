@@ -1,0 +1,28 @@
+{
+  "name": "tech-episode-video",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Kling + Remotion motion-graphics episodes for a tech playlist. Kling generates cinematic footage and morph-bridge transitions; Remotion carries the typography, diagrams and edit; ElevenLabs narrates; CC0 music scores it.",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts Episode out/episode.mp4",
+    "render:short": "remotion render src/index.ts EpisodeShort out/episode-short.mp4",
+    "still": "remotion still src/index.ts Episode"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@fontsource/metropolis": "^5.3.0",
+    "@remotion/cli": "4.0.290",
+    "@remotion/fonts": "^4.0.290",
+    "@remotion/google-fonts": "4.0.290",
+    "@remotion/media-utils": "4.0.290",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.290"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.0",
+    "typescript": "5.8.3"
+  }
+}

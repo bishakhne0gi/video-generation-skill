@@ -1,0 +1,95 @@
+{
+  "_": "EP 13 — MCP, traced against cosx-mcp. WORKSPACE REGISTER, mars-cream palette: the film is one continuous canvas the camera travels, operated by named agent cursors, exactly as the CosX MARS launch film — but this one TEACHES, so it carries narration. The signature move is the marquee: a cursor drags a rectangle around one part of a diagram and the frame pushes into it, so the viewer watches the choice being made before they arrive. Facts are first-party, from the artifact 'MCP, end to end' (db8399a2): the 15-tool read-only server in front of cosx-muscle. Every number on screen is real — 12 contracts, 7 implementations, -32601, 2025-06-18, 15 tools, 20 of 340.",
+  "series": "Ship It",
+  "episode": "EP 13",
+  "title": "The port, the wire, and the loop.",
+  "titleAccent": "the loop",
+  "subtitle": "What the Model Context Protocol actually does, message by message",
+  "hook": "“USB-C for AI” gets you the shape of the idea and none of the mechanism.",
+  "cta": "cosx",
+  "next": "Next: the regular expression that broke the internet",
+  "_theme": "mars-cream — the CosX MARS palette. Warm near-white field, iron-oxide accent. The source artifact is mono-on-black; inverting it to paper is deliberate, because this episode is the explanation rather than the spec.",
+  "theme": "mars-cream",
+  "fps": 30,
+  "_voice": "New voice for EP13 as directed. Model and settings unchanged — v2 cannot perform audio tags at all, which is what keeps the directive register structural rather than a setting that drifts.",
+  "voice": "nlyULslzTRhqlyv46oPj",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1313,
+  "_music": "Energetic generated bed, planned against the real VO timing so the score changes where the film changes.",
+  "music": {
+    "file": "audio/music/bed.wav",
+    "volume": 0.15,
+    "open": 0.34,
+    "mood": "driving-build",
+    "bpm": 84,
+    "startAt": 0
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "TEACHING FIRST, and the arc is the artifact's own: the M×N problem, the three roles, what a server exposes, the envelope, the handshake, where the model actually sits, transports, the two failures, auth vs authz, context economics. Definition then consequence, one clause per sentence, no hedges. The title card and the end card are silent beats so the bed lifts.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Watch what a language model can do alone.\nIt cannot read your minutes. It cannot query Postgres. It is a text function."
+    },
+    {
+      "scene": 2,
+      "text": "Three assistants, four data sources. That is twelve private integrations. Twelve auth flows. Twelve schemas to keep current."
+    },
+    {
+      "scene": 3,
+      "text": "MCP replaces those private contracts with one public one. Three plus four is seven.\nThe lines got STANDARD, not shorter."
+    },
+    {
+      "scene": 4,
+      "text": "Separate three words people collapse. The host owns the model. The client holds one session. The server knows about neither."
+    },
+    {
+      "scene": 5,
+      "text": "A server exposes three things. Tools the model picks. Resources the application attaches. Prompts the user chooses deliberately."
+    },
+    {
+      "scene": 6,
+      "text": "Read that description field again. It is prompt engineering, not documentation.\nIt is the only instruction the model gets."
+    },
+    {
+      "scene": 7,
+      "text": "Every message is one JSON-RPC object. Look for the id.\nA request carries one… a notification never does."
+    },
+    {
+      "scene": 8,
+      "text": "The handshake is three messages, and it is ordered. Initialize. Capabilities come back. Then initialized, and the session is live."
+    },
+    {
+      "scene": 9,
+      "text": "Now find the model in this loop. It is not on the wire.\nIt emits an intent, and the host does every translation."
+    },
+    {
+      "scene": 10,
+      "text": "Same messages, two pipes. Standard streams locally, HTTP everywhere else. On standard streams, stdout belongs to the protocol."
+    },
+    {
+      "scene": 11,
+      "text": "Keep two failures apart. A wrong method name is a protocol error.\nA missing meeting is a result the model can recover from."
+    },
+    {
+      "scene": 12,
+      "text": "A valid token says who you are. It never says what you may read.\nMake the user non-optional. The unscoped path stops existing."
+    },
+    {
+      "scene": 13,
+      "text": "Every byte you return is spent from the context window.\nReturn twenty of three hundred and forty matches… and say so."
+    }
+  ],
+  "shots": []
+}

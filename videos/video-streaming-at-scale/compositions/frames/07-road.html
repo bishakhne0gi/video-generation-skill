@@ -1,0 +1,283 @@
+<template>
+  <style>
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Zen Maru Gothic"; src: url("assets/fonts/ZenMaru-900.woff2") format("woff2"); font-weight: 900; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Zen Kaku Gothic New"; src: url("assets/fonts/ZenKaku-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --paper: #F4EBD9; --paper-warm: #FBF6EA; --cloud: #FDFBF4;
+      --ink: #3B2F2A; --ink-soft: #6B5A4E;
+      --sky: #7FB4DC; --sky-deep: #2E5F8A;
+      --meadow: #7FA653; --meadow-deep: #3F6B34;
+      --terracotta: #C4552F; --terracotta-lit: #EE8557; --terracotta-ink: #9E4324;
+      --night: #1E2A38; --night-mute: #A8BACB;
+    }
+
+    /* the continuity object — one real segment from the film's own manifest, pinned
+       bottom-left. The id never moves; only the state word changes. */
+    .seg-pill {
+      position: absolute; left: 96px; bottom: 74px;
+      display: flex; align-items: center; gap: 16px;
+      padding: 13px 26px; border-radius: 999px;
+      background: var(--paper-warm); box-shadow: 0 10px 30px rgba(59,47,42,0.22);
+      font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--ink);
+    }
+    .seg-pill b { font-weight: 700; }
+    .seg-pill i { display: block; width: 1px; height: 20px; background: rgba(59,47,42,0.22); }
+    .seg-state { position: relative; display: inline-block; width: 186px; height: 24px; }
+    .seg-state span {
+      position: absolute; left: 0; top: 0; white-space: nowrap;
+      font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      font-size: 15px; line-height: 24px; color: var(--terracotta-ink);
+    }
+
+    .grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.055; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='170'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='170' height='170' filter='url(%23n)'/></svg>");
+    }
+
+    #f7-wind { position: absolute; inset: -18%; }
+    #f7-plate { position: absolute; inset: 0; background: url("public/img/meadow-road.jpg") center/cover no-repeat; }
+    #f7-veil { position: absolute; inset: -18%; background: linear-gradient(90deg, rgba(59,47,42,0.06) 0%, rgba(59,47,42,0.02) 34%, rgba(59,47,42,0.10) 100%); }
+
+    /* the left type block sits over the plate's brightest band (sky meeting pale meadow).
+       A scrim anchored to the type is the fix — the same move frames 2, 4 and 9 make. */
+    #f7-scrim {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 40% 46% at 22% 30%, rgba(24,34,46,0.80) 0%, rgba(24,34,46,0.48) 50%, rgba(24,34,46,0) 76%);
+    }
+
+    #f7-stage { position: absolute; inset: 0; }
+
+    #f7-head {
+      position: absolute; left: 104px; top: 128px; width: 700px;
+      font-family: "Zen Maru Gothic", sans-serif; font-weight: 900;
+      font-size: 88px; line-height: 1.0; letter-spacing: -0.02em;
+      color: var(--cloud); text-shadow: 0 8px 36px rgba(30,42,56,0.6);
+    }
+    #f7-sub {
+      position: absolute; left: 108px; top: 372px; width: 640px;
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 500;
+      font-size: 38px; line-height: 1.36;
+      color: var(--cloud); text-shadow: 0 4px 22px rgba(30,42,56,0.66);
+    }
+    #f7-sub em { font-style: normal; color: #FFC09A; }
+
+    #f7-card {
+      position: absolute; left: 906px; top: 152px; width: 908px; height: 776px;
+      border-radius: 14px; background: var(--paper-warm);
+      border: 1px solid rgba(59,47,42,0.12);
+      box-shadow: 0 26px 64px rgba(30,42,56,0.30);
+    }
+
+    .f7-lab {
+      position: absolute; font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 700;
+      font-size: 15px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft);
+    }
+    #f7-lab1 { left: 48px; top: 44px; }
+    #f7-lab2 { left: 48px; top: 400px; }
+    #f7-lab3 { left: 48px; top: 578px; }
+
+    /* the throughput trace — a running system, drawn as a real polyline that keeps
+       advancing for the whole frame. Not a drift: it is the thing being measured. */
+    #f7-graph { position: absolute; left: 48px; top: 78px; width: 812px; height: 288px; }
+    #f7-grid {
+      position: absolute; inset: 0; border-radius: 8px; background: rgba(59,47,42,0.05);
+      background-image: linear-gradient(rgba(59,47,42,0.07) 1px, transparent 1px);
+      background-size: 100% 72px;
+    }
+    #f7-svg { position: absolute; inset: 0; }
+    #f7-now {
+      position: absolute; top: 0; width: 2px; height: 288px; background: var(--terracotta); opacity: 0.5;
+    }
+    #f7-read {
+      position: absolute; right: 14px; top: 12px;
+      font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 34px;
+      color: var(--ink); font-variant-numeric: tabular-nums;
+    }
+
+    /* the buffer meter — a fixed rail with a scaleX fill, because width is not animatable */
+    #f7-buf { position: absolute; left: 48px; top: 434px; width: 812px; height: 62px;
+      border-radius: 10px; background: rgba(59,47,42,0.08); }
+    #f7-buf-fill {
+      position: absolute; left: 0; top: 0; width: 812px; height: 62px; border-radius: 10px;
+      background: var(--meadow-deep); transform-origin: 0% 50%;
+    }
+    #f7-buf-pc {
+      position: absolute; left: 48px; top: 508px;
+      font-family: "JetBrains Mono", monospace; font-weight: 400; font-size: 21px;
+      color: var(--ink-soft); font-variant-numeric: tabular-nums;
+    }
+
+    /* the three rungs as chips — the active one is the only coloured thing */
+    .f7-rung {
+      position: absolute; top: 612px; width: 250px; padding: 18px 0; text-align: center;
+      border-radius: 999px; background: rgba(59,47,42,0.07);
+      font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 30px;
+      color: var(--ink-soft); font-variant-numeric: tabular-nums;
+    }
+    #f7-g0 { left: 48px; }
+    #f7-g1 { left: 329px; }
+    #f7-g2 { left: 610px; }
+    /* the "active" look, applied by animating backgroundColor + color only */
+
+    #f7-note {
+      position: absolute; left: 48px; top: 706px; width: 812px;
+      font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 400;
+      font-size: 21px; line-height: 1.45; color: var(--ink-soft);
+    }
+  </style>
+
+  <div id="root" data-composition-id="07-road" data-width="1920" data-height="1080">
+    <div id="f7-clip" class="clip" data-start="0" data-duration="12.5" data-track-index="0" data-layout-allow-overflow>
+      <div id="f7-stage">
+        <div id="f7-wind"><div id="f7-plate"></div></div>
+        <div id="f7-veil"></div>
+        <div id="f7-scrim"></div>
+
+        <div id="f7-head">Watch the buffer.</div>
+        <div id="f7-sub">The road gets harder. The player asks for <em>less</em>, and keeps going.</div>
+
+        <div id="f7-card">
+          <div class="f7-lab" id="f7-lab1">measured throughput</div>
+          <div id="f7-graph">
+            <div id="f7-grid"></div>
+            <svg id="f7-svg" viewBox="0 0 812 288" preserveAspectRatio="none">
+              <polyline id="f7-trace" fill="none" stroke="#2E5F8A" stroke-width="4"
+                        stroke-linejoin="round" stroke-linecap="round" points=""></polyline>
+            </svg>
+            <div id="f7-now"></div>
+            <div id="f7-read">7.4 Mbps</div>
+          </div>
+
+          <div class="f7-lab" id="f7-lab2">buffer</div>
+          <div id="f7-buf"><div id="f7-buf-fill"></div></div>
+          <div id="f7-buf-pc">94% &middot; 22.4s of video ahead of the playhead</div>
+
+          <div class="f7-lab" id="f7-lab3">requesting</div>
+          <div class="f7-rung" id="f7-g0">1080p</div>
+          <div class="f7-rung" id="f7-g1">720p</div>
+          <div class="f7-rung" id="f7-g2">480p</div>
+
+          <div id="f7-note">the picture softens for a few seconds &mdash; the playback does not stop</div>
+        </div>
+
+        <div class="seg-pill" id="f7-pill">
+          <b>seg-00412.m4s</b><i></i>
+          <span class="seg-state"><span>requested</span></span>
+        </div>
+
+        <div class="grain"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // ---- the throughput trace. A closed-form, deterministic curve (no Math.random):
+      // healthy at ~7.4 Mbps, collapsing between t=2.6 and t=5.2, then staying low. The
+      // player recovers anyway — that is the whole point of the frame.
+      var W = 812, H = 288, N = 170;
+      function mbps(u) {                       // u in 0..1 across the frame's 12.5s
+        var t = u * 12.5;
+        var base = 7.4;
+        if (t > 2.6) base = 7.4 - 5.6 * Math.min(1, (t - 2.6) / 2.4);
+        // a small deterministic ripple so the line reads as a measurement, not a plan
+        var rip = 0.30 * Math.sin(t * 5.1) + 0.16 * Math.sin(t * 11.7 + 1.1);
+        return Math.max(0.6, base + rip * (t > 2.6 ? 0.5 : 1));
+      }
+      var pts = [];
+      for (var i = 0; i <= N; i++) {
+        var u = i / N, v = mbps(u);
+        pts.push((u * W).toFixed(1) + "," + (H - (v / 9) * H).toFixed(1));
+      }
+      var trace = document.getElementById("f7-trace");
+      trace.setAttribute("points", pts.join(" "));
+      // the trace is revealed left-to-right by a dash offset — an SVG-native reveal, so
+      // nothing depends on animating `width` or `clip-path`.
+      var len = 2600;
+      trace.style.strokeDasharray = len;
+      trace.style.strokeDashoffset = len;
+
+      var readEl = document.getElementById("f7-read");
+      var bufEl = document.getElementById("f7-buf-pc");
+
+      gsap.set(["#f7-buf-fill"], { scaleX: 0.94 });
+      gsap.set(["#f7-pill", "#f7-note"], { autoAlpha: 0 });
+
+      // ---- SEAM 6 -> 7 ENTRY: cut-the-curve LEFT. Frame 06 exited at -238 on power4.in;
+      // this enters from +302 on power4.out. The plate and the card are at full opacity
+      // from t=0 and the card carries the travel — the frame rides its own cut.
+      tl.fromTo("#f7-stage", { x: 302 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      tl.fromTo("#f7-head", { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 0.24);
+
+      // the wind. It is a normal breeze until scene 2, where it DOUBLES — the painting and
+      // the graph say the same thing at the same moment, which is the frame's best idea.
+      tl.fromTo("#f7-wind", { xPercent: 0.9 }, { xPercent: -0.5, duration: 2.6, ease: "none" }, 0);
+      tl.to("#f7-wind", { xPercent: -3.4, duration: 2.6, ease: "power1.in" }, 2.6);
+      tl.to("#f7-wind", { xPercent: -4.6, duration: 7.3, ease: "none" }, 5.2);
+
+      // Scene 1-2 (0.0-5.2s): the trace draws continuously across the whole frame, and the
+      // readout counts with it. A running system: it never stops for the rest of the beat.
+      var prog = { u: 0 };
+      tl.to(prog, {
+        u: 1, duration: 12.2, ease: "none",
+        onUpdate: function () {
+          trace.style.strokeDashoffset = String(len * (1 - prog.u));
+          document.getElementById("f7-now").style.left = (prog.u * W) + "px";
+          readEl.textContent = mbps(prog.u).toFixed(1) + " Mbps";
+        }
+      }, 0.3);
+
+      // the buffer drains as throughput falls...
+      tl.to("#f7-buf-fill", { scaleX: 0.31, duration: 2.6, ease: "power2.in" }, 2.6);
+      var buf = { v: 94 };
+      tl.to(buf, {
+        v: 31, duration: 2.6, ease: "power2.in",
+        onUpdate: function () {
+          bufEl.textContent = Math.round(buf.v) + "% · " + (buf.v * 0.238).toFixed(1) + "s of video ahead of the playhead";
+        }
+      }, 2.6);
+      // the fill warms toward the accent as it empties — colour on CONTENT, not on an edge
+      tl.to("#f7-buf-fill", { backgroundColor: "#C4552F", duration: 2.6, ease: "power2.in" }, 2.6);
+
+      // Scene 3 (5.2-6.4s): HELD at the low point. 0.6s where nothing moves but the wind
+      // and the trace. This is the frame's climax and it is a silence.
+
+      // Scene 4 (6.4-9.8s): the step down. 1080p releases, 720p lights — and the buffer
+      // starts refilling immediately even though throughput has NOT recovered. That
+      // asymmetry is the mechanism, and it is why the step is shown before the recovery.
+      tl.set("#f7-g0", { backgroundColor: "rgba(59,47,42,0.07)", color: "#6B5A4E" }, 0);
+      tl.to("#f7-g0", { backgroundColor: "#2E5F8A", color: "#FDFBF4", duration: 0.3 }, 0.6);
+      tl.to("#f7-g0", { backgroundColor: "rgba(59,47,42,0.07)", color: "#6B5A4E", duration: 0.34, ease: "power2.out" }, 6.4);
+      tl.to("#f7-g1", { backgroundColor: "#C4552F", color: "#FDFBF4", duration: 0.34, ease: "power2.out" }, 6.52);
+
+      tl.to("#f7-buf-fill", { scaleX: 0.86, backgroundColor: "#3F6B34", duration: 2.6, ease: "power2.out" }, 6.7);
+      tl.to(buf, {
+        v: 86, duration: 2.6, ease: "power2.out",
+        onUpdate: function () {
+          bufEl.textContent = Math.round(buf.v) + "% · " + (buf.v * 0.238).toFixed(1) + "s of video ahead of the playhead";
+        }
+      }, 6.7);
+
+      // Scene 5 (9.8-12.5s): the consequence, stated.
+      tl.fromTo("#f7-sub", { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 9.5);
+      tl.to("#f7-note", { autoAlpha: 1, duration: 0.4, ease: "power2.out" }, 9.9);
+      tl.fromTo("#f7-pill", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out" }, 10.2);
+
+      // ---- SEAM 7 -> 8: the current, LEFT.
+      tl.to("#f7-stage", { x: -238, duration: 0.34, ease: "power4.in" }, 12.16);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["07-road"] = tl;
+    })();
+  </script>
+</template>

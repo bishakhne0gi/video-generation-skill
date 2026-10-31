@@ -1,0 +1,54 @@
+{
+  "fps": 30,
+  "seams": [
+    {
+      "id": "door→title",
+      "cut": 8.2,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": { "selector": "#f1-stage", "axis": "x", "dir": -1 },
+      "entry": { "selector": "#f2-l1", "axis": "x", "dir": -1 }
+    },
+    {
+      "id": "title→desk",
+      "cut": 13.2,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": { "selector": "#f2-stage", "axis": "x", "dir": -1 },
+      "entry": { "selector": "#f3-stage", "axis": "x", "dir": -1 }
+    },
+    {
+      "id": "desk→lock",
+      "cut": 25.1,
+      "technique": "inverse zoom — ARRIVAL, the thesis lands: a valid card is refused",
+      "exit": { "selector": "#f3-stage", "axis": "z", "dir": -1 },
+      "entry": { "selector": "#f4-stage", "axis": "z", "dir": -1, "scanRoot": "#f4-stage" }
+    },
+    {
+      "id": "lock→naming",
+      "cut": 36.7,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": { "selector": "#f4-stage", "axis": "x", "dir": -1 },
+      "entry": { "selector": "#f5-stage", "axis": "x", "dir": -1 }
+    },
+    {
+      "id": "naming→route",
+      "cut": 48.5,
+      "technique": "zoom-through — deeper into the same thought, concept into implementation",
+      "exit": { "selector": "#f5-stage", "axis": "z", "dir": 1 },
+      "entry": { "selector": "#f6-stage", "axis": "z", "dir": 1, "scanRoot": "#f6-stage" }
+    },
+    {
+      "id": "route→cost",
+      "cut": 60.3,
+      "technique": "cut-the-curve LEFT (the current)",
+      "exit": { "selector": "#f6-stage", "axis": "x", "dir": -1 },
+      "entry": { "selector": "#f7-stage", "axis": "x", "dir": -1 }
+    },
+    {
+      "id": "cost→takeaway",
+      "cut": 70.9,
+      "technique": "cut UP — elevation into the conclusion",
+      "exit": { "selector": "#f7-stage", "axis": "y", "dir": -1 },
+      "entry": { "selector": "#f8-stage", "axis": "y", "dir": -1 }
+    }
+  ]
+}

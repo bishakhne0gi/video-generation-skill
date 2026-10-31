@@ -1,0 +1,265 @@
+<template>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+
+    #root {
+      position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size;
+      --dark: #202020; --deep: #000000; --well: #1c1b19;
+      --div: rgba(252,252,252,0.14);
+      /* on the dark register the accent is #ff6a3d, not #ea2804 — brand orange measures
+         3.74:1 on #202020 and fails the 4.5:1 body floor. Same hue family, legibility only. */
+      --hot: #ff6a3d;
+      --on-dark: #fcfcfc; --on-mute: rgba(252,252,252,0.78); --on-faint: rgba(252,252,252,0.5);
+      --success: #2b9a66;
+    }
+    /* the ground is the halftone shader block, mounted below on its own clip layer */
+    #f6-base { position: absolute; inset: 0; background: var(--dark); }
+    #f6-stage { position: absolute; inset: 0; }
+    #f6-vig { position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 76% 70% at 50% 46%, rgba(0,0,0,0) 52%, rgba(0,0,0,0.42) 100%); }
+
+    #f6-kicker {
+      position: absolute; left: 96px; top: 104px;
+      font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--on-mute);
+    }
+    #f6-head {
+      position: absolute; left: 96px; top: 150px; width: 1200px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+      font-size: 58px; line-height: 1.05; letter-spacing: -0.022em; color: var(--on-dark);
+    }
+
+    /* ---- the code well. Dark surface at FULL opacity always: a dark panel held at partial
+            opacity composites to mid-grey, so what fades is its CONTENTS. ---- */
+    #f6-well {
+      position: absolute; left: 780px; top: 314px; width: 1044px; height: 456px;
+      background: var(--well); border: 1px solid var(--div); border-radius: 10px; overflow: hidden;
+    }
+    #f6-tabs {
+      position: absolute; left: 0; top: 0; width: 1044px; height: 46px;
+      background: var(--deep); display: flex; align-items: stretch;
+    }
+    .f6-tab {
+      display: flex; align-items: center; padding: 0 18px; border-radius: 4px 4px 0 0;
+      font-family: "JetBrains Mono", monospace; font-size: 15px; letter-spacing: 0.04em;
+      color: var(--on-faint);
+    }
+    .f6-tab.on { color: var(--on-dark); box-shadow: inset 0 -2px 0 var(--hot); }
+    #f6-code {
+      position: absolute; left: 0; top: 46px; width: 1044px; padding: 22px 26px;
+      font-family: "JetBrains Mono", monospace; font-size: 21px; line-height: 1.72;
+      color: var(--on-mute); white-space: pre;
+    }
+    .f6-ln { display: flex; align-items: baseline; }
+    .f6-ln i {
+      font-style: normal; width: 46px; flex: 0 0 46px; color: rgba(252,252,252,0.32);
+      font-size: 17px; text-align: right; padding-right: 18px;
+    }
+    .f6-kw { color: var(--hot); }
+    .f6-str { color: #7fc8b6; }
+    .f6-fn { color: #e8b46a; }
+    .f6-cm { color: rgba(252,252,252,0.42); }
+    /* the inserted line's gutter mark. This is a diff gutter on a line of CODE — content,
+       not a container edge — which is the one place the system's no-coloured-edge rule
+       does not apply. badge-success is semantic here, not a second accent. */
+    #f6-ins { position: relative; }
+    #f6-ins::before {
+      content: ""; position: absolute; left: -26px; top: 4px; width: 3px; height: 28px;
+      background: var(--success); border-radius: 9999px;
+    }
+
+    /* ---- the coupled surface: the HTTP response ---- */
+    #f6-resp {
+      position: absolute; left: 96px; top: 314px; width: 618px; height: 456px;
+      background: var(--well); border: 1px solid var(--div); border-radius: 10px; overflow: hidden;
+    }
+    #f6-resphd {
+      position: absolute; left: 0; top: 0; width: 618px; height: 46px; background: var(--deep);
+      display: flex; align-items: center; padding: 0 22px;
+      font-family: "JetBrains Mono", monospace; font-size: 15px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--on-faint);
+    }
+    #f6-status { position: absolute; left: 26px; top: 80px; height: 62px; width: 560px; }
+    #f6-status div {
+      position: absolute; left: 0; top: 0;
+      font-family: "JetBrains Mono", monospace; font-size: 44px; font-weight: 700; letter-spacing: 0.02em;
+    }
+    #f6-status .ok { color: var(--success); }
+    #f6-status .no { color: var(--hot); }
+    #f6-body {
+      position: absolute; left: 26px; top: 176px; width: 566px;
+      font-family: "JetBrains Mono", monospace; font-size: 19px; line-height: 1.7; color: var(--on-mute);
+      white-space: pre;
+    }
+    #f6-ids { position: absolute; left: 26px; top: 300px; width: 566px; }
+    .f6-id {
+      display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--div);
+      font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--on-mute);
+    }
+    .f6-id b { color: var(--on-dark); font-weight: 700; }
+    #f6-idor {
+      position: absolute; left: 26px; top: 402px;
+      font-family: "JetBrains Mono", monospace; font-size: 15px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--hot);
+    }
+
+    #f6-close {
+      position: absolute; left: 96px; top: 818px;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+      font-size: 62px; line-height: 1.0; letter-spacing: -0.025em; color: var(--on-dark);
+    }
+    #f6-close em { font-style: normal; color: var(--hot); }
+
+    #f6-chip {
+      position: absolute; right: 80px; top: 72px; display: flex; align-items: center; gap: 12px;
+      padding: 10px 22px; border-radius: 9999px;
+      background: rgba(252,252,252,0.06); border: 1px solid var(--div);
+      font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--on-mute);
+    }
+    #f6-chip i { width: 9px; height: 9px; border-radius: 9999px; background: var(--success); display: block; }
+    #f6-chip u { text-decoration: none; font-size: 15px; font-weight: 700; letter-spacing: 0.14em; color: var(--on-faint); }
+    #f6-slot { position: relative; display: block; width: 74px; height: 28px; }
+    #f6-slot b { position: absolute; left: 0; top: 0; font-weight: 500; }
+    #f6-slot .s0 { color: var(--success); }
+    #f6-slot .s1 { color: var(--hot); font-weight: 700; }
+
+    #f6-grain {
+      position: absolute; inset: -50%; width: 200%; height: 200%; pointer-events: none;
+      opacity: 0.08; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    }
+  </style>
+
+  <div id="root" data-composition-id="06-route" data-width="1920" data-height="1080">
+    <!-- the base ground, and the GPU shader field over it (registry block, re-skinned to
+         the palette: near-black ground, crests in #ff6a3d, cells enlarged and midtones
+         crushed so broad slow bands of light cross the frame without competing with type) -->
+    <div id="f6-base" class="clip" data-start="0" data-duration="11.8" data-track-index="0"></div>
+    <div
+      class="clip"
+      id="f6-shader"
+      data-composition-id="halftone-field"
+      data-composition-src="compositions/halftone-field.html"
+      data-start="0"
+      data-duration="11.8"
+      data-track-index="1"
+      data-width="1920"
+      data-height="1080"
+      style="position: absolute; inset: 0; opacity: 0.5"
+    ></div>
+
+    <div id="f6-stage">
+      <div id="f6-vig"></div>
+
+      <div id="f6-kicker">05 / The route &middot; where it goes wrong</div>
+      <div id="f6-head">This route authenticates<br />perfectly, and leaks.</div>
+
+      <div id="f6-well">
+        <div id="f6-tabs">
+          <div class="f6-tab on">routes/invoices.ts</div>
+          <div class="f6-tab">auth.ts</div>
+        </div>
+        <div id="f6-code">
+          <div class="f6-ln" id="f6-l1"><i>1</i><span><span class="f6-fn">app.get</span>(<span class="f6-str">'/api/invoices/:id'</span>, <span class="f6-kw">requireAuth</span>, <span class="f6-kw">async</span> (req, res) =&gt; {</span></div>
+          <div class="f6-ln" id="f6-l2"><i>2</i><span>  <span class="f6-kw">const</span> invoice = <span class="f6-kw">await</span> db.invoice.<span class="f6-fn">findById</span>(req.params.id)</span></div>
+          <div class="f6-ln" id="f6-ins"><i>3</i><span>  <span class="f6-kw">if</span> (invoice.ownerId !== req.user.id) <span class="f6-kw">return</span> res.<span class="f6-fn">sendStatus</span>(<span class="f6-str">403</span>)</span></div>
+          <div id="f6-below">
+            <div class="f6-ln" id="f6-l3"><i>4</i><span>  res.<span class="f6-fn">json</span>(invoice)</span></div>
+            <div class="f6-ln" id="f6-l4"><i>5</i><span>})</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="f6-resp">
+        <div id="f6-resphd">Response &middot; GET /api/invoices/1043</div>
+        <div id="f6-status">
+          <div class="ok">200 OK</div>
+          <div class="no">403 Forbidden</div>
+        </div>
+        <div id="f6-body">{ "id": 1043, "total": "£4,180.00" }</div>
+        <div id="f6-ids">
+          <div class="f6-id"><span>invoice 1043 &middot; ownerId</span><b>usr_8812</b></div>
+          <div class="f6-id"><span>req.user.id (the caller)</span><b>usr_2140</b></div>
+        </div>
+        <div id="f6-idor">IDOR &mdash; insecure direct object reference</div>
+      </div>
+
+      <div id="f6-close">Ownership, <em>not identity.</em></div>
+
+      <div id="f6-chip"><i></i><u>HTTP</u><span id="f6-slot"><b class="s0">200</b><b class="s1">403</b></span></div>
+      <div id="f6-grain"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+
+      // The well and the response panel arrive SOLID; only their contents fade. Dimming a
+      // dark surface with opacity over anything lighter renders mid-grey.
+      gsap.set("#f6-code .f6-ln", { autoAlpha: 0 });
+      gsap.set("#f6-ins", { autoAlpha: 0 });
+      gsap.set("#f6-below", { y: -36 });
+      gsap.set("#f6-status .no", { autoAlpha: 0 });
+      gsap.set("#f6-body, #f6-ids, #f6-idor, #f6-status .ok", { autoAlpha: 0 });
+      gsap.set("#f6-slot .s1", { autoAlpha: 0 });
+      gsap.set("#f6-close", { autoAlpha: 0 });
+      gsap.set("#f6-well, #f6-resp", { autoAlpha: 0 });
+
+      // ---- SEAM 5 -> 6 ENTRY: ZOOM-THROUGH (z +1). Frame 05 exited GROWING (1 -> 1.34),
+      // so this side must share the sign: it enters already large and keeps growing to
+      // rest. Entering small-and-growing would be the mirrored vector.
+      tl.fromTo("#f6-stage", { scale: 0.72, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.52, ease: "power3.out" }, 0);
+
+      // ---- Scene 1 (0.0–2.2s): the dark band is carried in at matched scale-velocity.
+      tl.fromTo("#f6-kicker", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.34 }, 0.24);
+      tl.fromTo("#f6-head", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.46, ease: "power3.out" }, 0.4);
+      tl.to("#f6-well", { autoAlpha: 1, duration: 0.3, ease: "none" }, 0.72);
+      tl.fromTo("#f6-chip", { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 0.34, ease: "back.out(1.5)" }, 0.86);
+
+      // ---- Scene 2 (2.2–5.0s): the route types itself in, line by line. `requireAuth` is
+      // doing its job perfectly, which is the whole trap.
+      tl.fromTo("#f6-l1", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.3, ease: "power2.out" }, 1.5);
+      tl.fromTo("#f6-l2", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.3, ease: "power2.out" }, 1.86);
+      tl.fromTo("#f6-l3", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.3, ease: "power2.out" }, 2.22);
+      tl.fromTo("#f6-l4", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.3, ease: "power2.out" }, 2.5);
+
+      // ---- Scene 3 (5.0–7.2s): the coupled surface resolves — 200 OK, with a body. Then
+      // the two ids land one above the other, so the mismatch is VISIBLE before it is named.
+      tl.to("#f6-resp", { autoAlpha: 1, duration: 0.3, ease: "none" }, 3.4);
+      tl.fromTo("#f6-status .ok", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.36, ease: "power3.out" }, 3.6);
+      tl.fromTo("#f6-body", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 3.95);
+      tl.fromTo("#f6-ids .f6-id:nth-child(1)", { autoAlpha: 0, x: -10 }, { autoAlpha: 1, x: 0, duration: 0.3, ease: "power2.out" }, 4.5);
+      tl.to("#f6-ids", { autoAlpha: 1, duration: 0.01 }, 4.5);
+      tl.fromTo("#f6-ids .f6-id:nth-child(2)", { autoAlpha: 0, x: -10 }, { autoAlpha: 1, x: 0, duration: 0.3, ease: "power2.out" }, 4.86);
+      tl.fromTo("#f6-idor", { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out" }, 5.3);
+
+      // ---- Scene 4 (7.2–9.4s): the fix. The line is INSERTED — the rows below slide down
+      // to make room — and then it SITS there unexecuted for 0.5s. Scheduled stillness.
+      tl.to("#f6-below", { y: 0, duration: 0.36, ease: "power3.out" }, 7.2);
+      tl.fromTo("#f6-ins", { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: 0.32, ease: "power3.out" }, 7.3);
+      // 7.62 -> 8.12 : nothing moves.
+
+      // ---- Scene 5 (9.4–11.8s): the coupled surface updates in the same beat, and the
+      // status follows on the frame of its cause.
+      tl.to("#f6-status .ok", { autoAlpha: 0, y: -14, duration: 0.3, ease: "power2.in" }, 8.14);
+      tl.fromTo("#f6-status .no", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.36, ease: "power3.out" }, 8.24);
+      tl.set("#f6-slot .s0", { autoAlpha: 0 }, 8.24);
+      tl.set("#f6-slot .s1", { autoAlpha: 1 }, 8.24);
+      tl.to("#f6-chip i", { backgroundColor: "#ff6a3d", duration: 0.22 }, 8.24);
+      tl.to("#f6-body", { opacity: 0.28, duration: 0.34, ease: "none" }, 8.24);
+      tl.fromTo("#f6-close", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 8.9);
+
+      // ---- SEAM 6 -> 7 : cut-the-curve LEFT (back to the current).
+      tl.to("#f6-stage", { x: -232, duration: 0.34, ease: "power4.in" }, 11.46);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["06-route"] = tl;
+    })();
+  </script>
+</template>

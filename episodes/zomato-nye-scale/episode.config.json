@@ -1,0 +1,218 @@
+{
+  "_": "EP 10 — Zomato's New Year's Eve. Visual register comes from references/ep10-inspo/ (a WhatsApp brand still, pinned by unbserved): cream field #F7F4EF, every shape carrying a ~3px #1C1C1C stroke, rounded cards tumbling at angles across a single-hue ramp, gold stars as punctuation, the brand mark large and centred and still. Zomato's Cranberry #E23744 is exact — it is the fill in their own wordmark SVG. Display face is Metropolis, the open-source base of Zomato's Okra, so this is the real typeface rather than a lookalike. The director chose to keep full photoreal footage against this flat register after being warned the two fight; the reconciliation is that every Kling clip is framed INSIDE an outlined rounded card, so the stroke language runs through both registers instead of the two sitting side by side. Numbers: references/ep10-facts.md, sourced only.",
+  "series": "Ship It",
+  "episode": "EP 10",
+  "title": "India orders dinner at midnight. All of it, at once.",
+  "titleAccent": "at once",
+  "subtitle": "Four hundred fifty million messages a minute, eleven thousand servers, and fifteen days of rehearsal",
+  "hook": "“You cannot load-test appetite.”",
+  "cta": "Read Zomato's NYE engineering post",
+  "next": "Follow for more",
+  "theme": "zomato-cream",
+  "fps": 30,
+  "voice": "MjAff57sfV5MRLNOeIpA",
+  "_voice": "Same voice as EP09 — series continuity. But NOT eleven_v3 this time. The director asked for a directive read with no modulation, so the model is eleven_multilingual_v2, which CANNOT perform audio tags at all: tts.mjs refuses to record a tagged line on a non-v3 model, which makes 'no modulation' a structural guarantee rather than a setting that drifts. v2 also gets previous_text/next_text continuity that v3 lacks, so one steady register holds across all eighteen lines. Stability high, style near zero. The authority comes from the writing — imperatives, front-loaded subjects, full stops where a weaker script would use commas.",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.75,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 1010,
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.17,
+    "mood": "dark-tech"
+  },
+  "audio": {
+    "vo": true,
+    "music": true
+  },
+  "_vo": "18 beats, ~2:30. ZERO audio tags by design — see _voice. Every figure is spelled out as words, never digits, because that is where a synthetic mouth most reliably embarrasses you. Contractions throughout. The three chapter slates are structure, not performance: short and flat.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Eleven fifty-eight at night. In two minutes, the biggest food delivery night in India begins."
+    },
+    {
+      "scene": 2,
+      "text": "This is what it takes to survive it… every single year."
+    },
+    {
+      "scene": 3,
+      "text": "Most systems scale for a curve. Zomato scales for a CLIFF… one that arrives on schedule."
+    },
+    {
+      "scene": 4,
+      "text": "A kitchen has a hard ceiling. So does a connection pool… Tonight, both of them find it."
+    },
+    {
+      "scene": 5,
+      "text": "Chapter one. The cliff."
+    },
+    {
+      "scene": 6,
+      "text": "Order volume does not rise on New Year's Eve. It STEPS… and it stays stepped for hours."
+    },
+    {
+      "scene": 7,
+      "text": "Chapter two. The spine."
+    },
+    {
+      "scene": 8,
+      "text": "So nothing waits on anything. Every action becomes a message. The queue is the architecture."
+    },
+    {
+      "scene": 9,
+      "text": "That night, Kafka carried four hundred and fifty million messages a minute… Five point six gigabytes per second."
+    },
+    {
+      "scene": 10,
+      "text": "You cannot fix what you cannot see. Their logging platform swallowed sixty terabytes in a single day."
+    },
+    {
+      "scene": 11,
+      "text": "Two point two billion active time series. Seventeen point eight million data points every second."
+    },
+    {
+      "scene": 12,
+      "text": "Chapter three. The rehearsal."
+    },
+    {
+      "scene": 13,
+      "text": "The night is won… in December."
+    },
+    {
+      "scene": 14,
+      "text": "Fifteen days of load testing. Thirty billion requests fired at their own systems… deliberately."
+    },
+    {
+      "scene": 15,
+      "text": "Eleven thousand instances, pre-scaled before anyone ordered. Autoscaling is too slow when the step is vertical."
+    },
+    {
+      "scene": 16,
+      "text": "Then they break it themselves… Inject the failure while the audience is still nobody."
+    },
+    {
+      "scene": 17,
+      "text": "Three million orders… Sixty percent of them delivered in under thirty minutes."
+    },
+    {
+      "scene": 18,
+      "text": "You cannot load-test appetite. Every year the model is wrong… Every year, they rebuild it.\n\nFollow for more."
+    }
+  ],
+  "_shots": "12 text-to-video jobs through the Kling MCP, plus 3 image-to-video morph bridges added after the first render pass (they need real stills from the scenes either side). The MCP exposes no 'negative' parameter — unlike the direct API path in kling.mjs — so every exclusion is written into the prompt tail instead. Two visual families only: WARM (street, kitchen, crowd, dawn — amber and red, shallow, alive) and COLD (ops room, data centre — blue-grey, wide, still). The cut between those two families IS the argument of the episode. Kling never renders text, signage, UI or numbers: every legible thing in this film is Remotion.",
+  "shots": [
+    {
+      "id": "ep10_open",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic wide shot of an Indian city street at night in light rain, a row of delivery scooters idling at a red traffic signal, warm amber sodium streetlights, red tail lights reflecting on wet asphalt, shallow depth of field, slow push in, photoreal, anamorphic, twenty-four frames per second film look. Absolutely no text, no signage lettering, no readable words, no logos, no brand marks, no user interface, no on-screen numbers, no subtitles, no distorted faces, no warped hands, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_kitchen",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic close shot inside a busy Indian restaurant kitchen at night, a metal ticket rail crowded with paper order slips, steam drifting across warm tungsten light, stainless steel surfaces catching orange highlights, shallow depth of field, slow lateral drift, photoreal, film grain. Absolutely no text, no readable writing on the paper slips, no logos, no user interface, no numbers, no subtitles, no distorted hands, no warped faces, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_wok",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Extreme close macro shot of a wok over a high flame, orange fire licking up the side, oil shimmering, sparks rising in slow motion, deep warm reds and ambers against a near-black background, shallow depth of field, photoreal, high shutter speed, film grain. Absolutely no text, no logos, no user interface, no numbers, no subtitles, no hands in frame, no faces, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_bags",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic overhead shot of a long steel counter crowded with sealed brown paper takeaway bags in a row, warm overhead kitchen light, gentle steam, slow dolly along the counter revealing more bags than the frame can hold, shallow depth of field, photoreal, film grain. Absolutely no text, no printed labels, no readable writing, no logos, no brand marks, no user interface, no numbers, no subtitles, no hands, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_rider",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic medium shot from behind of a delivery rider in a plain red jacket and helmet walking up to a lit apartment doorway at night carrying an insulated bag, warm light spilling from the open door, rain in the air, shallow depth of field, slow follow, photoreal, anamorphic. Absolutely no text, no logos, no brand marks on the jacket or bag, no readable signage, no house numbers, no user interface, no subtitles, no visible faces, no close-up hands, no distorted limbs, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_crowd",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic wide shot of a rooftop New Year crowd at night seen from behind and above, silhouetted shoulders and raised arms against a glowing city skyline, warm string-light bokeh, confetti drifting, slow rising crane move, shallow depth of field, photoreal, anamorphic. Absolutely no text, no logos, no user interface, no phone screen content, no numbers, no subtitles, no recognisable or distorted faces, no warped hands, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_fireworks",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic wide aerial shot of fireworks bursting over a dense Indian city skyline at midnight, warm gold and red bursts, low haze catching the light, thousands of lit windows below, slow drift forward, photoreal, anamorphic, film grain. Absolutely no text, no logos, no user interface, no numbers, no subtitles, no people in frame, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_opsroom",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic wide shot of a dim engineering operations room at night, several people seated in silhouette facing a wall of large monitors that glow cool blue and are deliberately far out of focus so nothing on them is legible, cold blue-grey palette, static locked-off camera, shallow depth of field, photoreal, film grain. Absolutely no text, no readable charts, no readable dashboards, no legible screen content, no logos, no numbers, no subtitles, no recognisable faces, no distorted hands, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_datacentre",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic wide shot down a data centre cold aisle, two walls of server racks receding to a vanishing point, hundreds of small status lights, cold blue-white illumination, faint haze, slow steady dolly forward down the centre line, photoreal, anamorphic, film grain. Absolutely no text, no labels, no readable writing, no logos, no user interface, no numbers, no subtitles, no people, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_rack_dark",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic medium shot of a single server rack in a data centre going dark, its status lights fading out while the racks either side stay lit cold blue, faint haze, very slow push in, photoreal, shallow depth of field, film grain. Absolutely no text, no labels, no readable writing, no logos, no user interface, no numbers, no subtitles, no people, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_dawn",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic wide shot of an empty Indian city road at first light, wet asphalt, soft pink and amber dawn sky, a single scooter passing far in the distance, low mist near the ground, static locked-off camera, photoreal, anamorphic, film grain. Absolutely no text, no signage lettering, no logos, no user interface, no numbers, no subtitles, no people in the foreground, no flicker, no morphing geometry."
+    },
+    {
+      "id": "ep10_morning",
+      "kind": "t2v",
+      "model": "kling-video-v3_0_turbo",
+      "duration": 5,
+      "resolution": "1080p",
+      "aspect": "16:9",
+      "prompt": "Cinematic medium shot of a shop shutter rolling up on a quiet Indian street on New Year morning, warm low sun raking across the frame, dust visible in the light, calm and still after a long night, slow push in, photoreal, shallow depth of field, film grain. Absolutely no text, no signage lettering, no readable writing, no logos, no user interface, no numbers, no subtitles, no visible faces, no distorted hands, no flicker, no morphing geometry."
+    }
+  ]
+}

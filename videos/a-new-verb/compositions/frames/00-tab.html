@@ -1,0 +1,113 @@
+<template>
+  <style>
+@font-face{font-family:"Archivo";src:url("assets/fonts/Archivo-var.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-400.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBMono";src:url("assets/fonts/JetBrainsMono-700.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Serif";src:url("assets/fonts/InstrumentSerif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:block}
+
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;
+  --paper:#F4F1EA; --paper2:#E7E1D4; --sheet:#FBF9F4;
+  --ink:#14110E; --ink2:#5A5245; --navy:#16233B;
+  --yellow:#FFEB00; --pen:#DC3220; --pentype:#B32414; --rule:#B8B0A0;
+  background:var(--paper); color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+#root *{margin:0;padding:0;box-sizing:border-box}
+
+/* stage carries every seam move; content never animates the clip itself */
+.stage{position:absolute;inset:0}
+.inner{position:relative;z-index:1;width:100%;height:100%}
+/* the coloured field travels WITH the stage, so a navy or yellow frame reads as a
+   card sliding over the page rather than as the ground changing colour. */
+.field{position:absolute;inset:0}
+
+/* ---- TYPE ---- */
+.hdr{font-weight:800;font-stretch:88%;letter-spacing:-.045em;line-height:.90;color:var(--ink)}
+.deck{font-weight:500;line-height:1.26;color:var(--ink2)}
+.quote{font-family:"Serif",Georgia,serif;line-height:1.16;color:var(--ink)}
+.ital{font-family:"Serif",Georgia,serif;font-style:italic}
+.mono{font-family:"JBMono",monospace;color:var(--ink)}
+.tag{font-family:"JBMono",monospace;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink2);font-size:21px}
+.redtype{color:var(--pentype)}
+.onnavy{color:var(--sheet)}
+.onnavy .tag,.onnavy .deck{color:#A9B6C9}
+
+/* ---- PAPER: a sheet is defined by its shadow and its edge, never by a stripe ---- */
+.sheet{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.16), 0 10px 24px rgba(20,17,14,.12)}
+.card{position:absolute;background:var(--sheet);
+  box-shadow:0 1px 0 rgba(20,17,14,.14), 0 7px 18px rgba(20,17,14,.10)}
+.hair{position:absolute;background:var(--rule);height:1px}
+.rule2{position:absolute;background:var(--ink);height:3px}
+
+/* ---- THE MARKER: sits BEHIND its phrase, skewed, origin left ---- */
+.mark{position:absolute;background:var(--yellow);z-index:0;transform-origin:0% 50%}
+.marknavy{background:var(--yellow)}
+.phrase{position:relative;z-index:1}
+
+/* ---- THE PEN: strokes only. Never a glyph, never on navy. ---- */
+.pen{position:absolute;pointer-events:none;overflow:visible}
+.pen path,.pen line,.pen polyline{fill:none;stroke:var(--pen);stroke-linecap:round;
+  stroke-linejoin:round}
+.penY path,.penY line,.penY polyline{stroke:var(--yellow)}
+.penD path,.penD line,.penD polyline{stroke:var(--pentype)}
+.penI path,.penI line,.penI polyline{stroke:var(--ink)}
+
+#root{background:transparent}
+  </style>
+
+  <div id="root" data-composition-id="00-tab" data-start="0" data-width="1920" data-height="1080">
+
+    <div style="position:absolute;right:64px;top:56px;transform:rotate(1.00deg)">
+      <div class="card" style="position:relative;width:318px;height:104px"></div>
+      <div class="tag" style="position:absolute;left:22px;top:20px;font-size:17px">FOLLOWING</div>
+      <div class="mono" style="position:absolute;right:22px;top:18px;font-size:19px;font-weight:700;color:var(--ink2)">req#4f2a</div>
+      <div style="position:absolute;left:22px;top:50px;width:280px;height:34px">
+        <span id="tab-w-0" class="mono" style="position:absolute;left:0;top:0;font-size:25px;font-weight:700;white-space:nowrap;color:var(--pentype)">TOO LONG</span><span id="tab-w-1" class="mono" style="position:absolute;left:0;top:0;font-size:25px;font-weight:700;white-space:nowrap;color:var(--pentype)">NO SEMANTICS</span><span id="tab-w-2" class="mono" style="position:absolute;left:0;top:0;font-size:25px;font-weight:700;white-space:nowrap;color:var(--pentype)">MISLABELLED</span><span id="tab-w-3" class="mono" style="position:absolute;left:0;top:0;font-size:25px;font-weight:700;white-space:nowrap;color:var(--pentype)">UNCACHEABLE</span><span id="tab-w-4" class="mono" style="position:absolute;left:0;top:0;font-size:25px;font-weight:700;white-space:nowrap;color:var(--ink)">QUERY</span><span id="tab-w-5" class="mono" style="position:absolute;left:0;top:0;font-size:25px;font-weight:700;white-space:nowrap;color:var(--ink)">CACHEABLE</span><span id="tab-w-6" class="mono" style="position:absolute;left:0;top:0;font-size:25px;font-weight:700;white-space:nowrap;color:var(--pentype)">NOT ROUTED</span><span id="tab-w-7" class="mono" style="position:absolute;left:0;top:0;font-size:25px;font-weight:700;white-space:nowrap;color:var(--ink)">SHAREABLE</span>
+      </div>
+      <div id="tab-tape" style="position:absolute;left:112px;top:-14px;width:94px;height:30px;background:rgba(255,235,0,.78);transform:rotate(-2.4deg)"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      // every state after the first starts hidden, set OUTSIDE the paused timeline —
+      // a zero-duration tl.set at position 0 does not render while the playhead sits at 0.
+      gsap.set("#tab-w-1", { autoAlpha: 0 });
+      gsap.set("#tab-w-2", { autoAlpha: 0 });
+      gsap.set("#tab-w-3", { autoAlpha: 0 });
+      gsap.set("#tab-w-4", { autoAlpha: 0 });
+      gsap.set("#tab-w-5", { autoAlpha: 0 });
+      gsap.set("#tab-w-6", { autoAlpha: 0 });
+      gsap.set("#tab-w-7", { autoAlpha: 0 });
+      tl.set("#tab-w-0", { autoAlpha: 0 }, 26.09);
+      tl.fromTo("#tab-w-1", { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.24, ease: "steps(4)" }, 26.09);
+      tl.set("#tab-w-1", { autoAlpha: 0 }, 38.48);
+      tl.fromTo("#tab-w-2", { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.24, ease: "steps(4)" }, 38.48);
+      tl.set("#tab-w-2", { autoAlpha: 0 }, 56.09);
+      tl.fromTo("#tab-w-3", { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.24, ease: "steps(4)" }, 56.09);
+      tl.set("#tab-w-3", { autoAlpha: 0 }, 71.74);
+      tl.fromTo("#tab-w-4", { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.24, ease: "steps(4)" }, 71.74);
+      tl.set("#tab-w-4", { autoAlpha: 0 }, 92.61);
+      tl.fromTo("#tab-w-5", { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.24, ease: "steps(4)" }, 92.61);
+      tl.set("#tab-w-5", { autoAlpha: 0 }, 114.78);
+      tl.fromTo("#tab-w-6", { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.24, ease: "steps(4)" }, 114.78);
+      tl.set("#tab-w-6", { autoAlpha: 0 }, 125.87);
+      tl.fromTo("#tab-w-7", { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.24, ease: "steps(4)" }, 125.87);
+      // the tab is pinned; it must still be alive, so the tape catches the light once per state
+      tl.fromTo("#tab-tape", { scaleX: 1 }, { scaleX: 1.06, duration: 0.18, ease: "steps(3)", yoyo: true, repeat: 1 }, 26.09);
+      tl.fromTo("#tab-tape", { scaleX: 1 }, { scaleX: 1.06, duration: 0.18, ease: "steps(3)", yoyo: true, repeat: 1 }, 38.48);
+      tl.fromTo("#tab-tape", { scaleX: 1 }, { scaleX: 1.06, duration: 0.18, ease: "steps(3)", yoyo: true, repeat: 1 }, 56.09);
+      tl.fromTo("#tab-tape", { scaleX: 1 }, { scaleX: 1.06, duration: 0.18, ease: "steps(3)", yoyo: true, repeat: 1 }, 71.74);
+      tl.fromTo("#tab-tape", { scaleX: 1 }, { scaleX: 1.06, duration: 0.18, ease: "steps(3)", yoyo: true, repeat: 1 }, 92.61);
+      tl.fromTo("#tab-tape", { scaleX: 1 }, { scaleX: 1.06, duration: 0.18, ease: "steps(3)", yoyo: true, repeat: 1 }, 114.78);
+      tl.fromTo("#tab-tape", { scaleX: 1 }, { scaleX: 1.06, duration: 0.18, ease: "steps(3)", yoyo: true, repeat: 1 }, 125.87);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["00-tab"] = tl;
+    })();
+  </script>
+</template>

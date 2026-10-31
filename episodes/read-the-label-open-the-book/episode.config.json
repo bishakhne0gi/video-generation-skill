@@ -1,0 +1,80 @@
+{
+  "_": "EP 20 — agent memory and skills. The STATION STRIP register (references/station-strip.md) wearing EP 16's palette and design system, which is also EP 18's: `stripe-mesh`, white canvas, deep-navy ink #0D253D, ONE saturated hue (indigo #533AFD) that is a CTA and an accent and nothing else. WHAT IS NEW IS THE FIELD AND THE SIGNATURE MOVE. The field is `MeshField` — a new primitive in lib/gradient.tsx: five soft colour lobes drifting on mutually incommensurate clocks under moving grain, which is the mesh-gradient look rather than the banded ribbon EP18 used. It has no edges, so it can run under a diagram, and it never repeats, so it can run for the whole film. The signature move is the SKILL DECK — the director supplied a stacked drag-carousel (shadcn/motion, `carousel-07`) and its geometry is ported exactly: the wrapped index offset, the x/rotate/y/scale/opacity/zIndex transforms and the responsive constants are all kept verbatim, and ONLY the input device changes. The upstream is driven by a pointer through a `useMotionValue`; a render has no pointer and rAF is not frame-pure, so `progress` is derived from `useCurrentFrame()` instead. That port is not decoration: a deck where every card is present and exactly one is in the frame at full resolution IS progressive disclosure, so the motif carries the argument rather than sitting beside it. EVERY FIGURE IS MEASURED ON THIS MACHINE ON 2026-08-13 AND THE FILM SAYS SO ON SCREEN — 113 SKILL.md files under ~/.claude; 37,337 tokens of frontmatter (name + description, always in context); 277,907 tokens of skill bodies (loaded only on a match); 942 bundled level-three files totalling ~1,395,306 tokens (loaded only when the body asks); 1.71M all in, against the 1M context window this session actually runs on. The self-referential figure on the cold open and the label station is this very skill: 228 tokens of frontmatter against 14,763 tokens of body, a 65x ratio, with 205,378 further tokens in its references/ directory. Nothing here is presented as an industry number. PROGRESSIVE DISCLOSURE is Anthropic's own documented term for the three-level skills mechanism; the SKILL.md shape (YAML frontmatter carrying `name` and `description`, body below the fence, bundled scripts and references beside it) is the documented format. The memory half is the file-backed convention this session runs: one fact per file with typed frontmatter, an index file loaded each session, links between memories, and the rule that a recalled memory reflects what was true when it was written and must be re-verified before it is acted on.",
+  "series": "Ship It",
+  "episode": "EP 20",
+  "title": "Read the Label.",
+  "titleAccent": "Open the Book.",
+  "subtitle": "Skills and memory work the same way: a cheap index in context, the expensive part fetched only when it matches.",
+  "hook": "Everything it can do does not fit in everything it can hold.",
+  "cta": "cosx",
+  "next": "Next: subagents, and the context you throw away on purpose",
+  "_theme": "EP 16's palette exactly, third film in the run to wear it — the construction and the palette are the series. This episode's own signature is the FIELD (a new mesh primitive, not the banded ribbon) and the DECK, not a new colour. Indigo stays the single filled hue.",
+  "theme": "stripe-mesh",
+  "fps": 30,
+  "_voice": "Unchanged from EP 13–19 — same voice id, same model, same settings. Every line opens on an instruction verb.",
+  "voice": "nlyULslzTRhqlyv46oPj",
+  "voiceModel": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.72,
+    "similarity_boost": 0.85,
+    "style": 0.05,
+    "use_speaker_boost": true
+  },
+  "voiceSeed": 2020,
+  "_music": "Same 84bpm grid as EP 13–19 so scene lengths snap identically across the run.",
+  "music": {
+    "file": "audio/music/bed.mp3",
+    "volume": 0.15,
+    "open": 0.34,
+    "mood": "calm-focus",
+    "bpm": 84,
+    "startAt": 0
+  },
+  "audio": {
+    "vo": true,
+    "music": true,
+    "sfx": true,
+    "sfxGain": 1
+  },
+  "_vo": "Nine lines, two acts. Act one is the skills half and every line is an instruction to look at one level of the mechanism; act two turns to memory, breaks it on purpose at the dark station, and the last line is a sorting rule rather than a summary — what goes in a skill, what goes in memory, and what goes nowhere.",
+  "vo": [
+    {
+      "scene": 1,
+      "text": "Add up everything this agent could know. One point seven million tokens… against a window that holds one."
+    },
+    {
+      "scene": 2,
+      "text": "Load the labels, not the books. A hundred and thirteen skills sit on disk. Only their descriptions are in context."
+    },
+    {
+      "scene": 3,
+      "text": "Open one skill file. The name and the description are always loaded. The body waits below the line."
+    },
+    {
+      "scene": 4,
+      "text": "Watch one description win. The match fires, and fourteen thousand tokens land at once."
+    },
+    {
+      "scene": 5,
+      "text": "Go one level deeper. The body points at files it will NOT read until the work actually needs them."
+    },
+    {
+      "scene": 6,
+      "text": "Now the other half. Skills are what the agent can do. Memory is what it knows about you."
+    },
+    {
+      "scene": 7,
+      "text": "Keep one fact per file. An index line loads every session. The fact itself waits to be relevant."
+    },
+    {
+      "scene": 8,
+      "text": "Watch a memory go bad. This one was true in March… and in August it is confidently wrong."
+    },
+    {
+      "scene": 9,
+      "text": "Sort it before you save it. Procedure becomes a skill. Anything the repo already records goes nowhere."
+    }
+  ],
+  "_shots": "None. The STATION STRIP register needs no Kling at all — EP15, EP16, EP17 and EP18 all shipped on graphics alone, and this episode is deliberately the most graphics-dense of the run.",
+  "shots": []
+}

@@ -1,0 +1,494 @@
+<template>
+  <style>
+@font-face{font-family:Figtree;src:url("assets/fonts/Figtree.woff2")format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:Manrope;src:url("assets/fonts/Manrope.woff2")format("woff2");font-weight:100 900;font-display:block}
+
+*{margin:0;padding:0;box-sizing:border-box}
+/* The console is square. Every corner, everywhere — no exceptions. */
+*{border-radius:0}
+#root{width:1920px;height:1080px;overflow:hidden;background:#F4F6F8;
+  font-family:Manrope,ui-sans-serif,system-ui,sans-serif;color:#16191D;
+  -webkit-font-smoothing:antialiased}
+
+/* ---- grounds -------------------------------------------------------------
+   Over-scanned by 18%: a frame whose seam enters from below 1.0 would
+   otherwise expose the stage edge. */
+.ground{position:absolute;inset:-18%}
+.g-paper{background:#F4F6F8}
+.g-app  {background:#F4F6F8}
+.g-bloom{background:#F4F6F8}
+
+/* The page substrate, straight out of DESIGN.md §4: a 5rem grid at ~6%, a top
+   light bleed, and noise. On paper the grid is ink, not white. */
+.grid{position:absolute;inset:-18%;
+  background-image:linear-gradient(rgba(16,24,40,0.12) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(16,24,40,0.12) 1px,transparent 1px);
+  background-size:80px 80px;opacity:0.40}
+.bleed{position:absolute;left:-18%;right:-18%;top:-18%;height:520px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0.92),rgba(255,255,255,0))}
+
+/* The one atmosphere the light console allows: a soft accent pool, never a
+   tint on the ground itself (DESIGN.md §2 — never tint the background). */
+.pool{position:absolute;width:1500px;height:1500px;
+  background:radial-gradient(circle,rgba(0,174,239,0.055) 0%,rgba(0,174,239,0.022) 42%,transparent 68%)}
+.pool-a{top:-560px;right:-380px}
+.pool-b{bottom:-620px;left:-300px}
+.pool-hot{opacity:1.8}
+
+/* Grain must MOVE. A static tile renders identical noise on all 4,200 frames,
+   which reads as dirt on the lens rather than as film. 3x oversized and
+   translated by the timeline. */
+/* 0.10, not the 0.42 a dark film wants. A multiply grain over PAPER darkens
+   the whole ground, and at dark-film strength it turned #F4F6F8 into a grey-blue
+   murk — the console stopped looking printed and started looking dirty. This is
+   the light-ground cousin of dimming a dark panel with opacity. */
+.grain{position:absolute;left:-640px;top:-360px;width:3200px;height:1800px;
+  opacity:0.10;pointer-events:none;mix-blend-mode:multiply;
+  background-image:url("assets/plates/noise.png");background-repeat:repeat}
+
+/* Paper takes a fraction of the vignette a dark frame does, and it has to stay
+   transparent much further out or the corners read as shadow on a white page. */
+.vig{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 92% 88% at 50% 46%,transparent 68%,rgba(16,24,40,0.035) 100%)}
+
+/* ---- type ----------------------------------------------------------------
+   Figtree 600 at -0.02em is the shipped headline, measured on /login and / .
+   Manrope carries everything else. Two families, no third. */
+.stage{position:absolute;inset:0}
+.inner{position:absolute;inset:0}
+
+.hdr{font-family:Figtree,sans-serif;font-weight:600;font-size:82px;line-height:1.05;
+  letter-spacing:-0.02em;color:#0B0D12}
+.hdr-xl{font-size:124px;line-height:1.02}
+.hdr-sm{font-size:56px}
+.lead{font-size:26px;line-height:1.55;color:#4B5563;max-width:820px}
+
+/* The eyebrow: uppercase Manrope 500 at 0.32em, muted. Every panel carries a
+   technical tag — DESIGN.md §10 makes that non-negotiable. */
+.tag{font-family:Manrope,sans-serif;font-weight:500;font-size:15px;
+  letter-spacing:0.32em;text-transform:uppercase;color:#575F6B}
+.tag-sm{font-size:12px;letter-spacing:0.22em}
+.tag-acc{color:#00AEEF}
+.num{font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
+.rule{height:1px;background:rgba(16,24,40,0.12);transform-origin:left center}
+
+/* ---- surfaces ------------------------------------------------------------
+   One white, one hairline, the bevel. Nothing carries a coloured edge:
+   colour belongs to the content, never to a container. */
+.panel{background:#FFFFFF;border:1px solid rgba(16,24,40,0.12);box-shadow:inset 0 1px 0 #fff, inset 0 -1px 0 rgba(16,24,40,0.06)}
+.frame{border:1px solid rgba(16,24,40,0.12)}
+.fill{background:rgba(16,24,40,0.035)}
+
+/* Corner brackets — four 8px L's inset at a frame's corners, purely
+   structural signage (DESIGN.md §5). */
+.br{position:absolute;width:10px;height:10px;pointer-events:none}
+.br-tl{left:-1px;top:-1px;border-left:1px solid #0090C8;border-top:1px solid #0090C8}
+.br-tr{right:-1px;top:-1px;border-right:1px solid #0090C8;border-top:1px solid #0090C8}
+.br-bl{left:-1px;bottom:-1px;border-left:1px solid #0090C8;border-bottom:1px solid #0090C8}
+.br-br{right:-1px;bottom:-1px;border-right:1px solid #0090C8;border-bottom:1px solid #0090C8}
+
+.chip{display:inline-flex;align-items:center;gap:10px;padding:11px 18px;
+  border:1px solid rgba(16,24,40,0.12);box-shadow:inset 0 1px 0 #fff, inset 0 -1px 0 rgba(16,24,40,0.06);background:#FFFFFF;
+  font-size:19px;color:#4B5563;white-space:nowrap}
+.chip-on{border-color:rgba(0,174,239,0.55);background:rgba(0,174,239,0.07);color:#00688F}
+.chip-sm{padding:7px 12px;font-size:15px}
+
+/* The match badge. The console really does fill this one with the accent —
+   verified on screen — so the film does too, and nothing else is filled. */
+.badge{display:inline-block;padding:7px 13px;background:#00AEEF;color:#fff;
+  font-size:17px;font-weight:600}
+
+/* The axis chip: a tinted mark carrying identity, the value in ink. */
+.ax{display:inline-flex;align-items:center;gap:9px;padding:7px 13px;font-size:19px;
+  border:1px solid;font-variant-numeric:tabular-nums}
+.ax b{font-weight:700;font-size:15px}
+
+/* The primary CTA is INK, never the accent (DESIGN.md §2). */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:16px;
+  padding:14px 28px;background:linear-gradient(to bottom,#2b3138,#16191d);color:#fff;
+  font-size:16px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
+
+/* The oversized macOS cursor. It is the film's only actor, so it is well over
+   life size — at 1:1 a pointer is invisible at this distance. */
+.cursor{position:absolute;width:54px;height:54px;pointer-events:none;z-index:90}
+</style>
+  <div id="root" data-composition-id="08-plan" data-start="0" data-width="1920" data-height="1080">
+    <div class="ground g-app"></div>
+    <div class="grid"></div>
+    <div class="bleed"></div>
+    <div class="pool pool-a"></div>
+    <div class="pool pool-b"></div>
+    <div id="plan-grain" class="grain"></div>
+    <div class="vig"></div>
+    <div id="stg7" class="stage"><div class="inner">
+      <div class="tag" id="s-tag" style="position:absolute;left:128px;top:116px">MODIFICATION PLAN</div>
+      <div class="rule" id="s-rule" style="position:absolute;left:128px;top:146px;width:230px"></div>
+      <div class="hdr" id="s-hdr" style="position:absolute;left:128px;top:174px;font-size:68px">It writes the job,<br/>then prices it.</div>
+      <div class="lead" id="s-lead" style="position:absolute;left:128px;top:346px;display:none"></div>
+
+      <div style="position:absolute;left:840px;top:130px;width:950px">
+        <div id="pl0" style="background:#FFFFFF;border:1px solid rgba(16,24,40,0.12);padding:34px 38px;margin-bottom:18px">
+          <div style="display:flex;align-items:baseline">
+            <span style="font-size:30px;font-weight:600;color:#0B0D12">CH-521510948-42</span>
+            <span class="num" style="margin-left:auto;font-size:26px;color:#00688F">rework 0.7 mm</span>
+          </div>
+          <div style="margin-top:22px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:16px">
+              <i id="pl0s0-d" style="width:7px;height:7px;background:#16191D;opacity:0"></i>
+              <span style="font-size:30px;color:#16191D"><div id="pl0s0" style="position:relative;display:inline-block;
+      font-size:30px;line-height:1.2;white-space:nowrap;color:#16191D"><span data-r="0" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="0" style="opacity:0">r</span><span data-r="1" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="1" style="opacity:0">a</span><span data-r="2" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="2" style="opacity:0">s</span><span data-r="3" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="3" style="opacity:0">p</span><span data-r="4" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="4" style="opacity:0">&nbsp;</span><span data-r="5" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="5" style="opacity:0">1</span><span data-r="6" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="6" style="opacity:0">m</span><span data-r="7" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="7" style="opacity:0">m</span><span data-r="8" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="8" style="opacity:0">&nbsp;</span><span data-r="9" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="9" style="opacity:0">g</span><span data-r="10" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="10" style="opacity:0">i</span><span data-r="11" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="11" style="opacity:0">r</span><span data-r="12" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="12" style="opacity:0">t</span><span data-r="13" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="13" style="opacity:0">h</span><span data-r="14" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span></div></span>
+            </div>
+          </div>
+        </div>
+        <div id="pl1" style="background:#FFFFFF;border:1px solid rgba(16,24,40,0.12);padding:34px 38px;margin-bottom:18px">
+          <div style="display:flex;align-items:baseline">
+            <span style="font-size:30px;font-weight:600;color:#0B0D12">CH-520510989-42</span>
+            <span class="num" style="margin-left:auto;font-size:26px;color:#00688F">rework 1.0 mm</span>
+          </div>
+          <div style="margin-top:22px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:16px">
+              <i id="pl1s0-d" style="width:7px;height:7px;background:#16191D;opacity:0"></i>
+              <span style="font-size:30px;color:#16191D"><div id="pl1s0" style="position:relative;display:inline-block;
+      font-size:30px;line-height:1.2;white-space:nowrap;color:#16191D"><span data-r="0" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="0" style="opacity:0">g</span><span data-r="1" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="1" style="opacity:0">r</span><span data-r="2" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="2" style="opacity:0">a</span><span data-r="3" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="3" style="opacity:0">d</span><span data-r="4" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="4" style="opacity:0">e</span><span data-r="5" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="5" style="opacity:0">&nbsp;</span><span data-r="6" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="6" style="opacity:0">u</span><span data-r="7" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="7" style="opacity:0">p</span><span data-r="8" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="8" style="opacity:0">&nbsp;</span><span data-r="9" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="9" style="opacity:0">3</span><span data-r="10" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="10" style="opacity:0">.</span><span data-r="11" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="11" style="opacity:0">8</span><span data-r="12" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="12" style="opacity:0">m</span><span data-r="13" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="13" style="opacity:0">m</span><span data-r="14" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span></div></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px">
+              <i id="pl1s1-d" style="width:7px;height:7px;background:#0090C8;opacity:0"></i>
+              <span style="font-size:30px;color:#0090C8"><div id="pl1s1" style="position:relative;display:inline-block;
+      font-size:30px;line-height:1.2;white-space:nowrap;color:#16191D"><span data-r="0" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="0" style="opacity:0">g</span><span data-r="1" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="1" style="opacity:0">i</span><span data-r="2" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="2" style="opacity:0">r</span><span data-r="3" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="3" style="opacity:0">t</span><span data-r="4" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="4" style="opacity:0">h</span><span data-r="5" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="5" style="opacity:0">&nbsp;</span><span data-r="6" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="6" style="opacity:0">l</span><span data-r="7" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="7" style="opacity:0">a</span><span data-r="8" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="8" style="opacity:0">n</span><span data-r="9" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="9" style="opacity:0">d</span><span data-r="10" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="10" style="opacity:0">s</span><span data-r="11" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="11" style="opacity:0">&nbsp;</span><span data-r="12" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="12" style="opacity:0">2</span><span data-r="13" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="13" style="opacity:0">5</span><span data-r="14" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="14" style="opacity:0">0</span><span data-r="15" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="15" style="opacity:0">.</span><span data-r="16" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="16" style="opacity:0">1</span><span data-r="17" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="17" style="opacity:0">&nbsp;</span><span data-r="18" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span><span data-c="18" style="opacity:0">✓</span><span data-r="19" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#0090C8;transform:translateY(5px)"></span></span></div></span>
+            </div>
+          </div>
+        </div>
+        <div id="pl2" style="background:#FFFFFF;border:1px solid rgba(16,24,40,0.12);padding:34px 38px;margin-bottom:18px">
+          <div style="display:flex;align-items:baseline">
+            <span style="font-size:30px;font-weight:600;color:#0B0D12">CH-524510775-42</span>
+            <span class="num" style="margin-left:auto;font-size:26px;color:#00688F">rework 1.2 mm</span>
+          </div>
+          <div style="margin-top:22px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:16px">
+              <i id="pl2s0-d" style="width:7px;height:7px;background:#BE185D;opacity:0"></i>
+              <span style="font-size:30px;color:#BE185D"><div id="pl2s0" style="position:relative;display:inline-block;
+      font-size:30px;line-height:1.2;white-space:nowrap;color:#16191D"><span data-r="0" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="0" style="opacity:0">p</span><span data-r="1" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="1" style="opacity:0">u</span><span data-r="2" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="2" style="opacity:0">t</span><span data-r="3" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="3" style="opacity:0">t</span><span data-r="4" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="4" style="opacity:0">y</span><span data-r="5" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="5" style="opacity:0">&nbsp;</span><span data-r="6" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="6" style="opacity:0">+</span><span data-r="7" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="7" style="opacity:0">0</span><span data-r="8" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="8" style="opacity:0">.</span><span data-r="9" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="9" style="opacity:0">5</span><span data-r="10" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="10" style="opacity:0">m</span><span data-r="11" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="11" style="opacity:0">m</span><span data-r="12" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="12" style="opacity:0">&nbsp;</span><span data-r="13" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="13" style="opacity:0">l</span><span data-r="14" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="14" style="opacity:0">e</span><span data-r="15" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="15" style="opacity:0">n</span><span data-r="16" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="16" style="opacity:0">g</span><span data-r="17" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="17" style="opacity:0">t</span><span data-r="18" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span><span data-c="18" style="opacity:0">h</span><span data-r="19" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#BE185D;transform:translateY(5px)"></span></span></div></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px">
+              <i id="pl2s1-d" style="width:7px;height:7px;background:#16191D;opacity:0"></i>
+              <span style="font-size:30px;color:#16191D"><div id="pl2s1" style="position:relative;display:inline-block;
+      font-size:30px;line-height:1.2;white-space:nowrap;color:#16191D"><span data-r="0" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="0" style="opacity:0">r</span><span data-r="1" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="1" style="opacity:0">a</span><span data-r="2" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="2" style="opacity:0">s</span><span data-r="3" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="3" style="opacity:0">p</span><span data-r="4" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="4" style="opacity:0">&nbsp;</span><span data-r="5" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="5" style="opacity:0">2</span><span data-r="6" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="6" style="opacity:0">m</span><span data-r="7" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="7" style="opacity:0">m</span><span data-r="8" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="8" style="opacity:0">&nbsp;</span><span data-r="9" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="9" style="opacity:0">g</span><span data-r="10" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="10" style="opacity:0">i</span><span data-r="11" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="11" style="opacity:0">r</span><span data-r="12" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="12" style="opacity:0">t</span><span data-r="13" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span><span data-c="13" style="opacity:0">h</span><span data-r="14" style="display:inline-block;width:0;overflow:visible;opacity:0;vertical-align:baseline"><span style="display:inline-block;width:2px;height:31px;background:#16191D;transform:translateY(5px)"></span></span></div></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:128px;top:600px;width:600px">
+        <div class="tag tag-sm" id="lg">THE COLOUR IS THE COST</div>
+        <div style="height:1px;background:rgba(16,24,40,0.12);margin:20px 0 26px"></div>
+        <div id="lg1" style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
+          <i style="width:9px;height:9px;background:#16191D"></i>
+          <span style="font-size:24px;color:#4B5563">rasp · grade — material comes off</span></div>
+        <div id="lg2" style="display:flex;align-items:center;gap:16px">
+          <i style="width:9px;height:9px;background:#BE185D"></i>
+          <span style="font-size:24px;color:#4B5563">putty — material goes back on, and costs about four times as much</span></div>
+      </div>
+    </div></div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function(){
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#stg7", { x: 300 }, { x: 0, duration: 0.43, ease: "power4.out" }, 0);
+      tl.fromTo("#plan-grain", { x: 0, y: 0 },
+        { x: -132, y: -74, duration: 10.23, ease: "none" }, 0);
+
+      tl.fromTo("#s-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.52, ease: "power3.out" }, 0.14);
+      tl.fromTo("#s-hdr",  { y: 16 }, { y: 0, duration: 0.56, ease: "power3.out" }, 0);
+      tl.fromTo("#s-lead", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.56, ease: "power3.out" }, 0.32);
+      tl.fromTo("#pl0", { x: 40 }, { x: 0, duration: 0.54, ease: "power3.out" }, 0.000);
+      tl.fromTo("#pl1", { x: 62 }, { x: 0, duration: 0.54, ease: "power3.out" }, 0.075);
+      tl.fromTo("#pl2", { x: 84 }, { x: 0, duration: 0.54, ease: "power3.out" }, 0.150);
+
+      tl.fromTo("#pl0s0-d", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.26, ease: "power3.out" }, 0.80);
+      tl.set("#pl0s0 [data-r='0']", { autoAlpha: 1 }, 1.000);
+      tl.set("#pl0s0 [data-c='0']", { autoAlpha: 1 }, 1.000);
+      tl.set("#pl0s0 [data-r='0']", { autoAlpha: 0 }, 1.000);
+      tl.set("#pl0s0 [data-r='1']", { autoAlpha: 1 }, 1.000);
+      tl.set("#pl0s0 [data-c='1']", { autoAlpha: 1 }, 1.059);
+      tl.set("#pl0s0 [data-r='1']", { autoAlpha: 0 }, 1.059);
+      tl.set("#pl0s0 [data-r='2']", { autoAlpha: 1 }, 1.059);
+      tl.set("#pl0s0 [data-c='2']", { autoAlpha: 1 }, 1.118);
+      tl.set("#pl0s0 [data-r='2']", { autoAlpha: 0 }, 1.118);
+      tl.set("#pl0s0 [data-r='3']", { autoAlpha: 1 }, 1.118);
+      tl.set("#pl0s0 [data-c='3']", { autoAlpha: 1 }, 1.176);
+      tl.set("#pl0s0 [data-r='3']", { autoAlpha: 0 }, 1.176);
+      tl.set("#pl0s0 [data-r='4']", { autoAlpha: 1 }, 1.176);
+      tl.set("#pl0s0 [data-c='4']", { autoAlpha: 1 }, 1.235);
+      tl.set("#pl0s0 [data-r='4']", { autoAlpha: 0 }, 1.235);
+      tl.set("#pl0s0 [data-r='5']", { autoAlpha: 1 }, 1.235);
+      tl.set("#pl0s0 [data-c='5']", { autoAlpha: 1 }, 1.294);
+      tl.set("#pl0s0 [data-r='5']", { autoAlpha: 0 }, 1.294);
+      tl.set("#pl0s0 [data-r='6']", { autoAlpha: 1 }, 1.294);
+      tl.set("#pl0s0 [data-c='6']", { autoAlpha: 1 }, 1.353);
+      tl.set("#pl0s0 [data-r='6']", { autoAlpha: 0 }, 1.353);
+      tl.set("#pl0s0 [data-r='7']", { autoAlpha: 1 }, 1.353);
+      tl.set("#pl0s0 [data-c='7']", { autoAlpha: 1 }, 1.412);
+      tl.set("#pl0s0 [data-r='7']", { autoAlpha: 0 }, 1.412);
+      tl.set("#pl0s0 [data-r='8']", { autoAlpha: 1 }, 1.412);
+      tl.set("#pl0s0 [data-c='8']", { autoAlpha: 1 }, 1.471);
+      tl.set("#pl0s0 [data-r='8']", { autoAlpha: 0 }, 1.471);
+      tl.set("#pl0s0 [data-r='9']", { autoAlpha: 1 }, 1.471);
+      tl.set("#pl0s0 [data-c='9']", { autoAlpha: 1 }, 1.529);
+      tl.set("#pl0s0 [data-r='9']", { autoAlpha: 0 }, 1.529);
+      tl.set("#pl0s0 [data-r='10']", { autoAlpha: 1 }, 1.529);
+      tl.set("#pl0s0 [data-c='10']", { autoAlpha: 1 }, 1.588);
+      tl.set("#pl0s0 [data-r='10']", { autoAlpha: 0 }, 1.588);
+      tl.set("#pl0s0 [data-r='11']", { autoAlpha: 1 }, 1.588);
+      tl.set("#pl0s0 [data-c='11']", { autoAlpha: 1 }, 1.647);
+      tl.set("#pl0s0 [data-r='11']", { autoAlpha: 0 }, 1.647);
+      tl.set("#pl0s0 [data-r='12']", { autoAlpha: 1 }, 1.647);
+      tl.set("#pl0s0 [data-c='12']", { autoAlpha: 1 }, 1.706);
+      tl.set("#pl0s0 [data-r='12']", { autoAlpha: 0 }, 1.706);
+      tl.set("#pl0s0 [data-r='13']", { autoAlpha: 1 }, 1.706);
+      tl.set("#pl0s0 [data-c='13']", { autoAlpha: 1 }, 1.765);
+      tl.set("#pl0s0 [data-r='13']", { autoAlpha: 0 }, 1.765);
+      tl.set("#pl0s0 [data-r='14']", { autoAlpha: 1 }, 1.765);
+      tl.set("#pl0s0 [data-r='14']", { autoAlpha: 0 }, 2.004);
+      tl.set("#pl0s0 [data-r='14']", { autoAlpha: 1 }, 2.304);
+      tl.set("#pl0s0 [data-r='14']", { autoAlpha: 0 }, 2.604);
+      tl.set("#pl0s0 [data-r='14']", { autoAlpha: 1 }, 2.904);
+      tl.set("#pl0s0 [data-r='14']", { autoAlpha: 0 }, 3.324);
+      tl.fromTo("#pl1s0-d", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.26, ease: "power3.out" }, 2.40);
+      tl.set("#pl1s0 [data-r='0']", { autoAlpha: 1 }, 2.600);
+      tl.set("#pl1s0 [data-c='0']", { autoAlpha: 1 }, 2.600);
+      tl.set("#pl1s0 [data-r='0']", { autoAlpha: 0 }, 2.600);
+      tl.set("#pl1s0 [data-r='1']", { autoAlpha: 1 }, 2.600);
+      tl.set("#pl1s0 [data-c='1']", { autoAlpha: 1 }, 2.659);
+      tl.set("#pl1s0 [data-r='1']", { autoAlpha: 0 }, 2.659);
+      tl.set("#pl1s0 [data-r='2']", { autoAlpha: 1 }, 2.659);
+      tl.set("#pl1s0 [data-c='2']", { autoAlpha: 1 }, 2.718);
+      tl.set("#pl1s0 [data-r='2']", { autoAlpha: 0 }, 2.718);
+      tl.set("#pl1s0 [data-r='3']", { autoAlpha: 1 }, 2.718);
+      tl.set("#pl1s0 [data-c='3']", { autoAlpha: 1 }, 2.776);
+      tl.set("#pl1s0 [data-r='3']", { autoAlpha: 0 }, 2.776);
+      tl.set("#pl1s0 [data-r='4']", { autoAlpha: 1 }, 2.776);
+      tl.set("#pl1s0 [data-c='4']", { autoAlpha: 1 }, 2.835);
+      tl.set("#pl1s0 [data-r='4']", { autoAlpha: 0 }, 2.835);
+      tl.set("#pl1s0 [data-r='5']", { autoAlpha: 1 }, 2.835);
+      tl.set("#pl1s0 [data-c='5']", { autoAlpha: 1 }, 2.894);
+      tl.set("#pl1s0 [data-r='5']", { autoAlpha: 0 }, 2.894);
+      tl.set("#pl1s0 [data-r='6']", { autoAlpha: 1 }, 2.894);
+      tl.set("#pl1s0 [data-c='6']", { autoAlpha: 1 }, 2.953);
+      tl.set("#pl1s0 [data-r='6']", { autoAlpha: 0 }, 2.953);
+      tl.set("#pl1s0 [data-r='7']", { autoAlpha: 1 }, 2.953);
+      tl.set("#pl1s0 [data-c='7']", { autoAlpha: 1 }, 3.012);
+      tl.set("#pl1s0 [data-r='7']", { autoAlpha: 0 }, 3.012);
+      tl.set("#pl1s0 [data-r='8']", { autoAlpha: 1 }, 3.012);
+      tl.set("#pl1s0 [data-c='8']", { autoAlpha: 1 }, 3.071);
+      tl.set("#pl1s0 [data-r='8']", { autoAlpha: 0 }, 3.071);
+      tl.set("#pl1s0 [data-r='9']", { autoAlpha: 1 }, 3.071);
+      tl.set("#pl1s0 [data-c='9']", { autoAlpha: 1 }, 3.129);
+      tl.set("#pl1s0 [data-r='9']", { autoAlpha: 0 }, 3.129);
+      tl.set("#pl1s0 [data-r='10']", { autoAlpha: 1 }, 3.129);
+      tl.set("#pl1s0 [data-c='10']", { autoAlpha: 1 }, 3.188);
+      tl.set("#pl1s0 [data-r='10']", { autoAlpha: 0 }, 3.188);
+      tl.set("#pl1s0 [data-r='11']", { autoAlpha: 1 }, 3.188);
+      tl.set("#pl1s0 [data-c='11']", { autoAlpha: 1 }, 3.247);
+      tl.set("#pl1s0 [data-r='11']", { autoAlpha: 0 }, 3.247);
+      tl.set("#pl1s0 [data-r='12']", { autoAlpha: 1 }, 3.247);
+      tl.set("#pl1s0 [data-c='12']", { autoAlpha: 1 }, 3.306);
+      tl.set("#pl1s0 [data-r='12']", { autoAlpha: 0 }, 3.306);
+      tl.set("#pl1s0 [data-r='13']", { autoAlpha: 1 }, 3.306);
+      tl.set("#pl1s0 [data-c='13']", { autoAlpha: 1 }, 3.365);
+      tl.set("#pl1s0 [data-r='13']", { autoAlpha: 0 }, 3.365);
+      tl.set("#pl1s0 [data-r='14']", { autoAlpha: 1 }, 3.365);
+      tl.set("#pl1s0 [data-r='14']", { autoAlpha: 0 }, 3.604);
+      tl.set("#pl1s0 [data-r='14']", { autoAlpha: 1 }, 3.904);
+      tl.set("#pl1s0 [data-r='14']", { autoAlpha: 0 }, 4.204);
+      tl.set("#pl1s0 [data-r='14']", { autoAlpha: 1 }, 4.504);
+      tl.set("#pl1s0 [data-r='14']", { autoAlpha: 0 }, 4.924);
+      tl.fromTo("#pl1s1-d", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.26, ease: "power3.out" }, 3.85);
+      tl.set("#pl1s1 [data-r='0']", { autoAlpha: 1 }, 4.050);
+      tl.set("#pl1s1 [data-c='0']", { autoAlpha: 1 }, 4.050);
+      tl.set("#pl1s1 [data-r='0']", { autoAlpha: 0 }, 4.050);
+      tl.set("#pl1s1 [data-r='1']", { autoAlpha: 1 }, 4.050);
+      tl.set("#pl1s1 [data-c='1']", { autoAlpha: 1 }, 4.109);
+      tl.set("#pl1s1 [data-r='1']", { autoAlpha: 0 }, 4.109);
+      tl.set("#pl1s1 [data-r='2']", { autoAlpha: 1 }, 4.109);
+      tl.set("#pl1s1 [data-c='2']", { autoAlpha: 1 }, 4.168);
+      tl.set("#pl1s1 [data-r='2']", { autoAlpha: 0 }, 4.168);
+      tl.set("#pl1s1 [data-r='3']", { autoAlpha: 1 }, 4.168);
+      tl.set("#pl1s1 [data-c='3']", { autoAlpha: 1 }, 4.226);
+      tl.set("#pl1s1 [data-r='3']", { autoAlpha: 0 }, 4.226);
+      tl.set("#pl1s1 [data-r='4']", { autoAlpha: 1 }, 4.226);
+      tl.set("#pl1s1 [data-c='4']", { autoAlpha: 1 }, 4.285);
+      tl.set("#pl1s1 [data-r='4']", { autoAlpha: 0 }, 4.285);
+      tl.set("#pl1s1 [data-r='5']", { autoAlpha: 1 }, 4.285);
+      tl.set("#pl1s1 [data-c='5']", { autoAlpha: 1 }, 4.344);
+      tl.set("#pl1s1 [data-r='5']", { autoAlpha: 0 }, 4.344);
+      tl.set("#pl1s1 [data-r='6']", { autoAlpha: 1 }, 4.344);
+      tl.set("#pl1s1 [data-c='6']", { autoAlpha: 1 }, 4.403);
+      tl.set("#pl1s1 [data-r='6']", { autoAlpha: 0 }, 4.403);
+      tl.set("#pl1s1 [data-r='7']", { autoAlpha: 1 }, 4.403);
+      tl.set("#pl1s1 [data-c='7']", { autoAlpha: 1 }, 4.462);
+      tl.set("#pl1s1 [data-r='7']", { autoAlpha: 0 }, 4.462);
+      tl.set("#pl1s1 [data-r='8']", { autoAlpha: 1 }, 4.462);
+      tl.set("#pl1s1 [data-c='8']", { autoAlpha: 1 }, 4.521);
+      tl.set("#pl1s1 [data-r='8']", { autoAlpha: 0 }, 4.521);
+      tl.set("#pl1s1 [data-r='9']", { autoAlpha: 1 }, 4.521);
+      tl.set("#pl1s1 [data-c='9']", { autoAlpha: 1 }, 4.579);
+      tl.set("#pl1s1 [data-r='9']", { autoAlpha: 0 }, 4.579);
+      tl.set("#pl1s1 [data-r='10']", { autoAlpha: 1 }, 4.579);
+      tl.set("#pl1s1 [data-c='10']", { autoAlpha: 1 }, 4.638);
+      tl.set("#pl1s1 [data-r='10']", { autoAlpha: 0 }, 4.638);
+      tl.set("#pl1s1 [data-r='11']", { autoAlpha: 1 }, 4.638);
+      tl.set("#pl1s1 [data-c='11']", { autoAlpha: 1 }, 4.697);
+      tl.set("#pl1s1 [data-r='11']", { autoAlpha: 0 }, 4.697);
+      tl.set("#pl1s1 [data-r='12']", { autoAlpha: 1 }, 4.697);
+      tl.set("#pl1s1 [data-c='12']", { autoAlpha: 1 }, 4.756);
+      tl.set("#pl1s1 [data-r='12']", { autoAlpha: 0 }, 4.756);
+      tl.set("#pl1s1 [data-r='13']", { autoAlpha: 1 }, 4.756);
+      tl.set("#pl1s1 [data-c='13']", { autoAlpha: 1 }, 4.815);
+      tl.set("#pl1s1 [data-r='13']", { autoAlpha: 0 }, 4.815);
+      tl.set("#pl1s1 [data-r='14']", { autoAlpha: 1 }, 4.815);
+      tl.set("#pl1s1 [data-c='14']", { autoAlpha: 1 }, 4.874);
+      tl.set("#pl1s1 [data-r='14']", { autoAlpha: 0 }, 4.874);
+      tl.set("#pl1s1 [data-r='15']", { autoAlpha: 1 }, 4.874);
+      tl.set("#pl1s1 [data-c='15']", { autoAlpha: 1 }, 4.932);
+      tl.set("#pl1s1 [data-r='15']", { autoAlpha: 0 }, 4.932);
+      tl.set("#pl1s1 [data-r='16']", { autoAlpha: 1 }, 4.932);
+      tl.set("#pl1s1 [data-c='16']", { autoAlpha: 1 }, 4.991);
+      tl.set("#pl1s1 [data-r='16']", { autoAlpha: 0 }, 4.991);
+      tl.set("#pl1s1 [data-r='17']", { autoAlpha: 1 }, 4.991);
+      tl.set("#pl1s1 [data-c='17']", { autoAlpha: 1 }, 5.050);
+      tl.set("#pl1s1 [data-r='17']", { autoAlpha: 0 }, 5.050);
+      tl.set("#pl1s1 [data-r='18']", { autoAlpha: 1 }, 5.050);
+      tl.set("#pl1s1 [data-c='18']", { autoAlpha: 1 }, 5.109);
+      tl.set("#pl1s1 [data-r='18']", { autoAlpha: 0 }, 5.109);
+      tl.set("#pl1s1 [data-r='19']", { autoAlpha: 1 }, 5.109);
+      tl.set("#pl1s1 [data-r='19']", { autoAlpha: 0 }, 5.348);
+      tl.set("#pl1s1 [data-r='19']", { autoAlpha: 1 }, 5.648);
+      tl.set("#pl1s1 [data-r='19']", { autoAlpha: 0 }, 5.948);
+      tl.set("#pl1s1 [data-r='19']", { autoAlpha: 1 }, 6.248);
+      tl.set("#pl1s1 [data-r='19']", { autoAlpha: 0 }, 6.668);
+      tl.fromTo("#pl2s0-d", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.26, ease: "power3.out" }, 5.15);
+      tl.set("#pl2s0 [data-r='0']", { autoAlpha: 1 }, 5.350);
+      tl.set("#pl2s0 [data-c='0']", { autoAlpha: 1 }, 5.350);
+      tl.set("#pl2s0 [data-r='0']", { autoAlpha: 0 }, 5.350);
+      tl.set("#pl2s0 [data-r='1']", { autoAlpha: 1 }, 5.350);
+      tl.set("#pl2s0 [data-c='1']", { autoAlpha: 1 }, 5.409);
+      tl.set("#pl2s0 [data-r='1']", { autoAlpha: 0 }, 5.409);
+      tl.set("#pl2s0 [data-r='2']", { autoAlpha: 1 }, 5.409);
+      tl.set("#pl2s0 [data-c='2']", { autoAlpha: 1 }, 5.468);
+      tl.set("#pl2s0 [data-r='2']", { autoAlpha: 0 }, 5.468);
+      tl.set("#pl2s0 [data-r='3']", { autoAlpha: 1 }, 5.468);
+      tl.set("#pl2s0 [data-c='3']", { autoAlpha: 1 }, 5.526);
+      tl.set("#pl2s0 [data-r='3']", { autoAlpha: 0 }, 5.526);
+      tl.set("#pl2s0 [data-r='4']", { autoAlpha: 1 }, 5.526);
+      tl.set("#pl2s0 [data-c='4']", { autoAlpha: 1 }, 5.585);
+      tl.set("#pl2s0 [data-r='4']", { autoAlpha: 0 }, 5.585);
+      tl.set("#pl2s0 [data-r='5']", { autoAlpha: 1 }, 5.585);
+      tl.set("#pl2s0 [data-c='5']", { autoAlpha: 1 }, 5.644);
+      tl.set("#pl2s0 [data-r='5']", { autoAlpha: 0 }, 5.644);
+      tl.set("#pl2s0 [data-r='6']", { autoAlpha: 1 }, 5.644);
+      tl.set("#pl2s0 [data-c='6']", { autoAlpha: 1 }, 5.703);
+      tl.set("#pl2s0 [data-r='6']", { autoAlpha: 0 }, 5.703);
+      tl.set("#pl2s0 [data-r='7']", { autoAlpha: 1 }, 5.703);
+      tl.set("#pl2s0 [data-c='7']", { autoAlpha: 1 }, 5.762);
+      tl.set("#pl2s0 [data-r='7']", { autoAlpha: 0 }, 5.762);
+      tl.set("#pl2s0 [data-r='8']", { autoAlpha: 1 }, 5.762);
+      tl.set("#pl2s0 [data-c='8']", { autoAlpha: 1 }, 5.821);
+      tl.set("#pl2s0 [data-r='8']", { autoAlpha: 0 }, 5.821);
+      tl.set("#pl2s0 [data-r='9']", { autoAlpha: 1 }, 5.821);
+      tl.set("#pl2s0 [data-c='9']", { autoAlpha: 1 }, 5.879);
+      tl.set("#pl2s0 [data-r='9']", { autoAlpha: 0 }, 5.879);
+      tl.set("#pl2s0 [data-r='10']", { autoAlpha: 1 }, 5.879);
+      tl.set("#pl2s0 [data-c='10']", { autoAlpha: 1 }, 5.938);
+      tl.set("#pl2s0 [data-r='10']", { autoAlpha: 0 }, 5.938);
+      tl.set("#pl2s0 [data-r='11']", { autoAlpha: 1 }, 5.938);
+      tl.set("#pl2s0 [data-c='11']", { autoAlpha: 1 }, 5.997);
+      tl.set("#pl2s0 [data-r='11']", { autoAlpha: 0 }, 5.997);
+      tl.set("#pl2s0 [data-r='12']", { autoAlpha: 1 }, 5.997);
+      tl.set("#pl2s0 [data-c='12']", { autoAlpha: 1 }, 6.056);
+      tl.set("#pl2s0 [data-r='12']", { autoAlpha: 0 }, 6.056);
+      tl.set("#pl2s0 [data-r='13']", { autoAlpha: 1 }, 6.056);
+      tl.set("#pl2s0 [data-c='13']", { autoAlpha: 1 }, 6.115);
+      tl.set("#pl2s0 [data-r='13']", { autoAlpha: 0 }, 6.115);
+      tl.set("#pl2s0 [data-r='14']", { autoAlpha: 1 }, 6.115);
+      tl.set("#pl2s0 [data-c='14']", { autoAlpha: 1 }, 6.174);
+      tl.set("#pl2s0 [data-r='14']", { autoAlpha: 0 }, 6.174);
+      tl.set("#pl2s0 [data-r='15']", { autoAlpha: 1 }, 6.174);
+      tl.set("#pl2s0 [data-c='15']", { autoAlpha: 1 }, 6.232);
+      tl.set("#pl2s0 [data-r='15']", { autoAlpha: 0 }, 6.232);
+      tl.set("#pl2s0 [data-r='16']", { autoAlpha: 1 }, 6.232);
+      tl.set("#pl2s0 [data-c='16']", { autoAlpha: 1 }, 6.291);
+      tl.set("#pl2s0 [data-r='16']", { autoAlpha: 0 }, 6.291);
+      tl.set("#pl2s0 [data-r='17']", { autoAlpha: 1 }, 6.291);
+      tl.set("#pl2s0 [data-c='17']", { autoAlpha: 1 }, 6.350);
+      tl.set("#pl2s0 [data-r='17']", { autoAlpha: 0 }, 6.350);
+      tl.set("#pl2s0 [data-r='18']", { autoAlpha: 1 }, 6.350);
+      tl.set("#pl2s0 [data-c='18']", { autoAlpha: 1 }, 6.409);
+      tl.set("#pl2s0 [data-r='18']", { autoAlpha: 0 }, 6.409);
+      tl.set("#pl2s0 [data-r='19']", { autoAlpha: 1 }, 6.409);
+      tl.set("#pl2s0 [data-r='19']", { autoAlpha: 0 }, 6.648);
+      tl.set("#pl2s0 [data-r='19']", { autoAlpha: 1 }, 6.948);
+      tl.set("#pl2s0 [data-r='19']", { autoAlpha: 0 }, 7.248);
+      tl.set("#pl2s0 [data-r='19']", { autoAlpha: 1 }, 7.548);
+      tl.set("#pl2s0 [data-r='19']", { autoAlpha: 0 }, 7.968);
+      tl.fromTo("#pl2s1-d", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.26, ease: "power3.out" }, 6.40);
+      tl.set("#pl2s1 [data-r='0']", { autoAlpha: 1 }, 6.600);
+      tl.set("#pl2s1 [data-c='0']", { autoAlpha: 1 }, 6.600);
+      tl.set("#pl2s1 [data-r='0']", { autoAlpha: 0 }, 6.600);
+      tl.set("#pl2s1 [data-r='1']", { autoAlpha: 1 }, 6.600);
+      tl.set("#pl2s1 [data-c='1']", { autoAlpha: 1 }, 6.659);
+      tl.set("#pl2s1 [data-r='1']", { autoAlpha: 0 }, 6.659);
+      tl.set("#pl2s1 [data-r='2']", { autoAlpha: 1 }, 6.659);
+      tl.set("#pl2s1 [data-c='2']", { autoAlpha: 1 }, 6.718);
+      tl.set("#pl2s1 [data-r='2']", { autoAlpha: 0 }, 6.718);
+      tl.set("#pl2s1 [data-r='3']", { autoAlpha: 1 }, 6.718);
+      tl.set("#pl2s1 [data-c='3']", { autoAlpha: 1 }, 6.776);
+      tl.set("#pl2s1 [data-r='3']", { autoAlpha: 0 }, 6.776);
+      tl.set("#pl2s1 [data-r='4']", { autoAlpha: 1 }, 6.776);
+      tl.set("#pl2s1 [data-c='4']", { autoAlpha: 1 }, 6.835);
+      tl.set("#pl2s1 [data-r='4']", { autoAlpha: 0 }, 6.835);
+      tl.set("#pl2s1 [data-r='5']", { autoAlpha: 1 }, 6.835);
+      tl.set("#pl2s1 [data-c='5']", { autoAlpha: 1 }, 6.894);
+      tl.set("#pl2s1 [data-r='5']", { autoAlpha: 0 }, 6.894);
+      tl.set("#pl2s1 [data-r='6']", { autoAlpha: 1 }, 6.894);
+      tl.set("#pl2s1 [data-c='6']", { autoAlpha: 1 }, 6.953);
+      tl.set("#pl2s1 [data-r='6']", { autoAlpha: 0 }, 6.953);
+      tl.set("#pl2s1 [data-r='7']", { autoAlpha: 1 }, 6.953);
+      tl.set("#pl2s1 [data-c='7']", { autoAlpha: 1 }, 7.012);
+      tl.set("#pl2s1 [data-r='7']", { autoAlpha: 0 }, 7.012);
+      tl.set("#pl2s1 [data-r='8']", { autoAlpha: 1 }, 7.012);
+      tl.set("#pl2s1 [data-c='8']", { autoAlpha: 1 }, 7.071);
+      tl.set("#pl2s1 [data-r='8']", { autoAlpha: 0 }, 7.071);
+      tl.set("#pl2s1 [data-r='9']", { autoAlpha: 1 }, 7.071);
+      tl.set("#pl2s1 [data-c='9']", { autoAlpha: 1 }, 7.129);
+      tl.set("#pl2s1 [data-r='9']", { autoAlpha: 0 }, 7.129);
+      tl.set("#pl2s1 [data-r='10']", { autoAlpha: 1 }, 7.129);
+      tl.set("#pl2s1 [data-c='10']", { autoAlpha: 1 }, 7.188);
+      tl.set("#pl2s1 [data-r='10']", { autoAlpha: 0 }, 7.188);
+      tl.set("#pl2s1 [data-r='11']", { autoAlpha: 1 }, 7.188);
+      tl.set("#pl2s1 [data-c='11']", { autoAlpha: 1 }, 7.247);
+      tl.set("#pl2s1 [data-r='11']", { autoAlpha: 0 }, 7.247);
+      tl.set("#pl2s1 [data-r='12']", { autoAlpha: 1 }, 7.247);
+      tl.set("#pl2s1 [data-c='12']", { autoAlpha: 1 }, 7.306);
+      tl.set("#pl2s1 [data-r='12']", { autoAlpha: 0 }, 7.306);
+      tl.set("#pl2s1 [data-r='13']", { autoAlpha: 1 }, 7.306);
+      tl.set("#pl2s1 [data-c='13']", { autoAlpha: 1 }, 7.365);
+      tl.set("#pl2s1 [data-r='13']", { autoAlpha: 0 }, 7.365);
+      tl.set("#pl2s1 [data-r='14']", { autoAlpha: 1 }, 7.365);
+      tl.set("#pl2s1 [data-r='14']", { autoAlpha: 0 }, 7.604);
+      tl.set("#pl2s1 [data-r='14']", { autoAlpha: 1 }, 7.904);
+      tl.set("#pl2s1 [data-r='14']", { autoAlpha: 0 }, 8.204);
+      tl.set("#pl2s1 [data-r='14']", { autoAlpha: 1 }, 8.504);
+      tl.set("#pl2s1 [data-r='14']", { autoAlpha: 0 }, 8.924);
+
+
+      tl.fromTo("#lg",  { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.44, ease: "power2.out" }, 5.10);
+      tl.fromTo("#lg1", { autoAlpha: 0, x: -16 }, { autoAlpha: 1, x: 0, duration: 0.46, ease: "power3.out" }, 5.28);
+      tl.fromTo("#lg2", { autoAlpha: 0, x: -16 }, { autoAlpha: 1, x: 0, duration: 0.46, ease: "power3.out" }, 5.46);
+
+      tl.to("#stg7", { x: -236, duration: 0.34, ease: "power4.in" }, 9.887);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["08-plan"] = tl;
+    })();
+  </script>
+</template>
